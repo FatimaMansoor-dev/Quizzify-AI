@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/styles.css">
+  <title>Document</title>
+</head>
+<body>
+
+  <div class="container">
+    <aside>
+      <!-- <img src="../static/blue.jpg" alt="Blue Background"> -->
+      <div class="title-overlay">
+        <h1>
+          <span class="bounce">Q</span>
+          <span class="bounce">U</span>
+          <span class="bounce">I</span>
+          <span class="bounce">Z</span>
+          <span class="bounce">I</span>
+          <span class="bounce">F</span>
+          <span class="bounce">Y</span>
+          <span class="bounce">-</span>
+          <span class="bounce">A</span>
+          <span class="bounce">I</span>
+        </h1>
+        <h2>Ace Your Next Exam Like a PRO!</h2>
+      </div>
+    </aside>
+    <main>
+      <div class="overlay">
+        <!-- <img src="../static/pink.jpg" alt="Pink Background"> -->
+        <!-- <img id="side" src="../static/side.png"> -->
+        <form class="login-form" id="auth-form">
+          <h2 id="form-title">Login</h2>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password">
+          <button type="submit" id="submit-button">Submit</button>
+          <p id="toggle-message">
+            Don't have an account? 
+            <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>
+          </p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const formTitle = document.getElementById('form-title');
+    const submitButton = document.getElementById('submit-button');
+    const toggleMessage = document.getElementById('toggle-message');
+
+    // Function to update the form UI
+    function toggleFormMode() {
+      if (formTitle.textContent === 'Login') {
+        formTitle.textContent = 'Sign Up';
+        submitButton.textContent = 'Sign Up';
+        toggleMessage.innerHTML = `Already have an account? 
+          <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Login</span>`;
+      } else {
+        formTitle.textContent = 'Login';
+        submitButton.textContent = 'Submit';
+        toggleMessage.innerHTML = `Don't have an account? 
+          <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>`;
+      }
+      attachToggleListener(); // Reattach the event listener to the new toggle link
+    }
+
+    // Function to attach the event listener to the toggle link
+    function attachToggleListener() {
+      const toggleAuthMode = document.getElementById('toggle-auth-mode');
+      toggleAuthMode.addEventListener('click', toggleFormMode);
+    }
+
+    // Initial event listener attachment
+    attachToggleListener();
+  </script>
+
+</body>
+</html>
