@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZIFY-AI</title>
+    <style>
+        /* Set the background image with gradient overlay */
+        body {
+            background-image: linear-gradient(
+                    rgba(0, 0, 0, 0.3), /* Top gradient with reduced opacity */
+                    rgba(0, 0, 0, 0.3)
+                ),
+                url('../static/bg.jpeg'); /* Adjust the path if necessary */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Style the navbar */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+            display: flex;
+            align-items: center; /* Center align vertically */
+            justify-content: space-between; /* Space between logo and user icon */
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 3.5rem; /* Make the text big */
+            color: rgb(28, 6, 109); /* Make the text purple */
+            text-decoration: none; /* Remove underline */
+            font-weight: bold;
+            display: flex;
+            align-items: center; /* Align text with image */
+        }
+
+        .navbar-brand img {
+            margin-right: 15px; /* Add space between the logo and text */
+            width: 100px; /* Increased size */
+            height: 100px; /* Increased size */
+        }
+
+        .navbar-brand:hover {
+            text-decoration: underline; /* Add underline on hover */
+        }
+
+        /* Style for the user button */
+        .user-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-button img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* Make the icon circular */
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sidebar-close:hover {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- Logo and title -->
+        <a class="navbar-brand" href="#">
+            <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
+            QUIZIFY-AI
+        </a>
+        
+        <!-- User button -->
+        <button class="user-button" onclick="openSidebar()">
+            <img src="../static/user.png" alt="User">
+        </button>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <button class="sidebar-close" onclick="closeSidebar()">×</button>
+        <div class="sidebar-content">
+            <h2>Name</h2>
+            <p>Welcome to your profile!</p>
+            <ul>
+                <li><a href="#">streak</a></li>
+                <li><a href="#">avg score</a></li>
+                <li><a href="#">last score</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function openSidebar() {
+            document.getElementById("sidebar").style.width = "300px";
+        }
+
+        function closeSidebar() {
+            document.getElementById("sidebar").style.width = "0";
+        }
+    </script>
+</body>
+</html>
