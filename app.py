@@ -94,7 +94,7 @@ def signup():
     except Exception as e:
         message = f"An error occurred: {e}"
 
-    return render_template('index.html', message=message)
+    return render_template('userProfile.html', message=message)
 
 if __name__ == '__main__':
     app.run(debug=True)
