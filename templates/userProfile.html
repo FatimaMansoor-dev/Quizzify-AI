@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QUIZIFY-AI</title>
     <style>
-        /* Set the background image with gradient overlay */
         body {
             background-color: rgb(0, 0, 0);
             background-size: cover;
@@ -16,37 +15,30 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Style the navbar */
         .navbar {
-        background-color: rgba(0, 0, 0, 0.8); /* Slightly transparent background */
-        display: flex;
-        align-items: center; /* Center align vertically */
-        justify-content: space-between; /* Space between logo and user icon */
-        padding: 10px 20px;
-    }
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
 
-    .navbar-brand {
-        font-size: 3.5rem; /* Make the text big */
-        color: rgb(28, 6, 109); /* Make the text purple */
-        text-decoration: none; /* Remove underline */
-        font-weight: bold;
-        display: flex;
-        align-items: center; /* Align text with image */
-        text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white, 0 0 30px white; /* Glowing effect */
-    }
-
+        .navbar-brand {
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+        }
 
         .navbar-brand img {
-            margin-right: 15px; /* Add space between the logo and text */
-            width: 100px; /* Increased size */
-            height: 100px; /* Increased size */
+            margin-right: 15px;
+            width: 100px;
+            height: 100px;
         }
 
-        .navbar-brand:hover {
-            text-decoration: underline; /* Add underline on hover */
-        }
-
-        /* Style for the user button */
         .user-button {
             background: none;
             border: none;
@@ -58,10 +50,9 @@
         .user-button img {
             width: 50px;
             height: 50px;
-            border-radius: 50%; /* Make the icon circular */
+            border-radius: 50%;
         }
 
-        /* Sidebar styles */
         .sidebar {
             height: 100%;
             width: 0;
@@ -95,97 +86,295 @@
             color: red;
         }
 
-        /* Streak Tracker Section */
         .streak-tracker {
-            margin: 20px auto;
+            color: #fff;
+            text-align: center;  /* Center align the content */
+            margin: 20px auto; /* Add margin to center the tracker */
+            padding: 20px;
+            border: 2px solid #fff;  /* Add border */
+            max-width: 85%; 
+            border-radius: 10px;  /* Optional: Add rounded corners */
+        }
+
+        .month-container {
+            flex: 0 0 auto;
+            width: 90px;  /* for months ka gap*/
+        }
+
+        .month-label {
             text-align: center;
-            max-width: 900px;
-            padding: 15px;
+            color: #fff;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
         }
 
-        .streak-tracker h2 {
-            margin-bottom: 15px;
-            color: rgb(28, 6, 109);
-            font-size: 1.8rem;
+        .week-row {
+            display: grid;
+            grid-template-columns: repeat(7, 10px);  /*bw boxes*/
+            gap: 2px;
+            margin-bottom: 8px;
         }
 
-        /* Style for day boxes */
-.day {
-    width: 15px; /* Reduced width */
-    height: 15px; /* Reduced height */
-    border: 1px solid #4b0082; /* Thinner border */
-    border-radius: 2px; /* Smaller border-radius */
-    cursor: pointer;
+        .day {
+            width: 6px;
+            height: 7px;
+            border-radius: 3px;
+            background-color: transparent;
+            border: 2px solid #4b0082;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        #calendar {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .empty {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .day span {
+            display: none;
+        }
+        
+        
+        .horizontal-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Streak tracker month-row */
-.month-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 15px); /* Updated size for boxes */
-    gap: 0; /* Removed space between rows and columns */
-    justify-content: center;
-    margin-bottom: 0; /* Removed bottom margin */
+.badges, .speedometer-container {
+    background-color: black; /* Set the background to black */
+    border: 2px solid white; /* Add a white border */
+    box-shadow: none; /* Remove the box shadow */
+    color: white; /* Set the text color to white for better contrast */
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px; /* Keep rounded corners */
+    width: 48%; /* Ensure both blocks share space equally */
 }
+
+.badges h2, .speedometer-container h2 {
+    color: #4b0082;
+    text-align: center;
+}
+
+.speedometer-container {
+    text-align: center;
+}
+
+.semi-circle {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    border-radius: 100px 100px 0 0; /* This creates the semi-circle shape */
+    border: 10px solid #4b0082; /* Adjust the border color as needed */
+    background: none; /* No background fill */
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.gauge-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #4b0082;
+    z-index: 1;
+}
+
+.start {
+        background-color: #4b0082; /* Indigo color */
+        color: white;
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin-left: 35rem;
+    }
+
+    .start:hover {
+        background-color: #6932a8; /* Slightly lighter indigo on hover */
+        transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    .start:active {
+        transform: scale(0.95); /* Pressed effect */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Enhanced Sidebar */
+    .sidebar {
+        background: linear-gradient(135deg, #210768, #6a0dad); /* Gradient background */
+        color: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+        font-family: Arial, sans-serif;
+    }
+
+    .sidebar-content h2 {
+        color: rgb(15, 1, 1);
+        font-size: 1.5rem;
+    }
+
+    .sidebar-content ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar-content ul li {
+        margin: 10px 0;
+    }
+
+    .sidebar-content ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-content ul li a:hover {
+        text-decoration: underline;
+        color: #ffd700; /* Gold color */
+    }
+
+    .sidebar-close {
+        color: white;
+        font-size: 2rem;
+    }
+
+    .sidebar-close:hover {
+        color: #ff4500; /* OrangeRed on hover */
+    }
+
+    .sidebar-content img {
+    width: 150px; /* Adjust the width as needed */
+    height: 250px; 
+    margin-top: -4rem;
+}
+
 
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
-        <!-- Logo and title -->
         <a class="navbar-brand" href="#">
             <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
             QUIZIFY-AI
         </a>
-        
-        <!-- User button -->
+        <button class="start">Take Quiz</button>
         <button class="user-button" onclick="openSidebar()">
             <img src="../static/user.png" alt="User">
         </button>
     </nav>
 
-    <!-- Streak Tracker Section -->
     <div class="streak-tracker">
         <div id="calendar"></div>
     </div>
 
-    <!-- JavaScript code to generate the calendar -->
+   <!-- Container for both blocks -->
+<div class="horizontal-container">
+    <!-- Badges Block -->
+    <div class="badges">
+        <h2>Badges</h2>
+        <p>Here you will see your earned badges.</p>
+        <!-- Add badge images or icons here -->
+    </div>
+
+    <!-- Speedometer Block -->
+    <div class="speedometer-container">
+        <h2>Quizzes Taken</h2>
+        <div class="speedometer">
+            <div class="semi-circle">
+                <div class="gauge-text">
+                    <span id="quizzesTaken">10</span> <!-- This will dynamically update -->
+                </div>
+                <div class="semi-circle-border">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
     <script>
-        // Days in each month
         const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         const calendar = document.getElementById("calendar");
 
-        daysInMonth.forEach((days, monthIndex) => {
-            // Create a row for each month
-            const row = document.createElement("div");
-            row.className = "month-row";
+        const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let startingDayOfWeek = 2; // Assume Month 1 starts on Wednesday
 
-            for (let day = 1; day <= days; day++) {
-                const dayBox = document.createElement("div");
-                dayBox.className = "day";
-                dayBox.title = `Month ${monthIndex + 1}, Day ${day}`;
-                row.appendChild(dayBox);
+        daysInMonth.forEach((days, monthIndex) => {
+            const monthContainer = document.createElement("div");
+            monthContainer.className = "month-container";
+
+            const monthLabel = document.createElement("div");
+            monthLabel.className = "month-label";
+            monthLabel.innerText = monthNames[monthIndex]; // Use month name instead of number
+            monthContainer.appendChild(monthLabel);
+
+            let dayOfWeek = monthIndex === 0 ? startingDayOfWeek : (startingDayOfWeek % 7);
+
+            let week = document.createElement("div");
+            week.className = "week-row";
+
+            for (let i = 0; i < dayOfWeek; i++) {
+                const emptyBox = document.createElement("div");
+                emptyBox.className = "day empty";
+                week.appendChild(emptyBox);
             }
 
-            calendar.appendChild(row);
+            for (let day = 1; day <= days; day++) {
+                if (dayOfWeek === 7) {
+                    dayOfWeek = 0;
+                    monthContainer.appendChild(week);
+                    week = document.createElement("div");
+                    week.className = "week-row";
+                }
+
+                const dayBox = document.createElement("div");
+                dayBox.className = "day";
+                dayBox.title = `${monthNames[monthIndex]} ${day}`;
+
+                // Create a span element to hold the number and hide it
+                const dayText = document.createElement("span");
+                dayText.innerText = day;
+                dayBox.appendChild(dayText);
+
+                dayBox.addEventListener("click", () => {
+                    dayBox.classList.toggle("active");
+                });
+
+                week.appendChild(dayBox);
+                dayOfWeek++;
+            }
+
+            if (week.children.length > 0) {
+                monthContainer.appendChild(week);
+            }
+
+            calendar.appendChild(monthContainer);
+            startingDayOfWeek = (startingDayOfWeek + days) % 7;
         });
-    </script>
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <button class="sidebar-close" onclick="closeSidebar()">×</button>
-        <div class="sidebar-content">
-            <h2>Name</h2>
-            <p>Welcome to your profile!</p>
-            <ul>
-                <li><a href="#">streak</a></li>
-                <li><a href="#">avg score</a></li>
-                <li><a href="#">last score</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <script>
         function openSidebar() {
             document.getElementById("sidebar").style.width = "300px";
         }
@@ -194,5 +383,20 @@
             document.getElementById("sidebar").style.width = "0";
         }
     </script>
+
+    <div id="sidebar" class="sidebar">
+        <button class="sidebar-close" onclick="closeSidebar()">×</button>
+        <div class="sidebar-content">
+            <img src="../static/hold.png" alt="Sidebar Image">
+            <h2>Name</h2>
+            <p>Welcome to your profile!</p>
+            <ul>
+                <li><a href="#">Streak</a></li>
+                <li><a href="#">Avg Score</a></li>
+                <li><a href="#">Last Score</a></li>
+            </ul>
+        </div>
+        
+    </div>
 </body>
 </html>
