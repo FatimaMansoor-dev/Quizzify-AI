@@ -156,13 +156,24 @@
 
 .badges, .speedometer-container {
     background-color: black; /* Set the background to black */
-    border: 2px solid white; /* Add a white border */
+    border: 2px solid #fff; /* Add a white border */
     box-shadow: none; /* Remove the box shadow */
     color: white; /* Set the text color to white for better contrast */
     padding: 20px;
     margin: 20px;
     border-radius: 10px; /* Keep rounded corners */
     width: 48%; /* Ensure both blocks share space equally */
+}
+.badges, .speedometer-container, .streak-tracker {
+    background-color: black; /* Set the background to black */
+    border: 2px solid white; /* Add a white border */
+    box-shadow: none; /* Remove the box shadow */
+    color: white; /* Set the text color to white for better contrast */
+    padding: 20px;
+    margin: 20px auto; /* Center and add margin */
+    border-radius: 10px; /* Keep rounded corners */
+    max-width: 85%; /* Set a max width to match with the streak tracker */
+    text-align: center;
 }
 
 .badges h2, .speedometer-container h2 {
@@ -172,8 +183,8 @@
 
 .speedometer-container {
     text-align: center;
+    margin-left: 0.7rem;
 }
-
 .semi-circle {
     position: relative;
     width: 200px;
@@ -267,6 +278,99 @@
     height: 250px; 
     margin-top: -4rem;
 }
+@media (max-width: 768px) {
+  .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 8px 15px;
+    box-sizing: border-box; /* Include padding in the element's total width */
+  }
+
+  .navbar-brand {
+    font-size: 2rem; /* Reduce font size */
+    display: flex; /* Ensure proper alignment of logo and text */
+    align-items: center;
+  }
+
+  .navbar-brand img {
+    width: 80px; /* Adjust logo size */
+    height: 80px;
+    margin-right: 10px; /* Decrease space between logo and text */
+  }
+
+  .user-button img {
+    width: 40px; /* Adjust user image size */
+    height: 40px;
+  }
+
+  .start {
+    font-size: 1rem; /* Reduce button font size */
+    padding: 8px 16px;
+    margin-left: auto; /* Align properly for smaller screens */
+  }
+
+  .streak-tracker {
+    margin: 10px; /* Add margin around streak tracker */
+    padding: 8px; /* Add padding within the streak tracker */
+  }
+ 
+    .horizontal-container {
+        flex-direction: column; /* Stack sections vertically */
+        align-items: stretch; /* Ensure they occupy full width */
+        gap: 10px; 
+        
+    }
+
+    .badges, .speedometer-container {
+        width: 92%; 
+        margin: 10px; /* Add margin around streak tracker */
+        padding: 8px;/* Take full width in vertical layout */
+    }
+    
+}
+
+
+@media (max-width: 480px) {
+  .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 6px 2px; /* Even smaller padding */
+    box-sizing: border-box; /* Ensure padding is part of the width calculation */
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem; /* Further reduce font size */
+    display: flex;
+  }
+
+  .navbar-brand img {
+    width: 40px; /* Adjust logo size */
+    height: 40px;
+    margin-right: 1px; /* Further reduce the space for very small screens */
+  }
+
+  .user-button img {
+    width: 30px; /* Reduce user image size */
+    height: 30px;
+  }
+
+  .start {
+    font-size: 0.5rem; 
+    width: 70px;
+    height: 20px;
+  }
+
+  .streak-tracker {
+    margin: 8px; /* Adjust spacing for very small screens */
+    padding: 6px; /* Adjust internal padding for smaller screens */
+  }
+}
+
+.streak-tracker {
+  margin: 15px auto; /* Center with auto and provide top/bottom spacing */
+  padding: 12px; /* Add padding inside */
+  border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+  border-radius: 5px; /* Optional: Rounded corners */
+}
+
 
 
     </style>
