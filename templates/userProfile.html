@@ -232,16 +232,40 @@
 
     /* Enhanced Sidebar */
     .sidebar {
-        background: linear-gradient(135deg, #210768, #6a0dad); /* Gradient background */
+        background: linear-gradient(135deg, #210768, #493188); /* Gradient background */
         color: white;
         box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
         font-family: Arial, sans-serif;
     }
 
     .sidebar-content h2 {
-        color: rgb(15, 1, 1);
         font-size: 1.5rem;
     }
+    .sidebar-content h3 {
+        font-size: 1.5rem;
+        color: white;
+    }
+    .image-container {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+    margin: 20px;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgb(17, 5, 49);
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 2px 5px rgba(42, 5, 110, 0.7);
+    z-index: 1;
+    
+    margin-top: -6rem;
+}
+
 
     .sidebar-content ul {
         list-style: none;
@@ -337,7 +361,7 @@
   }
 
   .navbar-brand {
-    font-size: 1.2rem; /* Further reduce font size */
+    font-size: 1.5rem; /* Further reduce font size */
     display: flex;
   }
 
@@ -491,9 +515,14 @@
     <div id="sidebar" class="sidebar">
         <button class="sidebar-close" onclick="closeSidebar()">×</button>
         <div class="sidebar-content">
-            <img src="../static/hold.png" alt="Sidebar Image">
-            <h2>Name</h2>
-            <p>Welcome to your profile!</p>
+            <div class="image-container">
+                <img src="../static/hold.png" alt="Hold Image" class="background-image">
+                <div class="text-overlay">haiii</div>
+            </div>
+            
+            <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
+            
+            
             <ul>
                 <li><a href="#">Streak</a></li>
                 <li><a href="#">Avg Score</a></li>
