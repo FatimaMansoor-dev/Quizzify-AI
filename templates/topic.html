@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step-by-Step Quiz Input</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+        }
+
+        .navbar-brand img {
+            margin-right: 15px;
+            width: 100px;
+            height: 100px;
+        }
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2rem;
+            color: #4a41ff;
+            text-shadow: 0 0 4px #824aed;
+        }
+
+        .progress-bar {
+            width: 90%;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto 30px;
+        }
+
+        .progress {
+            height: 20px;
+            background: linear-gradient(90deg, #4a41ff, #824aed);
+            width: 0;
+            transition: width 0.5s;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #4a41ff;
+        }
+
+        label {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: block;
+            color: #ddd;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #4a41ff;
+            border-radius: 5px;
+            background: #1b0030;
+            color: #fff;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: #824aed;
+            box-shadow: 0 0 8px #4a41ff;
+        }
+
+        button {
+            width: 100px;
+            padding: 10px;
+            background: linear-gradient(90deg, #4a41ff, #824aed);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #824aed, #4a41ff);
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+
+            button {
+                width: 80px;
+                font-size: 0.9rem;
+            }
+            .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 8px 15px;
+    box-sizing: border-box; /* Include padding in the element's total width */
+  }
+
+  .navbar-brand {
+    font-size: 2rem; /* Reduce font size */
+    display: flex; /* Ensure proper alignment of logo and text */
+    align-items: center;
+  }
+
+  .navbar-brand img {
+    width: 80px; /* Adjust logo size */
+    height: 80px;
+    margin-right: 10px; /* Decrease space between logo and text */
+  }
+  .progress-bar {
+            margin-top: 5rem;
+        }
+        }
+        @media (max-width: 480px) {
+  .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 6px 2px; /* Even smaller padding */
+    box-sizing: border-box; /* Ensure padding is part of the width calculation */
+  }
+
+  .navbar-brand {
+    font-size: 1.7rem; /* Further reduce font size */
+    display: flex;
+  }
+
+  .navbar-brand img {
+    width: 40px; /* Adjust logo size */
+    height: 40px;
+    margin-right: 1px; /* Further reduce the space for very small screens */
+  }}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
+            QUIZIFY-AI
+        </a>
+        
+    </nav>
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+    <form id="quizForm">
+        <div class="step active" id="step1">
+            <label for="topic">Choose a Topic:</label>
+            <select id="topic" name="topic" required>
+                <option value="" disabled selected>Select a topic</option>
+                <option value="math">Math</option>
+                <option value="science">Science</option>
+                <option value="history">History</option>
+                <option value="literature">Literature</option>
+            </select>
+            <div style="text-align: center;">
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+        <div class="step" id="step2">
+            <label for="difficulty">Select Difficulty Level:</label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="" disabled selected>Select difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <div style="text-align: center;">
+                <button type="button" onclick="prevStep()">Previous</button>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+        <div class="step" id="step3">
+            <label for="questions">Number of Questions:</label>
+            <input type="number" id="questions" name="questions" min="1" max="50" required>
+            <div style="text-align: center;">
+                <button type="button" onclick="prevStep()">Previous</button>
+                <button type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        const steps = document.querySelectorAll(".step");
+        const progress = document.getElementById("progress");
+        let currentStep = 0;
+
+        function updateProgress() {
+            const progressPercentage = ((currentStep) / steps.length) * 100;
+            progress.style.width = progressPercentage + "%";
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length) {
+                steps[currentStep].classList.remove("active");
+                currentStep++;
+                steps[currentStep].classList.add("active");
+                updateProgress();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                steps[currentStep].classList.remove("active");
+                currentStep--;
+                steps[currentStep].classList.add("active");
+                updateProgress();
+            }
+        }
+
+        document.getElementById("quizForm").addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent form from refreshing the page
+
+    // Update progress to 100% (indicating submission)
+    currentStep = steps.length; // Set to the last step
+    updateProgress(); // Ensure the progress bar reflects the completion
+
+    // Collect form inputs
+    const topic = document.getElementById("topic").value;
+    const difficulty = document.getElementById("difficulty").value;
+    const questions = document.getElementById("questions").value;
+
+    // Prepare data for the Flask function
+    const data = {
+        topic: topic,
+        difficulty: difficulty,
+        questions: questions
+    };
+
+    try {
+        console.log("Sending request:", data);
+        const response = await fetch("/generateOnTopic", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        console.log("Response received:", response);
+        if (response.ok) {
+            // console.log('hii')
+            const result = await response.json();
+            alert(`Quiz generated successfully! ${result.message}`);
+        } else {
+            console.log("Response status:", response.status);
+            alert("Failed to generate quiz. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while generating the quiz.");
+    }
+});
+
+
+    </script>
+</body>
+</html>
