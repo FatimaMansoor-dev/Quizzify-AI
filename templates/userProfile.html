@@ -189,8 +189,7 @@
     position: relative;
     width: 200px;
     height: 100px;
-    border-radius: 100px 100px 0 0; /* This creates the semi-circle shape */
-    border: 10px solid #4b0082; /* Adjust the border color as needed */
+    border-radius: 100px 100px 0 0; 
     background: none; /* No background fill */
     margin: 0 auto;
     overflow: hidden;
@@ -302,6 +301,29 @@
     height: 250px; 
     margin-top: -4rem;
 }
+.semi-circle {
+        position: relative;
+        width: 200px;
+        height: 100px;
+        border-radius: 100px 100px 0 0;
+        background: linear-gradient(to top, #444, #777); /* Add gradient for gauge appearance */
+        margin: 0 auto;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Add some depth */
+    }
+
+    
+
+    .gauge-text {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.5rem;
+        color: #fff;
+        z-index: 3;
+    }
+    
 @media (max-width: 768px) {
   .navbar {
     width: 100%; /* Ensure navbar spans the full screen width */
@@ -361,7 +383,7 @@
   }
 
   .navbar-brand {
-    font-size: 1.5rem; /* Further reduce font size */
+    font-size: 1.7rem; /* Further reduce font size */
     display: flex;
   }
 
@@ -405,7 +427,8 @@
             <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
             QUIZIFY-AI
         </a>
-        <button class="start">Take Quiz</button>
+        <button class="start" onclick="window.location.href='/options?email={{ email }}'">Take Quiz</button>
+
         <button class="user-button" onclick="openSidebar()">
             <img src="../static/user.png" alt="User">
         </button>
@@ -420,96 +443,110 @@
     <!-- Badges Block -->
     <div class="badges">
         <h2>Badges</h2>
-        <p>Here you will see your earned badges.</p>
-        <!-- Add badge images or icons here -->
+        <p>{{ message }}😅</p>
     </div>
-
     <!-- Speedometer Block -->
     <div class="speedometer-container">
-        <h2>Quizzes Taken</h2>
-        <div class="speedometer">
-            <div class="semi-circle">
-                <div class="gauge-text">
-                    <span id="quizzesTaken">10</span> <!-- This will dynamically update -->
-                </div>
-                <div class="semi-circle-border">
-                    
-                </div>
-            </div>
+        <h2>Quizes Taken</h2>
+        <div class="semi-circle">
+            <div class="gauge-text">{{ quizes }}</div>
         </div>
     </div>
+
     
 </div>
 
+    <script> 
+    const highlightDate = "{{ quiz_attempts[0] }}";  // Extract the date (e.g., '2024-12-31')
+const [highlightYear, highlightMonth, highlightDay] = highlightDate.split('-');
+const highlightDateObject = new Date(highlightYear, highlightMonth - 1, highlightDay);  // Create a Date object from the string
 
-    <script>
-        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        const calendar = document.getElementById("calendar");
+console.log(highlightDate);  // Log the date to ensure it's correct
 
-        const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        let startingDayOfWeek = 2; // Assume Month 1 starts on Wednesday
+const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const calendar = document.getElementById("calendar");
 
-        daysInMonth.forEach((days, monthIndex) => {
-            const monthContainer = document.createElement("div");
-            monthContainer.className = "month-container";
+const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let startingDayOfWeek = 2; // Assume Month 1 starts on Wednesday
 
-            const monthLabel = document.createElement("div");
-            monthLabel.className = "month-label";
-            monthLabel.innerText = monthNames[monthIndex]; // Use month name instead of number
-            monthContainer.appendChild(monthLabel);
+daysInMonth.forEach((days, monthIndex) => {
+    const monthContainer = document.createElement("div");
+    monthContainer.className = "month-container";
 
-            let dayOfWeek = monthIndex === 0 ? startingDayOfWeek : (startingDayOfWeek % 7);
+    const monthLabel = document.createElement("div");
+    monthLabel.className = "month-label";
+    monthLabel.innerText = monthNames[monthIndex]; // Use month name instead of number
+    monthContainer.appendChild(monthLabel);
 
-            let week = document.createElement("div");
+    let dayOfWeek = monthIndex === 0 ? startingDayOfWeek : (startingDayOfWeek % 7);
+
+    let week = document.createElement("div");
+    week.className = "week-row";
+
+    for (let i = 0; i < dayOfWeek; i++) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "day empty";
+        week.appendChild(emptyBox);
+    }
+
+    for (let day = 1; day <= days; day++) {
+        if (dayOfWeek === 7) {
+            dayOfWeek = 0;
+            monthContainer.appendChild(week);
+            week = document.createElement("div");
             week.className = "week-row";
+        }
 
-            for (let i = 0; i < dayOfWeek; i++) {
-                const emptyBox = document.createElement("div");
-                emptyBox.className = "day empty";
-                week.appendChild(emptyBox);
-            }
+        const dayBox = document.createElement("div");
+        dayBox.className = "day";
+        dayBox.title = `${monthNames[monthIndex]} ${day}`;
 
-            for (let day = 1; day <= days; day++) {
-                if (dayOfWeek === 7) {
-                    dayOfWeek = 0;
-                    monthContainer.appendChild(week);
-                    week = document.createElement("div");
-                    week.className = "week-row";
-                }
+        // Check if the day matches the highlight date
+        const currentDay = new Date(highlightYear, monthIndex, day);
+        if (currentDay.getTime() === highlightDateObject.getTime()) {
+            dayBox.classList.add("highlight"); // Apply highlight class
+        }
 
-                const dayBox = document.createElement("div");
-                dayBox.className = "day";
-                dayBox.title = `${monthNames[monthIndex]} ${day}`;
+        // Create a span element to hold the number and hide it
+        const dayText = document.createElement("span");
+        dayText.innerText = day;
+        dayBox.appendChild(dayText);
 
-                // Create a span element to hold the number and hide it
-                const dayText = document.createElement("span");
-                dayText.innerText = day;
-                dayBox.appendChild(dayText);
-
-                dayBox.addEventListener("click", () => {
-                    dayBox.classList.toggle("active");
-                });
-
-                week.appendChild(dayBox);
-                dayOfWeek++;
-            }
-
-            if (week.children.length > 0) {
-                monthContainer.appendChild(week);
-            }
-
-            calendar.appendChild(monthContainer);
-            startingDayOfWeek = (startingDayOfWeek + days) % 7;
+        dayBox.addEventListener("click", () => {
+            dayBox.classList.toggle("active");
         });
 
-        function openSidebar() {
-            document.getElementById("sidebar").style.width = "300px";
-        }
+        week.appendChild(dayBox);
+        dayOfWeek++;
+    }
 
-        function closeSidebar() {
-            document.getElementById("sidebar").style.width = "0";
-        }
+    if (week.children.length > 0) {
+        monthContainer.appendChild(week);
+    }
+
+    calendar.appendChild(monthContainer);
+    startingDayOfWeek = (startingDayOfWeek + days) % 7;
+});
+
+// Add styles for the highlight date
+const style = document.createElement("style");
+style.innerHTML = `
+    .highlight {
+        background-color: #4b0082; 
+        color: white;
+        font-weight: bold;
+    }
+`;
+document.head.appendChild(style);
+
+function openSidebar() {
+    document.getElementById("sidebar").style.width = "300px";
+}
+
+function closeSidebar() {
+    document.getElementById("sidebar").style.width = "0";
+}
     </script>
 
     <div id="sidebar" class="sidebar">
