@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZIFY-AI</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+        }
+
+        .navbar-brand img {
+            margin-right: 15px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .user-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-button img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar-content {
+            padding: 20px;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sidebar-close:hover {
+            color: red;
+        }
+
+        .streak-tracker {
+            /* color: #fff; */
+            text-align: center;  /* Center align the content */
+            margin: 20px auto; /* Add margin to center the tracker */
+            padding: 20px;
+            border: 2px solid #2e0541;  /* Add border */
+            max-width: 85%; 
+            border-radius: 10px;  /* Optional: Add rounded corners */
+        }
+
+        .month-container {
+            flex: 0 0 auto;
+            width: 90px;  /* for months ka gap*/
+        }
+
+        .month-label {
+            text-align: center;
+            color: #fff;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+        }
+
+        .week-row {
+            display: grid;
+            grid-template-columns: repeat(7, 10px);  /*bw boxes*/
+            gap: 2px;
+            margin-bottom: 8px;
+        }
+
+        .day {
+            width: 6px;
+            height: 7px;
+            border-radius: 3px;
+            background-color: transparent;
+            border: 2px solid #010196;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        #calendar {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .empty {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .day span {
+            display: none;
+        }
+        
+        
+        .horizontal-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 20px auto;
+    max-width: 85%; 
+}
+
+.badges, .speedometer-container {
+    background-color: black; 
+    box-shadow: none; /* Remove the box shadow */
+    color: white; /* Set the text color to white for better contrast */
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px; /* Keep rounded corners */
+    width: 50%; /* Ensure both blocks share space equally */
+    border: 2px solid #2e0541;  /* Add border */
+    margin: 15px auto; /* Center with auto and provide top/bottom spacing */
+  padding: 12px; /* Add padding inside */
+  border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+  border-radius: 5px; /* Optional: Rounded corners */
+}
+
+
+.badges h2, .speedometer-container h2 {
+    color: #f8f8f8;
+    text-align: center;
+}
+
+.speedometer-container {
+    text-align: center;
+    margin-left: 0.7rem;
+}
+.semi-circle {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    border-radius: 100px 100px 0 0; 
+    background: none; /* No background fill */
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.gauge-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #4b0082;
+    z-index: 1;
+}
+
+.start {
+        background-color: #4b0082; /* Indigo color */
+        color: white;
+        font-size: 1.2rem;
+        padding: 10px auto;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin-left: 35rem;
+    }
+
+    .start:hover {
+        background-color: #6932a8; /* Slightly lighter indigo on hover */
+        transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    .start:active {
+        transform: scale(0.95); /* Pressed effect */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Enhanced Sidebar */
+    .sidebar {
+        background: linear-gradient(135deg, #210768, #493188); /* Gradient background */
+        color: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+        font-family: Arial, sans-serif;
+    }
+
+    .sidebar-content h2 {
+        font-size: 1.5rem;
+    }
+    .sidebar-content h3 {
+        font-size: 1.5rem;
+        color: white;
+    }
+    .image-container {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+    margin: 20px;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgb(17, 5, 49);
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 2px 5px rgba(42, 5, 110, 0.7);
+    z-index: 1;
+    
+    margin-top: -6rem;
+}
+
+
+    .sidebar-content ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar-content ul li {
+        margin: 10px 0;
+    }
+
+    .sidebar-content ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-content ul li a:hover {
+        text-decoration: underline;
+        color: #ffd700; /* Gold color */
+    }
+
+    .sidebar-close {
+        color: white;
+        font-size: 2rem;
+    }
+
+    .sidebar-close:hover {
+        color: #ff4500; /* OrangeRed on hover */
+    }
+
+    .sidebar-content img {
+    width: 150px; /* Adjust the width as needed */
+    height: 250px; 
+    margin-top: -4rem;
+}
+.semi-circle {
+        position: relative;
+        width: 200px;
+        height: 100px;
+        border-radius: 100px 100px 0 0;
+        background: linear-gradient(to top, #444, #777); /* Add gradient for gauge appearance */
+        margin: 0 auto;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Add some depth */
+    }
+
+    
+
+    .gauge-text {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.5rem;
+        color: #fff;
+        z-index: 3;
+    }
+    
+@media (max-width: 768px) {
+  .navbar {
+    margin-top: 1rem;
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 8px 15px;
+    box-sizing: border-box; /* Include padding in the element's total width */
+  }
+
+  .navbar-brand {
+    font-size: 2rem; /* Reduce font size */
+    display: flex; /* Ensure proper alignment of logo and text */
+    align-items: center;
+  }
+
+  .navbar-brand img {
+    width: 80px; /* Adjust logo size */
+    height: 80px;
+    margin-right: 10px; /* Decrease space between logo and text */
+  }
+
+  .user-button img {
+    width: 40px; /* Adjust user image size */
+    height: 40px;
+  }
+
+  .start {
+    font-size: 1rem; /* Reduce button font size */
+    padding: 8px 16px;
+    margin-left: auto; /* Align properly for smaller screens */
+  }
+
+  .streak-tracker {
+    margin: 10px; /* Add margin around streak tracker */
+    padding: 8px; /* Add padding within the streak tracker */
+    margin-top: 2rem;
+  }
+ 
+    .horizontal-container {
+        flex-direction: column; /* Stack sections vertically */
+        align-items: stretch; /* Ensure they occupy full width */
+        gap: 10px; 
+        
+    }
+
+    .badges, .speedometer-container {
+        width: 92%; 
+        margin: 10px; /* Add margin around streak tracker */
+        padding: 8px;/* Take full width in vertical layout */
+    }
+    
+}
+
+
+@media (max-width: 480px) {
+  .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 6px 2px; /* Even smaller padding */
+    box-sizing: border-box; /* Ensure padding is part of the width calculation */
+  }
+
+  .navbar-brand {
+    font-size: 1.7rem; /* Further reduce font size */
+    display: flex;
+  }
+
+  .navbar-brand img {
+    width: 40px; /* Adjust logo size */
+    height: 40px;
+    margin-right: 1px; /* Further reduce the space for very small screens */
+  }
+
+  .user-button img {
+    width: 30px; /* Reduce user image size */
+    height: 30px;
+  }
+
+  .start {
+    font-size: 0.5rem; 
+    width: 70px;
+    height: 20px;
+  }
+
+  .streak-tracker {
+    margin: 8px; /* Adjust spacing for very small screens */
+    padding: 6px; /* Adjust internal padding for smaller screens */
+  }
+  .badges, .speedometer-container {
+        margin-left: -7px;
+        width: 97%;
+    }
+
+  
+}
+
+.streak-tracker {
+  margin: 15px auto; /* Center with auto and provide top/bottom spacing */
+  padding: 12px; /* Add padding inside */
+  border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+  border-radius: 5px; /* Optional: Rounded corners */
+}
+
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
+            QUIZIFY-AI
+        </a>
+        <button class="start" onclick="window.location.href='/options?email={{ email }}'">Take Quiz</button>
+
+        <button class="user-button" onclick="openSidebar()">
+            <img src="../static/user.png" alt="User">
+        </button>
+    </nav>
+
+    <div class="streak-tracker">
+        <div id="calendar"></div>
+    </div>
+
+   <!-- Container for both blocks -->
+   <div class="horizontal-container">
+    <!-- Badges Block -->
+    <div class="badges">
+        <h2>Badges</h2>
+        <p>{{ message }}😅</p>
+    </div>
+    <!-- Speedometer Block -->
+    <div class="speedometer-container">
+        <h2>Quizes Taken</h2>
+        <div class="semi-circle">
+            <div class="gauge-text">{{ quizes }}</div>
+        </div>
+    </div>
+</div>
+<div id="quizAttemptsData" data-quiz-attempts='{{ quiz_attempts | tojson }}'></div>
+
+
+    <script> 
+   // Example: quiz_attempts is an array of date strings, e.g. ['2024-12-01', '2024-12-15']
+// const quizAttempts = {{ quiz_attempts|tojson }}; // Assuming this is passed from the backend as a list
+// const quizAttempts = [
+//     '2025-12-01',
+//     '2025-12-15',
+// ];
+const quizAttemptsElement = document.getElementById("quizAttemptsData");
+        const quizAttempts = JSON.parse(quizAttemptsElement.getAttribute("data-quiz-attempts"));
+        
+// Parse the dates in quiz_attempts to Date objects
+const highlightDates = quizAttempts.map(quizDate => {
+    const [year, month, day] = quizDate.split('-');
+    return new Date(year, month - 1, day); // Create Date objects
+});
+console.log(highlightDates);
+
+const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const calendar = document.getElementById("calendar");
+
+const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let startingDayOfWeek = 2; // Assume Month 1 starts on Wednesday
+
+daysInMonth.forEach((days, monthIndex) => {
+    const monthContainer = document.createElement("div");
+    monthContainer.className = "month-container";
+
+    const monthLabel = document.createElement("div");
+    monthLabel.className = "month-label";
+    monthLabel.innerText = monthNames[monthIndex]; // Use month name instead of number
+    monthContainer.appendChild(monthLabel);
+
+    let dayOfWeek = monthIndex === 0 ? startingDayOfWeek : (startingDayOfWeek % 7);
+
+    let week = document.createElement("div");
+    week.className = "week-row";
+
+    for (let i = 0; i < dayOfWeek; i++) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "day empty";
+        week.appendChild(emptyBox);
+    }
+
+    for (let day = 1; day <= days; day++) {
+        if (dayOfWeek === 7) {
+            dayOfWeek = 0;
+            monthContainer.appendChild(week);
+            week = document.createElement("div");
+            week.className = "week-row";
+        }
+
+        const dayBox = document.createElement("div");
+        dayBox.className = "day";
+        dayBox.title = `${monthNames[monthIndex]} ${day}`;
+
+        // Check if the day matches any highlight date
+        const currentDay = new Date(2025, monthIndex, day); // Use year 2024 (replace with dynamic year if needed)
+        if (highlightDates.some(date => date.getTime() === currentDay.getTime())) {
+            dayBox.classList.add("highlight"); // Apply highlight class
+        }
+
+        // Create a span element to hold the number and hide it
+        const dayText = document.createElement("span");
+        dayText.innerText = day;
+        dayBox.appendChild(dayText);
+
+        dayBox.addEventListener("click", () => {
+            dayBox.classList.toggle("active");
+        });
+
+        week.appendChild(dayBox);
+        dayOfWeek++;
+    }
+
+    if (week.children.length > 0) {
+        monthContainer.appendChild(week);
+    }
+
+    calendar.appendChild(monthContainer);
+    startingDayOfWeek = (startingDayOfWeek + days) % 7;
+});
+
+// Add styles for the highlight date
+const style = document.createElement("style");
+style.innerHTML = `
+    .highlight {
+        background-color: green; 
+        color: white;
+        font-weight: bold;
+    }
+`;
+document.head.appendChild(style);
+
+// streat tracker
+// Function to calculate and display the streak
+function calculateStreak(datesArray) {
+            if (datesArray.length === 0) {
+                return 0;
+            }
+
+            // Sort the dates in ascending order
+            datesArray.sort((a, b) => new Date(a) - new Date(b));
+
+            let streak = 1;
+            let maxStreak = 1;
+
+            for (let i = 1; i < datesArray.length; i++) {
+                const previousDate = new Date(datesArray[i - 1]);
+                const currentDate = new Date(datesArray[i]);
+                
+                // Check if dates are consecutive
+                const difference = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+                if (difference === 1) {
+                    streak++;
+                    maxStreak = Math.max(maxStreak, streak);
+                } else {
+                    streak = 1; // Reset streak on a gap
+                }
+            }
+            return maxStreak;
+        }
+
+        // Function to update the streak display
+        // function trackDates() {
+        //     const streak = calculateStreak(quizAttempts);
+        //     document.getElementById('streak-display').textContent = `Streak: ${streak} days`;
+        //     openSidebar();
+        // }
+        document.addEventListener("DOMContentLoaded", function () {
+    calculateStreak(quizAttempts)
+    document.getElementById("streakCount").textContent = streakCount;
+});
+
+
+function openSidebar() {
+    document.getElementById("sidebar").style.width = "300px";
+    const sidebar = document.getElementById('mySidebar');
+    const streakCount = calculateStreak(quizAttempts); // Example streak count; replace with actual logic to get the count
+    const streakTracker = document.getElementById('streakTracker');
+
+    // Directly set the text content
+    streakTracker.innerText = `Streak Count: ${streakCount} days`;
+
+    sidebar.style.width = '300px'; // Open the sidebar
+}
+
+function closeSidebar() {
+    document.getElementById("sidebar").style.width = "0";
+}
+
+    </script>
+
+    <div id="sidebar" class="sidebar">
+        <button class="sidebar-close" onclick="closeSidebar()">×</button>
+        <div class="sidebar-content">
+            <div class="image-container">
+                <img src="../static/hold.png" alt="Hold Image" class="background-image">
+                <div class="text-overlay">haiii</div>
+            </div>
+            
+            <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
+            <button class="sidebar-close" onclick="closeSidebar()">×</button>
+    <div class="sidebar-content">
+        <p id="streakTracker"></p>
+        <!-- Other sidebar content -->
+    </div>
+            <!-- Other Sidebar Content -->
+            
+            <ul>
+                <!-- <p id="streak-display">Streak: 0 days</p>
+                 -->
+                <li><a href="#">Avg Score</a></li>
+                <li><a href="#">Last Score</a></li>
+            </ul>
+            
+        </div>
+        
+    </div>
+</body>
+</html>

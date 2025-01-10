@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step-by-Step Quiz Input</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+        }
+
+        .navbar-brand img {
+            margin-right: 15px;
+            width: 100px;
+            height: 100px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2rem;
+            color: #4a41ff;
+            text-shadow: 0 0 4px #824aed;
+        }
+
+        .progress-bar {
+            width: 90%;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto 30px;
+        }
+
+        .progress {
+            height: 20px;
+            background: linear-gradient(90deg, #4a41ff, #824aed);
+            width: 0;
+            transition: width 0.5s;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #4a41ff;
+            padding-right: 45px;
+            margin-top: 7rem;
+        }
+
+        label {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: block;
+            color: #ddd;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #4a41ff;
+            border-radius: 5px;
+            background: #1b0030;
+            color: #fff;
+        }
+
+        .radio-group {
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            margin-right: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #824aed;
+            box-shadow: 0 0 8px #4a41ff;
+        }
+
+        button {
+            width: 100px;
+            padding: 10px;
+            background: linear-gradient(90deg, #4a41ff, #824aed);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #824aed, #4a41ff);
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 8px 15px;
+                box-sizing: border-box;
+            }
+
+            .navbar-brand {
+                font-size: 2rem;
+            }
+
+            .navbar-brand img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 6px 10px;
+            }
+
+            .navbar-brand {
+                font-size: 1.7rem;
+            }
+
+            .navbar-brand img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
+            QUIZIFY-AI
+        </a>
+    </nav>
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+    <form id="quizForm">
+        <!-- Step 1: Topic and Description -->
+        <div class="step active" id="step1">
+            <label for="topic">Deatiled Topic:</label>
+            <input type="text" id="topic" name="topic" placeholder="Enter topic and description" required>
+            <div style="text-align: center;">
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Question Type -->
+        <div class="step" id="step2">
+            <label>Choose Question Type:</label>
+            <div class="radio-group">
+                <label><input type="radio" name="questionType" value="MCQs" required> MCQs</label>
+                <label><input type="radio" name="questionType" value="GeneralQnA" required> General Q/A</label>
+            </div>
+            <div style="text-align: center;">
+                <button type="button" onclick="prevStep()">Previous</button>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Difficulty -->
+        <div class="step" id="step3">
+            <label for="difficulty">Select Difficulty Level:</label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="" disabled selected>Select difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <div style="text-align: center;">
+                <button type="button" onclick="prevStep()">Previous</button>
+                <button type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <div id="email-container" data-email="{{ email }}"></div>
+<script>
+    const emailElement = document.getElementById('email-container');
+    const email = emailElement.dataset.email;
+    console.log(email); // Logs the email value
+</script>
+    <script>
+        const steps = document.querySelectorAll(".step");
+        const progress = document.getElementById("progress");
+        let currentStep = 0;
+
+        function updateProgress() {
+            const progressPercentage = ((currentStep) / steps.length) * 100;
+            progress.style.width = progressPercentage + "%";
+        }
+
+        function nextStep() {
+    // Ensure required fields are checked before proceeding
+    const activeStep = steps[currentStep];
+    const inputs = activeStep.querySelectorAll("input[required], select[required]");
+    let allValid = true;
+
+    inputs.forEach(input => {
+        if (input.type === "radio") {
+            const name = input.name;
+            const radios = document.querySelectorAll(`input[name="${name}"]`);
+            const isAnyChecked = Array.from(radios).some(radio => radio.checked);
+            if (!isAnyChecked) {
+                alert(`Please select an option for "${name}"`);
+                allValid = false;
+            }
+        } else if (!input.checkValidity()) {
+            alert(`Please complete the "${input.name}" field.`);
+            allValid = false;
+        }
+    });
+
+    if (allValid) {
+        steps[currentStep].classList.remove("active");
+        currentStep++;
+        steps[currentStep].classList.add("active");
+        updateProgress();
+    }
+}
+
+        function prevStep() {
+            if (currentStep > 0) {
+                steps[currentStep].classList.remove("active");
+                currentStep--;
+                steps[currentStep].classList.add("active");
+                updateProgress();
+            }
+        }
+
+        document.getElementById("quizForm").addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent form from refreshing the page
+
+    // Update progress to 100% (indicating submission)
+    currentStep = steps.length; // Set to the last step
+    updateProgress(); // Ensure the progress bar reflects the completion
+
+    // Collect form inputs
+    const topic = document.getElementById("topic").value;
+    const type = document.querySelector('input[name="questionType"]:checked')?.value;
+    const difficulty = document.getElementById("difficulty").value;
+
+    // Prepare data for the Flask function
+    const data = {
+        topic: topic,
+        type: type,
+        difficulty: difficulty
+    };
+
+    try {
+        console.log("Sending request to /generateOnTopic:", data);
+        const response = await fetch("/generateOnTopic", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+
+            // Redirect to the /quiz route with the result message
+            const params = new URLSearchParams({
+                message: result.message // Pass the result message as a query parameter
+            });
+            params.append('email', email);
+
+// Redirect to the desired URL with the query string
+window.location.href = `/quiz?${params.toString()}`;
+        } else {
+            console.log("Response status:", response.status);
+            alert("Failed to generate quiz. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while generating the quiz.");
+    }
+});
+    </script>
+</body>
+</html>

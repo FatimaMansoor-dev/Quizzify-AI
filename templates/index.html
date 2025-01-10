@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/styles.css">
+  <title>QuizifyAI</title>
+</head>
+<body>
+  <div class="container">
+    <aside>
+      <div class="title-overlay">
+        <h1>
+          <span class="bounce">Q</span>
+          <span class="bounce">U</span>
+          <span class="bounce">I</span>
+          <span class="bounce">Z</span>
+          <span class="bounce">I</span>
+          <span class="bounce">F</span>
+          <span class="bounce">Y</span>
+          <span class="bounce">-</span>
+          <span class="bounce">A</span>
+          <span class="bounce">I</span>
+        </h1>
+        <h2>Ace Your Next Exam Like a PRO!</h2>
+      </div>
+    </aside>
+    <main>
+      <div class="overlay">
+        <!-- Form for Login/Signup -->
+        <form class="login-form" id="auth-form" action="/login" method="POST">
+          <h2 id="form-title">Login</h2>
+          
+          <!-- Display message -->
+          {% if message %}
+          <p id="message-box" style="color: red; text-align: center;">{{ message }}</p>
+          {% endif %}
+
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+          <label for="password">Password</label>
+          <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Enter your password" minlength="9" required>
+            <button type="button" class="toggle-password" id="toggle-password">🙈</button>
+          </div>
+          <button type="submit" id="submit-button">Submit</button>
+          <p id="toggle-message">
+            Don't have an account? 
+            <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>
+          </p>
+        </form>
+        
+        <script>
+          const formTitle = document.getElementById('form-title');
+          const authForm = document.getElementById('auth-form');
+          const toggleMessage = document.getElementById('toggle-message');
+
+          function toggleFormMode() {
+            if (formTitle.textContent === 'Login') {
+              formTitle.textContent = 'Sign Up';
+              authForm.action = '/signup'; // Update action to point to /signup
+              toggleMessage.innerHTML = `Already have an account? 
+                <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Login</span>`;
+            } else {
+              formTitle.textContent = 'Login';
+              authForm.action = '/login'; // Update action to point to /login
+              toggleMessage.innerHTML = `Don't have an account? 
+                <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>`;
+            }
+            attachToggleListener(); // Reattach the event listener
+          }
+
+          function attachToggleListener() {
+            const toggleAuthMode = document.getElementById('toggle-auth-mode');
+            toggleAuthMode.addEventListener('click', toggleFormMode);
+          }
+
+          attachToggleListener();
+
+          const togglePassword = document.getElementById('toggle-password');
+          const passwordField = document.getElementById('password');
+
+          togglePassword.addEventListener('click', () => {
+            // Toggle the type attribute between password and text
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            // Toggle the icon/text of the button
+            togglePassword.textContent = type === 'password' ? '🙈' : '👁️';
+          });
+        </script>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

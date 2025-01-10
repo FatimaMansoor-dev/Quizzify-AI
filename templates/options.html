@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz</title>
+    <style>
+        body {
+            background-color: black;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+        }
+
+        .navbar-brand img {
+            margin-right: 15px;
+            width: 100px;
+            height: 100px;
+        }
+
+        h1 {
+            margin: 20px 0;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .button-box {
+            width: 400px;
+            height: 400px;
+            border: 2px solid white;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .button {
+            background-size: contain;
+            width: 100%;
+            height: 90%;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            background-color: transparent;
+        }
+
+        .idea-button {
+            background: url('../static/idea.png') no-repeat center center;
+        }
+
+        .doc-button {
+            background: url('../static/doc.png') no-repeat center center;
+        }
+
+        .button:hover {
+            filter: brightness(1.2);
+        }
+
+        .label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .button-container {
+                flex-direction: column; /* Stack boxes vertically */
+            }
+
+            .button-box {
+                width: 90%; /* Make boxes smaller */
+                height: auto;
+                padding: 15px;
+            }
+
+            .button {
+                height: 60vw; /* Adjust button size relative to viewport width */
+            }
+
+            .label {
+                font-size: 1rem; /* Slightly smaller text size for labels */
+            }
+            .navbar {
+    width: 100%; /* Ensure navbar spans the full screen width */
+    padding: 6px 2px; /* Even smaller padding */
+    box-sizing: border-box; /* Ensure padding is part of the width calculation */
+  }
+
+  .navbar-brand {
+    font-size: 1.7rem; /* Further reduce font size */
+    display: flex;
+  }
+
+  .navbar-brand img {
+    width: 40px; /* Adjust logo size */
+    height: 40px;
+    margin-right: 1px; /* Further reduce the space for very small screens */
+  }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
+            QUIZIFY-AI
+        </a>
+    </nav>
+
+    <h1>Make Your Choice!</h1>
+
+    <div class="button-container">
+        <div class="button-box">
+            
+            <button class="button idea-button" onclick="window.location.href='/topic?email={{ email }}'"></button>
+            <div class="label">Quiz on Topic</div>
+        </div>
+        <div class="button-box">
+            <button class="button doc-button" onclick="window.location.href='/upload'"></button>
+
+            <div class="label">Quiz from Document</div>
+        </div>
+    </div>
+
+    
+</body>
+</html>
