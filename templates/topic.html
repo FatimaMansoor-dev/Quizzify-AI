@@ -297,9 +297,11 @@
 
             // Redirect to the /quiz route with the result message
             const params = new URLSearchParams({
-                message: result.message // Pass the result message as a query parameter
-            });
-            params.append('email', email);
+    message: result.message // Result message from the backend
+});
+params.append('email', email);
+
+console.log("Final query string:", params.toString());
 
 // Redirect to the desired URL with the query string
 window.location.href = `/quiz?${params.toString()}`;

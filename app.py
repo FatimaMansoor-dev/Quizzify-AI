@@ -158,148 +158,136 @@ def generate_on_topic():
     topic = data.get('topic')
     type = data.get('type')
     difficulty = data.get('difficulty')
+    print(topic)
 
-    prompt = f"""
-        Generate {difficulty} {type} based quiz on {topic} in this format:
-        **Question 1:**
-What is 2 + 2?
-A) 3
-B) 4
-C) 5
-D) 6
-**Answer:** B)
+    if type == 'MCQs':
+        prompt = f"""
+            Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic} in this format:
+            **Question 1:** [question]?
+    A) [option 1]
+    B) [option 2]
+    C) [option 3]
+    D) [option 4]
+    **Answer:** B)
 
-    """
+        """
 
-    try:
-        completion = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=[
-                {"role": "system", "content": "You are responsible to generate quiz"},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.3,
-            max_tokens=1024,
-            top_p=1,
-            stream=True,
-            stop=None,
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=[
+                    {"role": "system", "content": "You are responsible to generate quiz"},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.3,
+                max_tokens=1024,
+                top_p=1,
+                stream=True,
+                stop=None,
+            )
 
-        extended_answer = ""
-        for response_chunk in completion:
-            extended_answer += response_chunk.choices[0].delta.content or ""
-        print(extended_answer)
+            extended_answer = ""
+            for response_chunk in completion:
+                extended_answer += response_chunk.choices[0].delta.content or ""
+            print(extended_answer)
 
-        # Return the response as JSON
-        return jsonify({"message": extended_answer, "email": email})
+            # Return the response as JSON
+            return jsonify({"message": extended_answer, "email": email})
 
-    except Exception as e:
-        print(f"Error generating quiz: {e}")
-        return jsonify({"error": "An error occurred while generating the quiz."}), 500
+        except Exception as e:
+            print(f"Error generating quiz: {e}")
+            return jsonify({"error": "An error occurred while generating the quiz."}), 500
 
 @app.route('/quiz')
 def quiz():
+    print("Received query parameters:", request.args)
     # Retrieve the message from the query parameters
-    message = request.args.get('message', 'No quiz generated')
-    email = request.args.get('email','no email')
+    message = request.args.get('message', 'No message provided')
+    email = request.args.get('email', 'No email provided')
+
     print("eee", email)
+    print('qq', message)
     
     # Pass the message to the template
-    return render_template('quiz.html', message=message)
+    return render_template('quiz.html', message=message, email=email)
 
 
-@app.route('/insertResults', methods=['POST'])
+@app.route('/insertResults', methods=['POST', 'GET'])
 def insert_results():
-    # Get the JSON data from the request
-    data = request.json
-    email = data.get('email')
-    score = data.get('score')
-    total_questions = data.get('totalQuestions')
-    answers = data.get('answers')  # list of answers: [{'question': '', 'selectedAnswer': None, 'correctAnswer': 'C'}, ...]
+    if request.method == 'POST':
+        # Handle POST request
+        data = request.json
+        email = data.get('email')
+        score = data.get('score')
 
-    # Log the received data
-    print("Email:", email)
-    print("Score:", score)
-    print("Total Questions:", total_questions)
-    print("Answers:", answers)
+        print("Email:", email)
+        print("Score:", score)
 
-    # Ensure email is provided
-    if not email:
-        return jsonify({"error": "Email is required"}), 400
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
 
-    try:
-        # Fetch user data from Firebase
-        response = requests.get(FIREBASE_URL)
-        if response.status_code != 200:
-            return jsonify({"error": "Failed to fetch user data from Firebase"}), 500
+        try:
+            # Fetch user data from Firebase
+            response = requests.get(FIREBASE_URL)
+            if response.status_code != 200:
+                return jsonify({"error": "Failed to fetch user data from Firebase"}), 500
 
-        users = response.json()
-        user_id = None
-        user_data = None
+            users = response.json()
+            user_id = None
+            user_data = None
 
-        # Find the user by email
-        for uid, user in users.items():
-            if user["email"] == email:
-                user_id = uid
-                user_data = user
-                break
+            # Find the user by email
+            for uid, user in users.items():
+                if user["email"] == email:
+                    user_id = uid
+                    user_data = user
+                    break
 
-        if not user_data:
-            return jsonify({"error": "User not found"}), 404
+            if not user_data:
+                return jsonify({"error": "User not found"}), 404
 
-        # Add quiz score and date
-        from datetime import datetime
-        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Initialize quiz_attempts as a dictionary if it doesn't exist yet
-        quiz_attempts = user_data.get("quiz_attempts", [])
+            # Add quiz score and date
+            from datetime import datetime, timedelta
+            current_date = datetime.now() + timedelta(hours=2)
+            formatted_date = current_date.strftime("%Y-%m-%d %H:%M:%S")
 
-        # Create a new quiz attempt as a dictionary
-        new_quiz_attempt = {
-            "score": score,
-            "date": current_date,
-            "total_questions": total_questions,
-            "answers": answers  # Store answers as a list
-        }
+            # Add new quiz attempt
+            quiz_attempts = user_data.get("quiz_attempts", [])
+            quiz_attempts.append({"score": score, "date": formatted_date})
 
-        # Append the new quiz attempt to the list
-        quiz_attempts.append(new_quiz_attempt)
-
-        # Update the user data in Firebase
-        update_url = f"{FIREBASE_URL.replace('.json', '')}/{user_id}.json"
-        update_data = {"quiz_attempts": quiz_attempts}
-        update_response = requests.patch(update_url, json=update_data)
-
-        if update_response.status_code == 200:
-            # Process quiz attempts to remove time information from dates
-            quiz_dates = [attempt.get("date").split(" ")[0] for attempt in quiz_attempts if "date" in attempt]
-
-            # Extract first name, last name, and other user info
-            first_name = user_data.get("first_name", "User")
-            last_name = user_data.get("last_name", "")
-
-            # Check if there are any quiz attempts
-            if not quiz_dates:
-                message = "You are one quiz away from getting the 'First Step' badge."
-                quizes = 0
+            ## Update the user data in Firebase
+            update_url = f"{FIREBASE_URL.replace('.json', '')}/{user_id}.json"
+            update_data = {"quiz_attempts": quiz_attempts}
+            update_response = requests.patch(update_url, json=update_data)
+            if update_response.status_code == 200:
+                # Process quiz attempts to remove time information from dates
+                quiz_dates = [attempt.get("date").split(" ")[0] for attempt in quiz_attempts if "date" in attempt]
+                # Extract first name, last name, and other user info
+                first_name = user_data.get("first_name", "User")
+                last_name = user_data.get("last_name", "")
+                # Check if there are any quiz attempts
+                if not quiz_dates:
+                    message = "You are one quiz away from getting the 'First Step' badge."
+                    quizes = 0
+                else:
+                    message = "First-Step Badge"
+                    quizes = len(quiz_dates)
+                return jsonify({"error": "done done"}), 200  ## ab yahan se score pass krdo wapis udhr jaiyag wahan se user profile call krdo
+                # return render_template(
+                #     'userProfile.html',
+                #     message=message,
+                #     first_name=first_name,
+                #     last_name=last_name,
+                #     quizes=quizes,
+                #     email=email,
+                #     quiz_attempts=quiz_dates  # Pass the list of quiz attempt dates to the template
+                # )
             else:
-                message = "First-Step Badge"
-                quizes = len(quiz_dates)
+                return jsonify({"error": "Failed to update user data in Firebase"}), 500
+        except Exception as e:
+            print(f"Error storing quiz results: {e}")
+            return jsonify({"error": "An error occurred while storing quiz results"}), 500
 
-            return render_template(
-                'userProfile.html',
-                message=message,
-                first_name=first_name,
-                last_name=last_name,
-                quizes=quizes,
-                email=email,
-                quiz_attempts=quiz_dates  # Pass the list of quiz attempt dates to the template
-            )
-        else:
-            return jsonify({"error": "Failed to update user data in Firebase"}), 500
-    except Exception as e:
-        print(f"Error storing quiz results: {e}")
-        return jsonify({"error": "An error occurred while storing quiz results"}), 500
 
 @app.route('/userProfile', methods=['GET'])
 def user_profile():

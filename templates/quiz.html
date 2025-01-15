@@ -69,14 +69,13 @@
     </div>
 
     <script>
-        // Dynamic message with questions and answers
-        const message = localStorage.getItem("quizResultMessage");
-        // Extract email from query parameters
-const urlParams = new URLSearchParams(window.location.search);
-const email = urlParams.get("email");
+        // Get message and email from backend
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get("message") || "No quiz data provided.";
+        const email = urlParams.get("email") || "No email provided.";
 
-console.log("User email:", email); // Optional: Log the email
-
+        console.log("Received email:", email); // Debugging
+        console.log("Received quiz message:", message); // Debugging
 
         // Parse questions from the message
         function parseQuestions(message) {
@@ -104,107 +103,87 @@ console.log("User email:", email); // Optional: Log the email
 
         // Load quiz dynamically
         function loadQuiz() {
-    quizContainer.innerHTML = ""; // Clear any existing content
-
-    questions.forEach((q, index) => {
-        // Create a block for each question
-        const questionBlock = document.createElement("div");
-        questionBlock.classList.add("question-block");
-
-        // Add the question text
-        const questionText = document.createElement("p");
-        questionText.textContent = `${index + 1}. ${q.question}`;
-        questionBlock.appendChild(questionText);
-
-        // Add options
-        const optionsContainer = document.createElement("div");
-        optionsContainer.classList.add("options");
-        
-        q.options.forEach((option, i) => {
-            // Wrap each option in a label for better association
-            const label = document.createElement("label");
-            label.classList.add("option-label");
-
-            // Add radio input
-            const radioInput = document.createElement("input");
-            radioInput.type = "radio";
-            radioInput.name = `question${index}`; // Group by question
-            radioInput.value = String.fromCharCode(65 + i); // A, B, C, D
-
-            // Append radio and option text to the label
-            label.appendChild(radioInput);
-            label.appendChild(document.createTextNode(` ${option}`));
-
-            // Add label to the options container
-            optionsContainer.appendChild(label);
-        });
-
-        // Append options to the question block
-        questionBlock.appendChild(optionsContainer);
-
-        // Append the question block to the quiz container
-        quizContainer.appendChild(questionBlock);
-    });
-}
-
-
-        // Submit and evaluate quiz
-        // Submit and evaluate quiz
-        function submitQuiz() {
-    let score = 0;
-    const userAnswers = [];
-    questions.forEach((q, index) => {
-        const selectedOption = document.querySelector(
-            `input[name="question${index}"]:checked`
-        );
-        if (selectedOption) {
-            userAnswers.push({
-                question: q.question,
-                selectedAnswer: selectedOption.value,
-                correctAnswer: q.correctAnswer,
-            });
-            if (selectedOption.value === q.correctAnswer) {
-                score++;
-            }
-        } else {
-            userAnswers.push({
-                question: q.question,
-                selectedAnswer: null,
-                correctAnswer: q.correctAnswer,
+            questions.forEach((q, index) => {
+                const questionBlock = document.createElement("div");
+                questionBlock.innerHTML = `
+                    <div class="question">${index + 1}. ${q.question}</div>
+                    <div class="options">
+                        ${q.options
+                            .map(
+                                (option, i) => `
+                            <label>
+                                <input type="radio" name="question${index}" value="${String.fromCharCode(
+                                    65 + i
+                                )}" />
+                                ${option}
+                            </label>
+                        `
+                            )
+                            .join("")}
+                    </div>
+                `;
+                quizContainer.appendChild(questionBlock);
             });
         }
-    });
 
-    const resultContainer = document.getElementById("result");
-    resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
+        // Submit and evaluate quiz
+        function submitQuiz() {
+            let score = 0;
+            const userAnswers = [];
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(
+                    `input[name="question${index}"]:checked`
+                );
+                if (selectedOption) {
+                    userAnswers.push({
+                        question: q.question,
+                        selectedAnswer: selectedOption.value,
+                        correctAnswer: q.correctAnswer,
+                    });
+                    if (selectedOption.value === q.correctAnswer) {
+                        score++;
+                    }
+                } else {
+                    userAnswers.push({
+                        question: q.question,
+                        selectedAnswer: null,
+                        correctAnswer: q.correctAnswer,
+                    });
+                }
+            });
 
-    // Send result to the Flask route
-    fetch("/insertResults", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            score: score,
-            email: email,
-            totalQuestions: questions.length,
-            answers: userAnswers,
-        }),
-    })
-        .then((response) => {
-            if (response.ok) {
-                // Redirect to the user profile page
-                window.location.href = `/userProfile?email=${email}`;
-            } else {
-                console.error("Failed to send results to the server.");
-                resultContainer.textContent = "Failed to submit your quiz. Please try again.";
-            }
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-            resultContainer.textContent = "An error occurred. Please try again.";
-        });
-}
+            const resultContainer = document.getElementById("result");
+            resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
+
+            // Send result to the Flask route
+            fetch("/insertResults", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    score: score,
+                    email: email,
+                    totalQuestions: questions.length,
+                    answers: userAnswers,
+                }),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        // Redirect to the user profile page
+                        window.location.href = `/userProfile?email=${email}`;
+                    } else {
+                        console.error("Failed to send results to the server.");
+                        resultContainer.textContent =
+                            "Failed to submit your quiz. Please try again.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    resultContainer.textContent =
+                        "An error occurred. Please try again.";
+                });
+        }
 
         // Load the quiz on page load
         loadQuiz();
