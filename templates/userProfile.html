@@ -554,32 +554,40 @@ document.head.appendChild(style);
 
 // streat tracker
 // Function to calculate and display the streak
-function calculateStreak(datesArray) {
-            if (datesArray.length === 0) {
-                return 0;
-            }
+function calculateCurrentStreak(datesArray) {
+    if (!datesArray || datesArray.length === 0) {
+        return 0;
+    }
 
-            // Sort the dates in ascending order
-            datesArray.sort((a, b) => new Date(a) - new Date(b));
+    // Map the dates to YYYY-MM-DD strings, then filter out duplicates by converting to Set
+    const validDates = [...new Set(datesArray.map(date => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0); // Set time to midnight (ignoring time)
+        return d.toISOString().split('T')[0]; // Convert to "YYYY-MM-DD" format
+    }))];
 
-            let streak = 1;
-            let maxStreak = 1;
+    // Convert the unique date strings back to Date objects
+    const sortedDates = validDates.map(dateString => new Date(dateString)).sort((a, b) => a.getTime() - b.getTime());
 
-            for (let i = 1; i < datesArray.length; i++) {
-                const previousDate = new Date(datesArray[i - 1]);
-                const currentDate = new Date(datesArray[i]);
-                
-                // Check if dates are consecutive
-                const difference = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
-                if (difference === 1) {
-                    streak++;
-                    maxStreak = Math.max(maxStreak, streak);
-                } else {
-                    streak = 1; // Reset streak on a gap
-                }
-            }
-            return maxStreak;
+    if (sortedDates.length === 0) return 0;
+
+    let streak = 1;
+
+    // Start checking from the last date and work backward
+    for (let i = sortedDates.length - 1; i > 0; i--) {
+        const difference = (sortedDates[i] - sortedDates[i - 1]) / (1000 * 60 * 60 * 24); // Calculate difference in days
+        console.log(`Comparing ${sortedDates[i].toISOString()} with ${sortedDates[i - 1].toISOString()}. Difference: ${difference}`);
+        if (difference === 1) {
+            streak++;
+        } else {
+            break; // Stop counting if there is a gap
         }
+    }
+
+    console.log(`Final streak count: ${streak}`);
+    return streak;
+}
+
 
         // Function to update the streak display
         // function trackDates() {
@@ -588,26 +596,43 @@ function calculateStreak(datesArray) {
         //     openSidebar();
         // }
         document.addEventListener("DOMContentLoaded", function () {
-    calculateStreak(quizAttempts)
+            calculateCurrentStreak(quizAttempts)
     document.getElementById("streakCount").textContent = streakCount;
 });
 
 
 function openSidebar() {
-    document.getElementById("sidebar").style.width = "300px";
-    const sidebar = document.getElementById('mySidebar');
-    const streakCount = calculateStreak(quizAttempts); // Example streak count; replace with actual logic to get the count
-    const streakTracker = document.getElementById('streakTracker');
+    const sidebar = document.getElementById("sidebar"); // Correctly references the existing 'sidebar' element
+    if (sidebar) {
+        sidebar.style.width = "300px"; // Open the sidebar
+    } else {
+        console.error("Sidebar element not found!");
+    }
 
-    // Directly set the text content
-    streakTracker.innerText = `Streak Count: ${streakCount} days`;
-
-    sidebar.style.width = '300px'; // Open the sidebar
+    const streakTracker = document.getElementById("streakTracker");
+    if (streakTracker) {
+        const streakCount = calculateCurrentStreak(quizAttempts); 
+        streakTracker.innerText = `Streak Count: ${streakCount} days`;
+    } else {
+        console.error("Streak tracker element not found!");
+    }
 }
+
 
 function closeSidebar() {
     document.getElementById("sidebar").style.width = "0";
 }
+    document.addEventListener("DOMContentLoaded", function () {
+        // Scores passed from Flask to the template
+        const lastScore = "{{ last_score }}";
+        const maxScore = "{{ max_score }}";
+
+        // Update the sidebar placeholders
+        document.getElementById("lastScore").textContent = lastScore || "N/A";
+        document.getElementById("maxScore").textContent = maxScore || "N/A";
+    });
+
+
 
     </script>
 
@@ -628,11 +653,10 @@ function closeSidebar() {
             <!-- Other Sidebar Content -->
             
             <ul>
-                <!-- <p id="streak-display">Streak: 0 days</p>
-                 -->
-                <li><a href="#">Avg Score</a></li>
-                <li><a href="#">Last Score</a></li>
+                <li>Last Score: <span id="lastScore"></span></li>
+                <li>Maximum Score: <span id="maxScore"></span></li>
             </ul>
+            
             
         </div>
         
