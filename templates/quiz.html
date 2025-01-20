@@ -40,8 +40,27 @@
             display: block;
             margin: 5px 0;
         }
-        .submit-btn {
+        .navigation {
+            display: flex;
+            justify-content: space-between;
             margin-top: 20px;
+        }
+        .progress-bar {
+            height: 10px;
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #4a41ff;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .nav-btn {
             padding: 10px 20px;
             background-color: #4a41ff;
             color: white;
@@ -49,7 +68,7 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .submit-btn:hover {
+        .nav-btn:hover {
             background-color: #3732c1;
         }
         .result {
@@ -58,135 +77,165 @@
             font-weight: bold;
             color: #4a41ff;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="quiz-container">
         <h1>Math Quiz</h1>
         <div id="quiz"></div>
-        <button class="submit-btn" onclick="submitQuiz()">Submit Answers</button>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="navigation">
+            <button class="nav-btn hidden" id="prev-btn" onclick="navigate(-1)">Previous</button>
+            <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next</button>
+            <button class="nav-btn hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
+        </div>
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        // Get message and email from backend
-        const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get("message") || "No quiz data provided.";
-        const email = urlParams.get("email") || "No email provided.";
+        // Extract URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const message = urlParams.get("message") || "No quiz data provided.";
+const email = urlParams.get("email") || "No email provided.";
 
-        console.log("Received email:", email); // Debugging
-        console.log("Received quiz message:", message); // Debugging
+// Function to parse the message into questions
+function parseQuestions(message) {
+    const questionBlocks = message.split(/\*\*Question \d+:\*\*/).slice(1);
+    return questionBlocks.map((block) => {
+        const [questionPart, answerPart] = block.split("**Answer:**");
+        const questionMatch = questionPart.match(/^(.*?)\n(.*?)$/s);
+        const questionText = questionMatch[1].trim();
+        const options = questionMatch[2]
+            .trim()
+            .split("\n")
+            .map((opt) => opt.trim());
+        const correctAnswer = answerPart.match(/[A-D]\)/)[0][0];
+        return {
+            question: questionText,
+            options,
+            correctAnswer,
+        };
+    });
+}
 
-        // Parse questions from the message
-        function parseQuestions(message) {
-            const questionBlocks = message.split(/\*\*Question \d+:\*\*/).slice(1);
-            return questionBlocks.map((block) => {
-                const [questionPart, answerPart] = block.split("**Answer:**");
-                const questionMatch = questionPart.match(/^(.*?)\n(.*?)$/s);
-                const questionText = questionMatch[1].trim();
-                const options = questionMatch[2]
-                    .trim()
-                    .split("\n")
-                    .map((opt) => opt.trim());
+// Parse the quiz questions
+const questions = parseQuestions(message);
 
-                const correctAnswer = answerPart.match(/[A-D]\)/)[0][0];
-                return {
-                    question: questionText,
-                    options,
-                    correctAnswer,
-                };
-            });
+// DOM elements and state variables
+const quizContainer = document.getElementById("quiz");
+const progressBarFill = document.getElementById("progress-bar-fill");
+let currentQuestion = 0;
+
+// Array to store user's answers
+const userAnswers = new Array(questions.length).fill(null);
+
+function loadQuiz(index) {
+    // Load the current question and options
+    quizContainer.innerHTML = `
+        <div class="question">${index + 1}. ${questions[index].question}</div>
+        <div class="options">
+            ${questions[index].options
+                .map(
+                    (option, i) => `
+                    <label>
+                        <input type="radio" name="question${index}" value="${String.fromCharCode(65 + i)}"
+                        ${userAnswers[index] === String.fromCharCode(65 + i) ? "checked" : ""} />
+                        ${option}
+                    </label>
+                `
+                )
+                .join("")}
+        </div>
+    `;
+    updateProgress();
+    updateNavigation();
+}
+
+function updateProgress() {
+    // Update the progress bar width
+    const progress = ((currentQuestion + 1) / questions.length) * 100;
+    progressBarFill.style.width = `${progress}%`;
+}
+
+function updateNavigation() {
+    // Show/hide navigation buttons based on current question index
+    document.getElementById("prev-btn").classList.toggle("hidden", currentQuestion === 0);
+    document.getElementById("next-btn").classList.toggle(
+        "hidden",
+        currentQuestion === questions.length - 1
+    );
+    document.getElementById("submit-btn").classList.toggle(
+        "hidden",
+        currentQuestion !== questions.length - 1
+    );
+}
+
+function navigate(direction) {
+    // Save the current selection
+    const selectedOption = document.querySelector(`input[name="question${currentQuestion}"]:checked`);
+    if (selectedOption) {
+        userAnswers[currentQuestion] = selectedOption.value;
+    }
+
+    // Navigate to the next or previous question
+    currentQuestion += direction;
+    loadQuiz(currentQuestion);
+}
+
+function submitQuiz() {
+    let score = 0;
+
+    // Evaluate the quiz results
+    questions.forEach((q, index) => {
+        const selectedAnswer = userAnswers[index];
+        if (selectedAnswer) {
+            if (selectedAnswer === q.correctAnswer) {
+                score++;
+            }
         }
+    });
 
-        const questions = parseQuestions(message);
-        const quizContainer = document.getElementById("quiz");
+    // Display the result
+    const resultContainer = document.getElementById("result");
+    resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
 
-        // Load quiz dynamically
-        function loadQuiz() {
-            questions.forEach((q, index) => {
-                const questionBlock = document.createElement("div");
-                questionBlock.innerHTML = `
-                    <div class="question">${index + 1}. ${q.question}</div>
-                    <div class="options">
-                        ${q.options
-                            .map(
-                                (option, i) => `
-                            <label>
-                                <input type="radio" name="question${index}" value="${String.fromCharCode(
-                                    65 + i
-                                )}" />
-                                ${option}
-                            </label>
-                        `
-                            )
-                            .join("")}
-                    </div>
-                `;
-                quizContainer.appendChild(questionBlock);
-            });
-        }
+    // Send results to the backend
+    fetch("/insertResults", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            score: score,
+            email: email,
+            totalQuestions: questions.length,
+            answers: questions.map((q, index) => ({
+                question: q.question,
+                selectedAnswer: userAnswers[index],
+                correctAnswer: q.correctAnswer,
+            })),
+        }),
+    })
+        .then((response) => {
+            if (response.ok) {
+                window.location.href = `/userProfile?email=${email}`;
+            } else {
+                resultContainer.textContent = "Failed to submit your quiz. Please try again.";
+            }
+        })
+        .catch(() => {
+            resultContainer.textContent = "An error occurred. Please try again.";
+        });
+}
 
-        // Submit and evaluate quiz
-        function submitQuiz() {
-            let score = 0;
-            const userAnswers = [];
-            questions.forEach((q, index) => {
-                const selectedOption = document.querySelector(
-                    `input[name="question${index}"]:checked`
-                );
-                if (selectedOption) {
-                    userAnswers.push({
-                        question: q.question,
-                        selectedAnswer: selectedOption.value,
-                        correctAnswer: q.correctAnswer,
-                    });
-                    if (selectedOption.value === q.correctAnswer) {
-                        score++;
-                    }
-                } else {
-                    userAnswers.push({
-                        question: q.question,
-                        selectedAnswer: null,
-                        correctAnswer: q.correctAnswer,
-                    });
-                }
-            });
+// Load the initial question
+loadQuiz(currentQuestion);
 
-            const resultContainer = document.getElementById("result");
-            resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
-
-            // Send result to the Flask route
-            fetch("/insertResults", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    score: score,
-                    email: email,
-                    totalQuestions: questions.length,
-                    answers: userAnswers,
-                }),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        // Redirect to the user profile page
-                        window.location.href = `/userProfile?email=${email}`;
-                    } else {
-                        console.error("Failed to send results to the server.");
-                        resultContainer.textContent =
-                            "Failed to submit your quiz. Please try again.";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    resultContainer.textContent =
-                        "An error occurred. Please try again.";
-                });
-        }
-
-        // Load the quiz on page load
-        loadQuiz();
     </script>
 </body>
 </html>
