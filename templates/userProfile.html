@@ -175,7 +175,9 @@
     color: #f8f8f8;
     text-align: center;
 }
-
+.badges img{
+    width: 50%;
+}
 .speedometer-container {
     text-align: center;
     margin-left: 0.7rem;
@@ -419,8 +421,44 @@
   border: 1px solid #ccc; /* Optional: Add a border for better visibility */
   border-radius: 5px; /* Optional: Rounded corners */
 }
+.streak-tracker {
+  margin: 15px auto; /* Center with auto and provide top/bottom spacing */
+  padding: 12px;
+}
+
+#calendar {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+}
+
+.month-container {
+  flex: 1 0 auto; /* Allow containers to scale flexibly */
+  max-width: calc(100% / 12); /* Ensures equal width for months */
+}
+
+.month-label {
+  text-align: center;
+  color: #fff;
+  font-size: 1rem; /* Slightly bigger for visibility */
+  margin-bottom: 20px;
+}
 
 
+
+.day {
+  width: 50%; 
+}
+
+.day span {
+  display: none; /* Optional: Hide inner text */
+}
+
+.empty {
+  background-color: transparent;
+  border: none;
+  cursor: default;
+}
 
     </style>
 </head>
@@ -446,7 +484,14 @@
     <!-- Badges Block -->
     <div class="badges">
         <h2>Badges</h2>
-        <p>{{ message }}😅</p>
+        <div>
+            {% if message == "First-Step Badge" %}
+                <img src="../static/firststep.png" alt="First Step Badge">
+                <p>First Step Badge</p>
+            {% else %}
+                <p>{{ message }}😅</p>
+            {% endif %}
+        </div>
     </div>
     <!-- Speedometer Block -->
     <div class="speedometer-container">
@@ -460,28 +505,24 @@
 
 
     <script> 
-   // Example: quiz_attempts is an array of date strings, e.g. ['2024-12-01', '2024-12-15']
-// const quizAttempts = {{ quiz_attempts|tojson }}; // Assuming this is passed from the backend as a list
-// const quizAttempts = [
-//     '2025-12-01',
-//     '2025-12-15',
-// ];
+ 
 const quizAttemptsElement = document.getElementById("quizAttemptsData");
         const quizAttempts = JSON.parse(quizAttemptsElement.getAttribute("data-quiz-attempts"));
         
 // Parse the dates in quiz_attempts to Date objects
-const highlightDates = quizAttempts.map(quizDate => {
-    const [year, month, day] = quizDate.split('-');
-    return new Date(year, month - 1, day); // Create Date objects
-});
-console.log(highlightDates);
+const highlightDates = quizAttempts.length > 0
+    ? quizAttempts.map(quizDate => {
+        const [year, month, day] = quizDate.split('-');
+        return new Date(year, month - 1, day);
+    })
+    : []; // Default to an empty array if no quizAttempts
 
 const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const calendar = document.getElementById("calendar");
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-let startingDayOfWeek = 2; // Assume Month 1 starts on Wednesday
+let startingDayOfWeek = 2; // Month 1 starts on Wednesday
 
 daysInMonth.forEach((days, monthIndex) => {
     const monthContainer = document.createElement("div");
@@ -516,7 +557,7 @@ daysInMonth.forEach((days, monthIndex) => {
         dayBox.title = `${monthNames[monthIndex]} ${day}`;
 
         // Check if the day matches any highlight date
-        const currentDay = new Date(2025, monthIndex, day); // Use year 2024 (replace with dynamic year if needed)
+        const currentDay = new Date(2025, monthIndex, day); 
         if (highlightDates.some(date => date.getTime() === currentDay.getTime())) {
             dayBox.classList.add("highlight"); // Apply highlight class
         }
