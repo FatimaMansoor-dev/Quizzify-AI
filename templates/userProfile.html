@@ -20,7 +20,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            padding: 10px 50px;
         }
 
         .navbar-brand {
@@ -168,6 +168,10 @@
   padding: 12px; /* Add padding inside */
   border: 1px solid #ccc; /* Optional: Add a border for better visibility */
   border-radius: 5px; /* Optional: Rounded corners */
+  border: 1px solid #524f4f; 
+  border-width: 0.5rem;
+  
+  box-shadow: 0 4px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
 }
 
 
@@ -181,6 +185,8 @@
 .speedometer-container {
     text-align: center;
     margin-left: 0.7rem;
+    border: 1px solid #524f4f; 
+    border-width: 0.5rem;
 }
 .semi-circle {
     position: relative;
@@ -206,7 +212,7 @@
         background-color: #4b0082; /* Indigo color */
         color: white;
         font-size: 1.2rem;
-        padding: 10px auto;
+        /* padding: 10px auto; */
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -214,6 +220,7 @@
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         margin-left: 35rem;
+        height: 2rem;
     }
 
     .start:hover {
@@ -270,6 +277,7 @@
 
     .sidebar-content ul li {
         margin: 10px 0;
+        color: white;
     }
 
     .sidebar-content ul li a {
@@ -418,12 +426,15 @@
 .streak-tracker {
   margin: 15px auto; /* Center with auto and provide top/bottom spacing */
   padding: 12px; /* Add padding inside */
-  border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+  border: 1px solid #524f4f; 
+  border-width: 0.5rem;
   border-radius: 5px; /* Optional: Rounded corners */
 }
 .streak-tracker {
   margin: 15px auto; /* Center with auto and provide top/bottom spacing */
   padding: 12px;
+  
+  box-shadow: 0 4px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
 }
 
 #calendar {
@@ -485,13 +496,36 @@
     <div class="badges">
         <h2>Badges</h2>
         <div>
-            {% if message == "First-Step Badge" %}
-                <img src="../static/firststep.png" alt="First Step Badge">
-                <p>First Step Badge</p>
-            {% else %}
-                <p>{{ message }}😅</p>
-            {% endif %}
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                {% for i in range(0, message|length, 2) %}
+                    <div style="display: flex; flex-direction: row; gap: 16px; width: 100%;">
+                        <!-- First item in the row -->
+                        <div style="flex: 1; text-align: center;">
+                            <p>{{ message[i] }}</p>
+                            {% if message[i] == "First Step Badge" %}
+                                <img src="../static/firststep.png" alt="First Step Badge">
+                            {% elif message[i] == "Quiz Master Badge" %}
+                                <img src="../static/quizmaster.png" alt="Quiz Master Badge">
+                            {% endif %}
+                        </div>
+            
+                        <!-- Second item in the row (if it exists) -->
+                        {% if i + 1 < message|length %}
+                            <div style="flex: 1; text-align: center;">
+                                <p>{{ message[i + 1] }}</p>
+                                {% if message[i + 1] == "First Step Badge" %}
+                                    <img src="../static/firststep.png" alt="First Step Badge">
+                                {% elif message[i + 1] == "Quiz Master Badge" %}
+                                    <img src="../static/quizmaster.png" alt="Quiz Master Badge">
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            
         </div>
+        
     </div>
     <!-- Speedometer Block -->
     <div class="speedometer-container">
@@ -683,18 +717,17 @@ function closeSidebar() {
         <div class="sidebar-content">
             <div class="image-container">
                 <img src="../static/hold.png" alt="Hold Image" class="background-image">
-                <div class="text-overlay">haiii</div>
+                <div class="text-overlay">Hello</div>
             </div>
             
             <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
             <button class="sidebar-close" onclick="closeSidebar()">×</button>
     <div class="sidebar-content">
-        <p id="streakTracker"></p>
+        <!-- <p ></p> -->
         <!-- Other sidebar content -->
     </div>
-            <!-- Other Sidebar Content -->
-            
             <ul>
+                <li> <span id="streakTracker"> </span></li>
                 <li>Last Score: <span id="lastScore"></span></li>
                 <li>Maximum Score: <span id="maxScore"></span></li>
             </ul>

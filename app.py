@@ -36,6 +36,31 @@ def get_user_data(email):
             return user_data
     return None
 
+def get_badge_message(quiz_count):
+    badges = {
+        1: "First Step",
+        5: "Quiz Master",
+        50: "Quiz Enthusiast",
+        100: "Quiz Prodigy",
+        500: "Quiz Mastermind"
+    }
+
+    # List to store earned badges
+    earned_badges = []
+
+    # Add badges earned based on quiz count
+    for threshold in sorted(badges.keys()):
+        if quiz_count >= threshold:
+            earned_badges.append(f"{badges[threshold]} Badge")
+
+    # Check if the user is about to unlock the next badge
+    for threshold in sorted(badges.keys()):
+        if quiz_count + 1 == threshold:
+            earned_badges.append(f"You are one quiz away from getting the '{badges[threshold]}' badge.")
+            break
+
+    # Return the list of badges
+    return earned_badges if earned_badges else ["Keep going! Your first badge is just one quiz away!"]
 
 def prepare_user_profile(user_data):
     """Prepare data for rendering the user profile."""
@@ -47,7 +72,11 @@ def prepare_user_profile(user_data):
     last_score = quiz_attempts[-1].get("score") if quiz_attempts else None
     max_score = max((attempt.get("score", 0) for attempt in quiz_attempts), default=None)
     
-    message = "You are one quiz away from getting the 'First Step' badge." if not quiz_dates else "First-Step Badge"
+
+    quiz_count = len(quiz_dates)  # Replace with the actual quiz count
+    message = get_badge_message(quiz_count)
+    print(message)
+    # message = "You are one quiz away from getting the 'First Step' badge." if not quiz_dates else "First-Step Badge"
     quizes = len(quiz_dates)
 
     return {
