@@ -149,7 +149,6 @@
         .horizontal-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     width: 100%;
     margin: 20px auto;
     max-width: 85%; 
@@ -170,8 +169,10 @@
   border-radius: 5px; /* Optional: Rounded corners */
   border: 1px solid #524f4f; 
   border-width: 0.5rem;
+  border: 1px solid #30237e; 
+  border-width: 0.3rem;
   
-  box-shadow: 0 4px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
+  box-shadow: 0 10px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
 }
 
 
@@ -185,8 +186,7 @@
 .speedometer-container {
     text-align: center;
     margin-left: 0.7rem;
-    border: 1px solid #524f4f; 
-    border-width: 0.5rem;
+    
 }
 .semi-circle {
     position: relative;
@@ -247,6 +247,7 @@
     .sidebar-content h3 {
         font-size: 1.5rem;
         color: white;
+        margin-top: -1rem;
     }
     .image-container {
     position: relative;
@@ -260,25 +261,77 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgb(17, 5, 49);
+    color: rgb(66, 32, 160);
     font-size: 2rem;
     font-weight: bold;
-    text-shadow: 0px 2px 5px rgba(42, 5, 110, 0.7);
+    /* text-shadow: 0px 2px 5px rgba(42, 5, 110, 0.7); */
     z-index: 1;
     
     margin-top: -6rem;
 }
 
 
-    .sidebar-content ul {
-        list-style: none;
-        padding: 0;
-    }
+.sidebar-content ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+    color: white;
+}
 
-    .sidebar-content ul li {
-        margin: 10px 0;
-        color: white;
-    }
+.sidebar-content ul li {
+    margin: 15px 0; /* Add more space between items */
+    position: relative; /* For decorative elements like icons or borders */
+    padding-left: 20px; /* Space for icons or custom bullets */
+    font-size: 1.1rem; /* Slightly larger text for readability */
+    display: flex; /* Allow alignment of text and icons */
+    align-items: center;
+}
+
+.sidebar-content ul li a {
+    color: #f8f8f8; /* Softer white for a modern feel */
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500; /* Add weight for better visibility */
+    transition: color 0.3s ease, transform 0.2s ease; /* Add hover effects */
+}
+
+.sidebar-content ul li a:hover {
+    color: #ffd700; /* Gold color on hover */
+    text-decoration: none; /* Keep it clean */
+    transform: translateX(5px); /* Subtle slide effect */
+}
+
+.sidebar-content ul li::before {
+    content: '•'; /* Custom bullet point */
+    position: absolute;
+    left: 0;
+    color: #ffd700; /* Gold color for bullets */
+    font-size: 1.5rem; /* Slightly larger than text */
+}
+
+.sidebar-content ul li a:hover::before {
+    color: #ff4500; /* Change bullet color on hover */
+}
+
+.sidebar-content ul li a::after {
+    content: ''; /* Add a decorative line under links */
+    display: block;
+    width: 0;
+    height: 2px;
+    background-color: #ffd700;
+    transition: width 0.3s ease;
+}
+
+.sidebar-content ul li a:hover::after {
+    width: 100%; /* Underline animation effect */
+}
+
+.sidebar-content ul li:hover {
+    cursor: pointer;
+    background: rgba(248, 247, 247, 0.1); /* Subtle highlight on hover */
+    border-radius: 8px; /* Rounded corners for hover effect */
+    padding: 8px 20px; /* Add padding for a button-like feel */
+}
 
     .sidebar-content ul li a {
         color: white;
@@ -302,8 +355,8 @@
     }
 
     .sidebar-content img {
-    width: 150px; /* Adjust the width as needed */
-    height: 250px; 
+    width: 100px; /* Adjust the width as needed */
+    height: 200px; 
     margin-top: -4rem;
 }
 .semi-circle {
@@ -378,7 +431,11 @@
         margin: 10px; /* Add margin around streak tracker */
         padding: 8px;/* Take full width in vertical layout */
     }
-    
+    .day {
+        width: 5px;   /* Further reduce size */
+        height: 5px;  /* Adjust for better spacing on smaller screens */
+        font-size: 0.7rem;
+    }
 }
 
 
@@ -413,7 +470,7 @@
 
   .streak-tracker {
     margin: 8px; /* Adjust spacing for very small screens */
-    padding: 6px; /* Adjust internal padding for smaller screens */
+    padding: 6px;
   }
   .badges, .speedometer-container {
         margin-left: -7px;
@@ -426,50 +483,97 @@
 .streak-tracker {
   margin: 15px auto; /* Center with auto and provide top/bottom spacing */
   padding: 12px; /* Add padding inside */
-  border: 1px solid #524f4f; 
-  border-width: 0.5rem;
+  border: 1px solid #30237e; 
+  border-width: 0.3rem;
   border-radius: 5px; /* Optional: Rounded corners */
 }
 .streak-tracker {
   margin: 15px auto; /* Center with auto and provide top/bottom spacing */
   padding: 12px;
   
-  box-shadow: 0 4px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
+  box-shadow: 0 10px 10px rgba(72, 13, 235, 0.2); /* Subtle shadow */
 }
 
 #calendar {
   display: flex;
-  gap: 5px;
-  overflow-x: auto;
+  gap: 20px; /* Add a larger gap between month containers */
+  overflow-x: auto; /* Allow horizontal scrolling for smaller screens */
+  padding: 10px; /* Add padding inside the calendar container */
 }
 
 .month-container {
-  flex: 1 0 auto; /* Allow containers to scale flexibly */
-  max-width: calc(100% / 12); /* Ensures equal width for months */
+    flex: 1 0 auto; /* Allow containers to scale flexibly */
+  max-width: 120px; /* Increase the width of each month container */
+  text-align: center;
+  padding: 5px; /* Add padding inside the container */
+  margin-right: 15px; /* Add margin between months */
+  box-sizing: border-box; /* Include padding in total width */
 }
 
 .month-label {
-  text-align: center;
-  color: #fff;
-  font-size: 1rem; /* Slightly bigger for visibility */
-  margin-bottom: 20px;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
-
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, 12px); /* Set consistent column width */
+  grid-template-rows: repeat(1, 12px); /* Consistent row height */
+  gap: 5px; /* Add space between days */
+}
 
 .day {
-  width: 50%; 
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background-color: #474749;
+  border: 1px solid #545457;
 }
 
-.day span {
-  display: none; /* Optional: Hide inner text */
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  #calendar {
+    gap: 15px; /* Reduce the gap slightly for smaller screens */
+  }
+  .month-container {
+    max-width: 100px; /* Decrease width for smaller screens */
+    margin-right: 10px; /* Slightly reduce spacing between months */
+  }
+  .week-row {
+    grid-template-columns: repeat(7, 10px);
+    gap: 3px;
+  }
+  .day {
+    width: 10px;
+    height: 10px;
+  }
 }
 
-.empty {
-  background-color: transparent;
-  border: none;
-  cursor: default;
+@media (max-width: 480px) {
+    .streak-tracker{
+        margin-right: 0.7rem;
+        margin-left: 1rem;
+    }
+  #calendar {
+    gap: 10px; /* Reduce the gap further for very small screens */
+  }
+  .month-container {
+    max-width: 90px;
+    margin-right: 8px;
+  }
+  .week-row {
+    grid-template-columns: repeat(7, 8px);
+    gap: 3px;
+  }
+  .day {
+    width: 8px;
+    height: 8px;
+
+  }
+
 }
+
 
     </style>
 </head>
@@ -726,6 +830,7 @@ function closeSidebar() {
         <!-- <p ></p> -->
         <!-- Other sidebar content -->
     </div>
+    <h3>Your Scores</h3>
             <ul>
                 <li> <span id="streakTracker"> </span></li>
                 <li>Last Score: <span id="lastScore"></span></li>
