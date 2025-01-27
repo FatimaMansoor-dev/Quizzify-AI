@@ -84,7 +84,7 @@
 </head>
 <body>
     <div class="quiz-container">
-        <h1>Math Quiz</h1>
+        <h1>Your Quiz</h1>
         <div id="quiz"></div>
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
@@ -102,6 +102,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const message = urlParams.get("message") || "No quiz data provided.";
 const email = urlParams.get("email") || "No email provided.";
+const difficulty = urlParams.get("difficulty") || "No difficulty provided.";
 
 // Function to parse the message into questions
 function parseQuestions(message) {
@@ -213,12 +214,7 @@ function submitQuiz() {
         body: JSON.stringify({
             score: score,
             email: email,
-            totalQuestions: questions.length,
-            answers: questions.map((q, index) => ({
-                question: q.question,
-                selectedAnswer: userAnswers[index],
-                correctAnswer: q.correctAnswer,
-            })),
+            difficulty: difficulty
         }),
     })
         .then((response) => {

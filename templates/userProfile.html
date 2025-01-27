@@ -52,6 +52,8 @@
             height: 50px;
             border-radius: 50%;
         }
+   
+
 
         .sidebar {
             height: 100%;
@@ -188,25 +190,6 @@
     margin-left: 0.7rem;
     
 }
-.semi-circle {
-    position: relative;
-    width: 200px;
-    height: 100px;
-    border-radius: 100px 100px 0 0; 
-    background: none; /* No background fill */
-    margin: 0 auto;
-    overflow: hidden;
-}
-
-.gauge-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.5rem;
-    color: #4b0082;
-    z-index: 1;
-}
 
 .start {
         background-color: #4b0082; /* Indigo color */
@@ -219,7 +202,7 @@
         transition: all 0.3s ease;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        margin-left: 35rem;
+        /* margin-left: 35rem; */
         height: 2rem;
     }
 
@@ -235,7 +218,7 @@
 
     /* Enhanced Sidebar */
     .sidebar {
-        background: linear-gradient(135deg, #210768, #493188); /* Gradient background */
+        background: linear-gradient(135deg, #5d4b8d, #493188); /* Gradient background */
         color: white;
         box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
         font-family: Arial, sans-serif;
@@ -381,6 +364,9 @@
         color: #fff;
         z-index: 3;
     }
+    .navbar .start{
+        margin-left: 35rem;
+    }
     
 @media (max-width: 768px) {
   .navbar {
@@ -409,10 +395,10 @@
 
   .start {
     font-size: 1rem; /* Reduce button font size */
-    padding: 8px 16px;
+    /* padding: 8px 16px; */
     margin-left: auto; /* Align properly for smaller screens */
   }
-
+ 
   .streak-tracker {
     margin: 10px; /* Add margin around streak tracker */
     padding: 8px; /* Add padding within the streak tracker */
@@ -574,6 +560,87 @@
 
 }
 
+/* Container for the entire speedometer widget */
+.speedometer-container {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Circle container to center the circle and text */
+.circle-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+}
+
+/* The circle itself */
+.circle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Rotating border (SVG circle) */
+.circle-border {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg); /* Rotate to start drawing from the top */
+    transition: stroke-dashoffset 2s ease; /* Add smooth transition */
+}
+
+/* Text inside the circle */
+.gauge-text {
+    position: absolute;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 80%; /* Ensure it takes full height of the circle */
+    width: 100%; /* Ensure it takes full width of the circle */
+    color: #333;
+    font-size: 16px;
+}
+
+
+/* Styling for the total quizzes text */
+.total-quizzes {
+    font-size: 36px;
+    font-weight: bold;
+    color: #067eb6;
+    margin-bottom: 10px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Difficulty breakdown text styling */
+.difficulty-breakdown {
+    font-size: 24px;
+    color: #067e42;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Hover effect to animate the stroke-dashoffset (draw the circle clockwise) */
+.speedometer-container:hover .circle-border circle {
+    stroke-dasharray: 344; /* Circumference of the circle */
+    stroke-dashoffset: 0; /* Draw the circle */
+}
+
+/* Initial stroke-dashoffset to hide the circle */
+.circle-border circle {
+    stroke-dasharray: 344;
+    stroke-dashoffset: 344; /* Initially hide the stroke */
+}
+
+/* Style the circle border */
+circle {
+    transition: stroke-dashoffset 2s ease;
+}
+
 
     </style>
 </head>
@@ -584,7 +651,8 @@
             QUIZIFY-AI
         </a>
         <button class="start" onclick="window.location.href='/options?email={{ email }}'">Take Quiz</button>
-
+        
+        <!-- <button class="start" onclick="">Change Password</button> -->
         <button class="user-button" onclick="openSidebar()">
             <img src="../static/user.png" alt="User">
         </button>
@@ -606,7 +674,9 @@
                         <!-- First item in the row -->
                         <div style="flex: 1; text-align: center;">
                             <p>{{ message[i] }}</p>
-                            {% if message[i] == "First Step Badge" %}
+                            {% if message[i] == "You are one quiz away from getting the 'First Step' badge." %}
+                                <img src="../static/loading.png" alt="Take your first quiz now">
+                            {% elif message[i] == "First Step Badge" %}
                                 <img src="../static/firststep.png" alt="First Step Badge">
                             {% elif message[i] == "Quiz Master Badge" %}
                                 <img src="../static/quizmaster.png" alt="Quiz Master Badge">
@@ -633,17 +703,32 @@
     </div>
     <!-- Speedometer Block -->
     <div class="speedometer-container">
-        <h2>Quizes Taken</h2>
-        <div class="semi-circle">
-            <div class="gauge-text">{{ quizes }}</div>
+        <h2>Quizzes Taken</h2>
+        <div class="circle-container">
+            <div class="circle">
+                <svg class="circle-border" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="60" cy="60" r="55" stroke="yellow" stroke-width="10" fill="none"/>
+                </svg> <!-- Rotating border -->
+                <div class="gauge-text">
+                    <span class="total-quizzes">Total: {{ quizes }}</span>
+                    <div class="difficulty-breakdown">
+                        <span>Easy: {{ difficulty_counts.easy }}</span> <br>
+                        <span>Medium: {{ difficulty_counts.medium }}</span> <br>
+                        <span>Hard: {{ difficulty_counts.hard }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
+    
+    
+
 </div>
 <div id="quizAttemptsData" data-quiz-attempts='{{ quiz_attempts | tojson }}'></div>
 
 
     <script> 
- 
 const quizAttemptsElement = document.getElementById("quizAttemptsData");
         const quizAttempts = JSON.parse(quizAttemptsElement.getAttribute("data-quiz-attempts"));
         
@@ -837,7 +922,7 @@ function closeSidebar() {
                 <li>Maximum Score: <span id="maxScore"></span></li>
             </ul>
             
-            
+            <button class="start" onclick="window.location.href='/'">Logout</button>
         </div>
         
     </div>

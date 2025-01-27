@@ -1,15 +1,27 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 import requests
 import json
 from datetime import datetime, timedelta
+import random
+from flask_mail import Mail, Message
 from groq import Groq
 
 app = Flask(__name__)
+app.secret_key = 'your-unique-secret-key'
 
-# Load the character mapping from JSON
+# Mail Configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'benzenering032@gmail.com'
+app.config['MAIL_PASSWORD'] = 'kpfa yprh zdev kafn'
+app.config['MAIL_DEFAULT_SENDER'] = 'benzenering032@gmail.com'
+
+mail = Mail(app)
+
+# Load character mapping from JSON
 with open("char_key_mapping.json", "r") as f:
     char_mapping = json.load(f)
-
 FIREBASE_URL = "https://quizifyai-7d979-default-rtdb.firebaseio.com/users.json"
 client = Groq(api_key="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")
 
@@ -26,15 +38,65 @@ def decrypt_password(encrypted_password):
 
 def get_user_data(email):
     """Fetch user data from Firebase by email."""
-    response = requests.get(FIREBASE_URL)
-    if response.status_code != 200:
-        raise Exception("Failed to fetch user data from Firebase")
+    try:
+        response = requests.get(FIREBASE_URL)
+        # response = requests.get(FIREBASE_URL)
+        print(response.json())
+
+        if response.status_code != 200:
+            raise Exception("Failed to fetch user data from Firebase")
+        
+        users = response.json()
+        if not users:
+            return None  # Return None if no users are found
+
+        if isinstance(users, dict):  # Firebase may return a dictionary
+            for user_id, user_data in users.items():
+                if user_data.get("email") == email:
+                    return user_data
+
+        return None  # No matching user found
+    except Exception as e:
+        print(f"Error fetching user data: {e}")
+        return None
+
+
+
+
+def prepare_user_profile(user_data):
+    """Prepare data for rendering the user profile."""
+    first_name = user_data.get("first_name", "User")
+    last_name = user_data.get("last_name", "")
+    quiz_attempts = user_data.get("quiz_attempts", [])
+
+    # Extract quiz dates
+    quiz_dates = [attempt.get("date").split(" ")[0] for attempt in quiz_attempts if "date" in attempt]
     
-    users = response.json()
-    for user_id, user_data in users.items():
-        if user_data["email"] == email:
-            return user_data
-    return None
+    # Last score and max score
+    last_score = quiz_attempts[-1].get("score") if quiz_attempts else None
+    max_score = max((attempt.get("score", 0) for attempt in quiz_attempts), default=None)
+    
+    # Count quizzes based on difficulty levels
+    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
+    for attempt in quiz_attempts:
+        difficulty = attempt.get("difficulty", "").lower()
+        if difficulty in difficulty_counts:
+            difficulty_counts[difficulty] += 1
+
+    # Quiz count and badge message
+    quiz_count = len(quiz_dates)
+    message = get_badge_message(quiz_count)
+
+    return {
+        "message": message,
+        "first_name": first_name,
+        "last_name": last_name,
+        "quizes": quiz_count,
+        "quiz_attempts": quiz_dates,
+        "last_score": last_score,
+        "max_score": max_score,
+        "difficulty_counts": difficulty_counts  
+    }
 
 def get_badge_message(quiz_count):
     badges = {
@@ -61,33 +123,6 @@ def get_badge_message(quiz_count):
 
     # Return the list of badges
     return earned_badges if earned_badges else ["Keep going! Your first badge is just one quiz away!"]
-
-def prepare_user_profile(user_data):
-    """Prepare data for rendering the user profile."""
-    first_name = user_data.get("first_name", "User")
-    last_name = user_data.get("last_name", "")
-    quiz_attempts = user_data.get("quiz_attempts", [])
-
-    quiz_dates = [attempt.get("date").split(" ")[0] for attempt in quiz_attempts if "date" in attempt]
-    last_score = quiz_attempts[-1].get("score") if quiz_attempts else None
-    max_score = max((attempt.get("score", 0) for attempt in quiz_attempts), default=None)
-    
-
-    quiz_count = len(quiz_dates)  # Replace with the actual quiz count
-    message = get_badge_message(quiz_count)
-    print(message)
-    # message = "You are one quiz away from getting the 'First Step' badge." if not quiz_dates else "First-Step Badge"
-    quizes = len(quiz_dates)
-
-    return {
-        "message": message,
-        "first_name": first_name,
-        "last_name": last_name,
-        "quizes": quizes,
-        "quiz_attempts": quiz_dates,
-        "last_score": last_score,
-        "max_score": max_score
-    }
 
 
 # Routes
@@ -118,43 +153,76 @@ def login():
         return render_template('index.html', message=f"An error occurred: {e}")
 
 
+import random
+from flask import session
+
 @app.route('/signup', methods=['POST'])
 def signup():
     email = request.form.get('email')
     password = request.form.get('password')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
 
-    if not email or not password:
-        return render_template('index.html', message="Please fill in both fields.")
+    if not email or not password or not first_name or not last_name:
+        return render_template('index.html', message="Please fill in all fields.")
     if len(password) < 9:
         return render_template('index.html', message="Password must be at least 9 characters long.")
 
     try:
+        # Check if the email already exists
         if get_user_data(email):
             return render_template('index.html', message="Email already exists. Please use a different email.")
         
-        # Create user
-        name = email.split("@")[0]
-        first_name, last_name = (name.split(".")[0], name.split(".")[1]) if "." in name else (name, "")
-        data = {
-            "email": email,
-            "password": encrypt_password(password),
-            "first_name": first_name,
-            "last_name": last_name
-        }
+        # Generate OTP
+        otp = random.randint(100000, 999999)
+        session['otp'] = otp  # Store OTP in the session
+        session['email'] = email
+        session['password'] = encrypt_password(password)  # Store encrypted password temporarily
+        session['first_name'] = first_name
+        session['last_name'] = last_name
 
-        response = requests.post(FIREBASE_URL, json=data)
-        if response.status_code == 200:
-            profile_data = {
-                "message": "Just a quiz away from earning First-Step Badge",
-                "first_name": first_name,
-                "last_name": last_name,
-                "quizes": 0,
-                "quiz_attempts": []
-            }
-            return render_template('userProfile.html', email=email, **profile_data)
-        return render_template('index.html', message="Failed to create an account.")
+        # Send OTP email
+        message = Message("Verify Your Email - QuizifyAI", recipients=[email])
+        message.body = f"Your OTP for email verification is: {otp}"
+        mail.send(message)
+
+        return render_template('verify_otp.html', email=email)
     except Exception as e:
         return render_template('index.html', message=f"An error occurred: {e}")
+
+
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp():
+    user_otp = request.form.get('otp_combined')
+    stored_otp = session.get('otp')
+    print(user_otp,stored_otp)
+    email = session.get('email')
+    encrypted_password = session.get('password')
+    first_name = session.get('first_name')
+    last_name = session.get('last_name')
+
+    if not user_otp or not stored_otp:
+        return render_template('verify_otp.html', email=email, message="OTP is required.")
+
+    try:
+        if int(user_otp) == stored_otp:
+            # OTP verified, create user
+            data = {
+                "email": email,
+                "password": encrypted_password,
+                "first_name": first_name,
+                "last_name": last_name
+            }
+            response = requests.post(FIREBASE_URL, json=data)
+            if response.status_code == 200:
+                profile_data = prepare_user_profile(data)
+                return render_template('userProfile.html', email=email, **profile_data)
+            return render_template('verify_otp.html', email=email, message="Failed to create an account.")
+        else:
+            return render_template('verify_otp.html', email=email, message="Invalid OTP. Please try again.")
+    except Exception as e:
+        return render_template('verify_otp.html', email=email, message=f"An error occurred: {e}")
+
 
 
 @app.route('/userProfile', methods=['GET'])
@@ -230,6 +298,35 @@ def generate_on_topic():
             return jsonify({"message": extended_answer, "email": email})
         except Exception as e:
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
+    else:
+        prompt = f"""
+        Generate 10 {difficulty} questions on {topic} along with their answers in the format:
+        **Question 1:** [question]
+        **Answer:** [answer]
+        **Question 2:** [question]
+        **Answer:** [answer]
+        """
+
+        try:
+            completion = client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=[
+                    {"role": "system", "content": "You are responsible to generate question answer pair"},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.3,
+                max_tokens=1024,
+                top_p=1,
+                stream=True,
+                stop=None,
+            )
+
+            extended_answer = ""
+            for response_chunk in completion:
+                extended_answer += response_chunk.choices[0].delta.content or ""
+            return jsonify({"message": extended_answer, "email": email, "difficulty": difficulty})
+        except Exception as e:
+            return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
 
 
 @app.route('/quiz')
@@ -246,6 +343,8 @@ def insert_results():
         data = request.json
         email = data.get('email')
         score = data.get('score')
+        difficulty = data.get('difficulty')
+
 
         print("Email:", email)
         print("Score:", score)
@@ -280,7 +379,7 @@ def insert_results():
 
             # Add new quiz attempt
             quiz_attempts = user_data.get("quiz_attempts", [])
-            quiz_attempts.append({"score": score, "date": formatted_date})
+            quiz_attempts.append({"score": score, "date": formatted_date, "difficulty": difficulty})
 
             ## Update the user data in Firebase
             update_url = f"{FIREBASE_URL.replace('.json', '')}/{user_id}.json"
@@ -300,15 +399,7 @@ def insert_results():
                     message = "First-Step Badge"
                     quizes = len(quiz_dates)
                 return jsonify({"error": "done done"}), 200  ## ab yahan se score pass krdo wapis udhr jaiyag wahan se user profile call krdo
-                # return render_template(
-                #     'userProfile.html',
-                #     message=message,
-                #     first_name=first_name,
-                #     last_name=last_name,
-                #     quizes=quizes,
-                #     email=email,
-                #     quiz_attempts=quiz_dates  # Pass the list of quiz attempt dates to the template
-                # )
+            
             else:
                 return jsonify({"error": "Failed to update user data in Firebase"}), 500
         except Exception as e:
