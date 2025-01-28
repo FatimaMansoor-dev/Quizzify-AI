@@ -12,8 +12,14 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f4f4f9;
+      background: linear-gradient(
+        rgba(0, 0, 0, 0.3),
+        rgba(0, 0, 0, 0.3)
+      ),
+      url('../static/bg.jpeg') no-repeat center center fixed;
+      background-size: cover;
     }
+
     .container {
       text-align: center;
       background: white;
@@ -21,17 +27,21 @@
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       max-width: 400px;
-      width: 100%;
+      width: 80%;
     }
+
     h2 {
       margin-bottom: 20px;
     }
+
     .otp-input {
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap;
       margin: 20px 0;
     }
+
     .otp-input input {
       width: 40px;
       height: 40px;
@@ -40,11 +50,13 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
+
     .otp-input input:focus {
       outline: none;
       border-color: #007bff;
       box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
+
     button {
       background-color: #007bff;
       color: white;
@@ -54,15 +66,35 @@
       cursor: pointer;
       font-size: 16px;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     p {
       font-size: 14px;
       color: #555;
     }
+
     p.error {
       color: red;
+    }
+
+    @media (max-width: 400px) {
+      .otp-input {
+        gap: 5px;
+      }
+
+      .otp-input input {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 8px 15px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>

@@ -534,6 +534,14 @@
     width: 10px;
     height: 10px;
   }
+  .circle {
+        width: 90px; /* Reduced size */
+        height: 90px; /* Reduced size */
+    }
+
+    .gauge-text {
+        font-size: 12px; /* Smaller text */
+    }
 }
 
 @media (max-width: 480px) {
@@ -557,6 +565,14 @@
     height: 8px;
 
   }
+  .circle {
+        width: 7px; /* Further reduced size */
+        height: 7px; /* Further reduced size */
+    }
+
+    .gauge-text {
+        font-size: 10px; /* Further reduced text */
+    }
 
 }
 
@@ -673,13 +689,13 @@ circle {
                     <div style="display: flex; flex-direction: row; gap: 16px; width: 100%;">
                         <!-- First item in the row -->
                         <div style="flex: 1; text-align: center;">
-                            <p>{{ message[i] }}</p>
+                            <p>{{ message[i] }} 🎉</p>
                             {% if message[i] == "You are one quiz away from getting the 'First Step' badge." %}
                                 <img src="../static/loading.png" alt="Take your first quiz now">
                             {% elif message[i] == "First Step Badge" %}
                                 <img src="../static/firststep.png" alt="First Step Badge">
                             {% elif message[i] == "Quiz Master Badge" %}
-                                <img src="../static/quizmaster.png" alt="Quiz Master Badge">
+                                <img src="../static/quizmaster.png" alt="Quiz Master Badge ">
                             {% endif %}
                         </div>
             
@@ -707,7 +723,7 @@ circle {
         <div class="circle-container">
             <div class="circle">
                 <svg class="circle-border" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="60" cy="60" r="55" stroke="yellow" stroke-width="10" fill="none"/>
+                    <circle cx="60" cy="60" r="55" stroke="yellow" stroke-width="7" fill="none"/>
                 </svg> <!-- Rotating border -->
                 <div class="gauge-text">
                     <span class="total-quizzes">Total: {{ quizes }}</span>

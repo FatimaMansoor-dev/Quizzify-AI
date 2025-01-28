@@ -9,32 +9,45 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            /* background-color: #f4f4f9; */
             color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
+            background: 
+        linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+        url('../static/image.png') no-repeat center center fixed;
+    background-size: contain; /* Shows the entire image */
         }
         .quiz-container {
-            background: #fff;
+            /* background: #fff; */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             width: 90%;
             max-width: 600px;
+            justify-content: left;
         }
         .quiz-container h1 {
-            color: #4a41ff;
+            /* color: #150f92; */
             margin-bottom: 20px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 3.5rem;
+            color: rgb(28, 6, 109);
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
         }
         .question {
             font-weight: bold;
             margin-top: 20px;
+            color: white;
         }
         .options {
             margin: 10px 0;
+            color: white;
         }
         .options label {
             display: block;
@@ -73,27 +86,47 @@
         }
         .result {
             margin-top: 20px;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #4a41ff;
         }
         .hidden {
             display: none;
         }
+        .options {
+    text-align: left; /* Ensures the options container aligns content to the left */
+    margin: 10px 0;
+}
+
+.options label {
+    display: block; /* Forces each option to be on its own line */
+    margin: 5px 0;
+    cursor: pointer; /* Makes the label clickable */
+}
+
+.options input[type="radio"] {
+    margin-right: 10px; /* Adds spacing between the radio button and the label text */
+    vertical-align: middle; /* Aligns the radio button with the label text */
+}
+
     </style>
 </head>
 <body>
     <div class="quiz-container">
-        <h1>Your Quiz</h1>
-        <div id="quiz"></div>
+        <h1>Good Luck ^-^ </h1>
+
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
         </div>
+
+        <div id="quiz"></div>
+
         <div class="navigation">
             <button class="nav-btn hidden" id="prev-btn" onclick="navigate(-1)">Previous</button>
             <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next</button>
             <button class="nav-btn hidden" id="submit-btn" onclick="submitQuiz()">Submit</button>
         </div>
+        
         <div class="result" id="result"></div>
     </div>
 
@@ -189,6 +222,13 @@ function navigate(direction) {
 }
 
 function submitQuiz() {
+    // Check if all questions have an answer selected
+    const unanswered = userAnswers.some((answer) => answer === null);
+    if (unanswered) {
+        alert("Please answer all questions before submitting the quiz.");
+        return; // Stop the submission process
+    }
+
     let score = 0;
 
     // Evaluate the quiz results
@@ -205,6 +245,20 @@ function submitQuiz() {
     const resultContainer = document.getElementById("result");
     resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
 
+    // Countdown timer
+let countdown = 5;
+const countdownContainer = document.createElement("p"); // Create a countdown element
+resultContainer.appendChild(countdownContainer); // Add it below the result text
+
+const countdownInterval = setInterval(() => {
+    countdownContainer.textContent = `You will be redirected in ${countdown}...`;
+    countdown--;
+
+    if (countdown < 0) {
+        clearInterval(countdownInterval); // Stop the countdown
+        window.location.href = `/userProfile?email=${email}`; // Redirect after countdown
+    }
+}, 1000); // Update every second
     // Send results to the backend
     fetch("/insertResults", {
         method: "POST",
