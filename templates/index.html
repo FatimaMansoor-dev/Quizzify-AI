@@ -64,21 +64,26 @@
           const additionalFields = document.getElementById('additional-fields');
 
           function toggleFormMode() {
-            if (formTitle.textContent === 'Login') {
-              formTitle.textContent = 'Sign Up';
-              authForm.action = '/signup';
-              additionalFields.style.display = 'block'; // Show First Name and Last Name inputs
-              toggleMessage.innerHTML = `Already have an account? 
-                <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Login</span>`;
-            } else {
-              formTitle.textContent = 'Login';
-              authForm.action = '/login';
-              additionalFields.style.display = 'none'; // Hide First Name and Last Name inputs
-              toggleMessage.innerHTML = `Don't have an account? 
-                <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>`;
-            }
-            attachToggleListener();
-          }
+  if (formTitle.textContent === 'Login') {
+    formTitle.textContent = 'Sign Up';
+    authForm.action = '/signup';
+    additionalFields.style.display = 'block'; // Show First Name and Last Name inputs
+    authForm.style.marginTop = '50px'; // Increase margin top when signing up
+
+    toggleMessage.innerHTML = `Already have an account? 
+      <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Login</span>`;
+  } else {
+    formTitle.textContent = 'Login';
+    authForm.action = '/login';
+    additionalFields.style.display = 'none'; // Hide First Name and Last Name inputs
+    authForm.style.marginTop = '0'; // Reset margin-top when logging in
+
+    toggleMessage.innerHTML = `Don't have an account? 
+      <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>`;
+  }
+  attachToggleListener();
+}
+
 
           function attachToggleListener() {
             const toggleAuthMode = document.getElementById('toggle-auth-mode');

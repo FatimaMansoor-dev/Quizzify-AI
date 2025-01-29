@@ -519,6 +519,27 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-brand {
+        margin-bottom: 10px;
+    }
+
+    .start {
+        position: absolute;
+        right: 60px;
+        top: 30px;
+    }
+
+    .user-button {
+        position: absolute;
+        /* top: 15px; */
+        right: 15px;
+    }
   #calendar {
     gap: 15px; /* Reduce the gap slightly for smaller screens */
   }
@@ -545,6 +566,7 @@
 }
 
 @media (max-width: 480px) {
+    
     .streak-tracker{
         margin-right: 0.7rem;
         margin-left: 1rem;
@@ -579,7 +601,7 @@
 /* Container for the entire speedometer widget */
 .speedometer-container {
     text-align: center;
-    padding: 20px;
+    padding: 9px;
 }
 
 /* Circle container to center the circle and text */
@@ -664,7 +686,7 @@ circle {
     <nav class="navbar">
         <a class="navbar-brand" href="#">
             <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo">
-            QUIZIFY-AI
+            QuizXpert
         </a>
         <button class="start" onclick="window.location.href='/options?email={{ email }}'">Take Quiz</button>
         
