@@ -5,32 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Quiz</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            /* background-color: #f4f4f9; */
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-align: center;
-            background: 
-        linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-        url('../static/image.png') no-repeat center center fixed;
-    background-size: contain; /* Shows the entire image */
-        }
-        .quiz-container {
-            /* background: #fff; */
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 90%;
-            max-width: 600px;
-            justify-content: left;
-        }
-        .quiz-container h1 {
+          body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    color: #333;
+    display: flex;  /* Ensure flexbox is enabled */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh;
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.3), 
+        rgba(0, 0, 0, 0.3)
+    ),
+    url('../static/quiz.jpg') no-repeat center center fixed;
+    background-size: cover;
+    flex-direction: column; /* Stack heading and quiz container vertically */
+}
+
+.quiz-container {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    border: 6px solid purple;
+    text-align: left; /* Ensures text inside aligns properly */
+    position: relative; /* Helps in positioning elements inside */
+}
+
+.quiz-container::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #720a72, #c46eaa, #5456f1, #ff00ff);
+    background-size: 300% 300%;
+    border-radius: 10px;
+    z-index: -1;
+    animation: glowing-border 4s linear infinite;
+}
+
+@keyframes glowing-border {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+        h1 {
             /* color: #150f92; */
             margin-bottom: 20px;
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -39,6 +64,7 @@
             text-decoration: none;
             font-weight: bold;
             text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+            font-style: italic;
         }
         .question {
             font-weight: bold;
@@ -68,7 +94,7 @@
         }
         .progress-bar-fill {
             height: 100%;
-            background: #4a41ff;
+            background: #790652;
             border-radius: 5px;
             width: 0%;
             transition: width 0.3s ease;
@@ -88,7 +114,7 @@
             margin-top: 20px;
             font-size: 1.5rem;
             font-weight: bold;
-            color: #4a41ff;
+            color: #0f0f0f;
         }
         .hidden {
             display: none;
@@ -108,13 +134,23 @@
     margin-right: 10px; /* Adds spacing between the radio button and the label text */
     vertical-align: middle; /* Aligns the radio button with the label text */
 }
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+}
 
+/* Further reduce size for mobile screens */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+}
     </style>
 </head>
 <body>
+    <h1>Good Luck ^-^ </h1>
     <div class="quiz-container">
-        <h1>Good Luck ^-^ </h1>
-
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
         </div>
@@ -129,6 +165,7 @@
         
         <div class="result" id="result"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.3"></script>
 
     <script>
         // Extract URL parameters
@@ -220,67 +257,59 @@ function navigate(direction) {
     currentQuestion += direction;
     loadQuiz(currentQuestion);
 }
-
 function submitQuiz() {
+    // Save the answer of the last question before submission
+    const selectedOption = document.querySelector(`input[name="question${currentQuestion}"]:checked`);
+    if (selectedOption) {
+        userAnswers[currentQuestion] = selectedOption.value;
+    }
+
     // Check if all questions have an answer selected
     const unanswered = userAnswers.some((answer) => answer === null);
     if (unanswered) {
         alert("Please answer all questions before submitting the quiz.");
-        return; // Stop the submission process
+        return;
     }
 
     let score = 0;
-
-    // Evaluate the quiz results
     questions.forEach((q, index) => {
-        const selectedAnswer = userAnswers[index];
-        if (selectedAnswer) {
-            if (selectedAnswer === q.correctAnswer) {
-                score++;
-            }
+        if (userAnswers[index] === q.correctAnswer) {
+            score++;
         }
     });
 
-    // Display the result
     const resultContainer = document.getElementById("result");
     resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
 
-    // Countdown timer
-let countdown = 5;
-const countdownContainer = document.createElement("p"); // Create a countdown element
-resultContainer.appendChild(countdownContainer); // Add it below the result text
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
-const countdownInterval = setInterval(() => {
-    countdownContainer.textContent = `You will be redirected in ${countdown}...`;
-    countdown--;
+    let countdown = 5;
+    const countdownContainer = document.createElement("p");
+    resultContainer.appendChild(countdownContainer);
 
-    if (countdown < 0) {
-        clearInterval(countdownInterval); // Stop the countdown
-        window.location.href = `/userProfile?email=${email}`; // Redirect after countdown
-    }
-}, 1000); // Update every second
-    // Send results to the backend
+    const countdownInterval = setInterval(() => {
+        countdownContainer.textContent = `You will be redirected in ${countdown}...`;
+        countdown--;
+
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            window.location.href = `/userProfile?email=${email}`;
+        }
+    }, 1000);
+
     fetch("/insertResults", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            score: score,
-            email: email,
-            difficulty: difficulty
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score, email, difficulty }),
     })
-        .then((response) => {
-            if (response.ok) {
-                window.location.href = `/userProfile?email=${email}`;
-            } else {
-                resultContainer.textContent = "Failed to submit your quiz. Please try again.";
-            }
-        })
-        .catch(() => {
-            resultContainer.textContent = "An error occurred. Please try again.";
-        });
+    .then((response) => {
+        if (!response.ok) {
+            resultContainer.textContent = "Failed to submit your quiz. Please try again.";
+        }
+    })
+    .catch(() => {
+        resultContainer.textContent = "An error occurred. Please try again.";
+    });
 }
 
 // Load the initial question

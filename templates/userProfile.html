@@ -249,6 +249,8 @@
     font-weight: bold;
     /* text-shadow: 0px 2px 5px rgba(42, 5, 110, 0.7); */
     z-index: 1;
+    font-style: italic;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     
     margin-top: -6rem;
 }
@@ -529,11 +531,12 @@
         margin-bottom: 10px;
     }
 
-    .start {
+    .navbar .start {
         position: absolute;
         right: 60px;
         top: 30px;
     }
+    
 
     .user-button {
         position: absolute;
@@ -643,6 +646,7 @@
     width: 100%; /* Ensure it takes full width of the circle */
     color: #333;
     font-size: 16px;
+    z-index: 0;
 }
 
 
@@ -944,7 +948,7 @@ function closeSidebar() {
         <div class="sidebar-content">
             <div class="image-container">
                 <img src="../static/hold.png" alt="Hold Image" class="background-image">
-                <div class="text-overlay">Hello</div>
+                <div class="text-overlay">Hey</div>
             </div>
             
             <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
@@ -959,8 +963,9 @@ function closeSidebar() {
                 <li>Last Score: <span id="lastScore"></span></li>
                 <li>Maximum Score: <span id="maxScore"></span></li>
             </ul>
-            
             <button class="start" onclick="window.location.href='/'">Logout</button>
+            
+            
         </div>
         
     </div>
