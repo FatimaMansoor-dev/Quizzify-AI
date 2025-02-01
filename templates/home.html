@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizXpert - AI Quiz Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #typing-text {
+    margin-top: 4rem;
+    min-height: 40px; /* Adjust based on the tallest text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+    </style>
+</head>
+<body>
+    <nav class="bg-gray-900 p-4 shadow-lg fixed w-full top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#home" class="text-white text-3xl font-bold">QuizXpert</a>
+            <button class="md:hidden text-white focus:outline-none" id="menu-toggle">
+                &#9776;
+            </button>
+            <div class="hidden md:flex space-x-6" id="menu">
+                <a href="#home" class="text-gray-300 hover:text-white">Home</a>
+                <a href="#features" class="text-gray-300 hover:text-white">Features</a>
+                <a href="#started" class="text-gray-300 hover:text-white">Get Started</a>
+                <a href="/sign" class="text-gray-300 hover:text-white">Sign Up</a>
+            </div>
+        </div>
+        <div class="md:hidden hidden bg-gray-800 p-4" id="mobile-menu">
+            <a href="#home" class="block text-gray-300 hover:text-white py-2">Home</a>
+            <a href="#features" class="block text-gray-300 hover:text-white py-2">Features</a>
+            <a href="/sign" class="block text-gray-300 hover:text-white py-2">Sign Up</a>
+        </div>
+    </nav>
+    
+    <header id="home" class="bg-gradient-to-r from-purple-800 via-blue-600 to-black text-white text-center min-h-screen flex flex-col justify-center items-center shadow-lg">
+
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-wide">QuizXpert</h1>
+        <h2 id="typing-text" class="text-2xl md:text-4xl font-semibold mt-4"></h2>
+        <p class="text-lg md:text-3xl mt-6 max-w-4xl mx-auto">AI-powered quiz generation for educators, students, and professionals.</p>
+    </header>
+    
+    <main class="p-4 md:p-10">
+        <section id="features" class="bg-gray-900 p-6 md:p-12 rounded-lg shadow-lg text-center">
+            <h2 class="text-3xl md:text-5xl font-semibold">Generate Quizzes Instantly</h2>
+            <p class="mt-6 text-lg md:text-xl max-w-3xl mx-auto">With QuizXpert, create quizzes on any topic in seconds using AI.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">AI-Powered</h3>
+                    <p>Utilizes cutting-edge AI to craft quality quizzes.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Instant Results</h3>
+                    <p>Generate quizzes in seconds with minimal effort.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Upload Docs</h3>
+                    <p>Generate quizzes directly from uploaded documents.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Title & Description</h3>
+                    <p>Create quizzes simply by providing a title and description.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Stay Motivated</h3>
+                    <p>Maintain streaks and track progress to challenge yourself.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Earn Badges</h3>
+                    <p>Unlock badges based on the number of quizzes you take.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Quiz Reports</h3>
+                    <p>Receive a copy of your attempted quizzes via email.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold">Adaptive Difficulty</h3>
+                    <p>Quizzes adjust difficulty based on your level.</p>
+                </div>
+            </div>
+        </section>
+        
+<br>
+<section id="started" class="p-10 bg-gray-900 text-white">
+    <h2 class="text-3xl md:text-5xl font-semibold text-center mb-10">How to Get Started</h2>
+    
+    <div class="max-w-3xl mx-auto relative">
+        <div class="space-y-10 relative">
+            <!-- Timeline -->
+            <div class="absolute left-5 top-0 w-1 bg-gray-700 h-full"></div>
+            
+            <!-- Step 1 -->
+            <div class="relative flex items-center">
+                <div class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold text-lg absolute left-0">
+                    1
+                </div>
+                <div class="ml-16 w-full">
+                    <button class="w-full text-left font-semibold text-xl flex justify-between items-center" onclick="toggleStep(1)">
+                        <span>Sign Up</span>
+                        <span class="text-blue-400">+</span>
+                    </button>
+                    <p id="step1" class="text-gray-300 mt-2 hidden">Create an account by signing up with your email.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative flex items-center">
+                <div class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold text-lg absolute left-0">
+                    2
+                </div>
+                <div class="ml-16 w-full">
+                    <button class="w-full text-left font-semibold text-xl flex justify-between items-center" onclick="toggleStep(2)">
+                        <span>Choose Quiz Type</span>
+                        <span class="text-blue-400">+</span>
+                    </button>
+                    <p id="step2" class="text-gray-300 mt-2 hidden">Select the type of quiz you want: MCQs, fill in the blanks, etc.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative flex items-center">
+                <div class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold text-lg absolute left-0">
+                    3
+                </div>
+                <div class="ml-16 w-full">
+                    <button class="w-full text-left font-semibold text-xl flex justify-between items-center" onclick="toggleStep(3)">
+                        <span>Generate Quiz</span>
+                        <span class="text-blue-400">+</span>
+                    </button>
+                    <p id="step3" class="text-gray-300 mt-2 hidden">Click on "Generate" to let AI create your quiz instantly.</p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative flex items-center">
+                <div class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold text-lg absolute left-0">
+                    4
+                </div>
+                <div class="ml-16 w-full">
+                    <button class="w-full text-left font-semibold text-xl flex justify-between items-center" onclick="toggleStep(4)">
+                        <span>Take or Share Quiz</span>
+                        <span class="text-blue-400">+</span>
+                    </button>
+                    <p id="step4" class="text-gray-300 mt-2 hidden">Take the quiz yourself or share it with students & friends.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    </main>
+    
+    <footer class="bg-gradient-to-r from-purple-800 via-blue-600 to-black text-white text-center py-6 mt-10 shadow-lg">
+        <p>&copy; 2025 QuizXpert. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        const texts = [
+        "Fill in the Blank",
+        "Multiple Choice Questions",
+        "Score History",
+        "Streak Tracker"
+    ];
+
+    let index = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    const textElement = document.getElementById("typing-text");
+
+    function typeEffect() {
+        const currentText = texts[index];
+        if (!isDeleting) {
+            // Typing effect
+            textElement.innerText = currentText.substring(0, charIndex + 1);
+            charIndex++;
+            if (charIndex === currentText.length) {
+                isDeleting = true;
+                setTimeout(typeEffect, 1000); // Wait before deleting
+                return;
+            }
+        } else {
+            // Deleting effect
+            textElement.innerText = currentText.substring(0, charIndex - 1);
+            charIndex--;
+            if (charIndex === 0) {
+                isDeleting = false;
+                index = (index + 1) % texts.length; // Move to next text
+            }
+        }
+        setTimeout(typeEffect, isDeleting ? 50 : 100); // Speed: Typing (100ms), Deleting (50ms)
+    }
+
+    typeEffect(); // Start animation
+
+    function toggleStep(step) {
+        const stepContent = document.getElementById("step" + step);
+        stepContent.classList.toggle("hidden");
+    }
+    </script>
+</body>
+</html>

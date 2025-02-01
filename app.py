@@ -128,8 +128,11 @@ def get_badge_message(quiz_count):
 # Routes
 @app.route('/')
 def home():
-    return render_template('index.html', message=None)
+    return render_template('home.html', message=None)
 
+@app.route('/sign')
+def sign():
+    return render_template('index.html', message=None)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -300,7 +303,8 @@ def generate_on_topic():
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
     else:
         prompt = f"""
-        Generate 10 {difficulty} questions on {topic} along with their answers in the format:
+        Generate 10 meaningfull {difficulty} fill in the blank questions on {topic} along with their answers. there should be
+        only one blank in a question and that should make sense. Reply in the format:
         **Question 1:** [question]
         **Answer:** [answer]
         **Question 2:** [question]
@@ -311,7 +315,7 @@ def generate_on_topic():
             completion = client.chat.completions.create(
                 model="llama3-8b-8192",
                 messages=[
-                    {"role": "system", "content": "You are responsible to generate question answer pair"},
+                    {"role": "system", "content": "You are responsible to generate fill in the blank pair"},
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
@@ -324,6 +328,7 @@ def generate_on_topic():
             extended_answer = ""
             for response_chunk in completion:
                 extended_answer += response_chunk.choices[0].delta.content or ""
+            print(extended_answer)
             return jsonify({"message": extended_answer, "email": email, "difficulty": difficulty})
         except Exception as e:
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
@@ -334,6 +339,14 @@ def quiz():
     message = request.args.get('message', 'No message provided')
     email = request.args.get('email', 'No email provided')
     return render_template('quiz.html', message=message, email=email)
+
+
+@app.route('/blank')
+def blank():
+    message = request.args.get('message', 'No message provided')
+    email = request.args.get('email', 'No email provided')
+    return render_template('blank.html', email=email, message=message)
+
 
 
 @app.route('/insertResults', methods=['POST', 'GET'])

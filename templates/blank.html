@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill-in-the-Blank Quiz</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .quiz-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        .question {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .progress {
+            width: 100%;
+            background: #ddd;
+            height: 8px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #007BFF;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #007BFF;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #score-container {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h2>Fill-in-the-Blank Quiz</h2>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <form id="quiz-form">
+            <div id="questions"></div>
+            <button type="submit">Submit Answers</button>
+        </form>
+        <div id="score-container"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get("message") || "**Question 1:** What is the capital of France? (Ans: Paris)\n**Question 2:** Who wrote 'Hamlet'? (Ans: Shakespeare)";
+        const correctAnswers = {};
+
+        function parseQuiz(message) {
+            let questionsContainer = document.getElementById("questions");
+            let lines = message.split("\n");
+            let totalQuestions = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].startsWith("**Question")) {
+                    totalQuestions++;
+                    let questionText = lines[i].replace("**", "").replace("**", "");
+                    let answerMatch = lines[i].match(/\(Ans: (.*?)\)/);
+                    let correctAnswer = answerMatch ? answerMatch[1].trim().toLowerCase() : "";
+                    correctAnswers[totalQuestions] = correctAnswer;
+
+                    let questionDiv = document.createElement("div");
+                    questionDiv.classList.add("question");
+                    questionDiv.innerHTML = `<p>${questionText.replace(/\(Ans: .*?\)/, "")}</p>
+                                            <input type="text" name="q${totalQuestions}" data-question="${totalQuestions}" required>`;
+                    questionsContainer.appendChild(questionDiv);
+                }
+            }
+
+            updateProgress(0, totalQuestions);
+        }
+
+        function updateProgress(current, total) {
+            let progressPercent = (current / total) * 100;
+            document.getElementById("progressBar").style.width = progressPercent + "%";
+        }
+
+        document.getElementById("quiz-form").addEventListener("input", function() {
+            let filledInputs = document.querySelectorAll("input[type='text']").length;
+            updateProgress(filledInputs, Object.keys(correctAnswers).length);
+        });
+
+        document.getElementById("quiz-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let score = 0;
+            let totalQuestions = Object.keys(correctAnswers).length;
+
+            document.querySelectorAll("input[type='text']").forEach(input => {
+                let userAnswer = input.value.trim().toLowerCase();
+                let questionNum = input.dataset.question;
+                
+                if (userAnswer === correctAnswers[questionNum]) {
+                    score++;
+                    input.style.border = "2px solid green";
+                } else {
+                    input.style.border = "2px solid red";
+                }
+            });
+
+            let scoreContainer = document.getElementById("score-container");
+            scoreContainer.innerHTML = `You scored <strong>${score}/${totalQuestions}</strong>!`;
+            scoreContainer.style.display = "block";
+        });
+
+        parseQuiz(message);
+    </script>
+
+</body>
+</html>

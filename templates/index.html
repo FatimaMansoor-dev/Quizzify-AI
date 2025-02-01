@@ -7,6 +7,9 @@
   <title>QuizXpert</title>
 </head>
 <body>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <div id="particles-js"></div>
+
   <div class="container">
     <aside>
       <div class="title-overlay">
@@ -100,6 +103,55 @@
             passwordField.setAttribute('type', type);
             togglePassword.textContent = type === 'password' ? '🙈' : '👁️';
           });
+
+          particlesJS("particles-js", {
+    "particles": {
+      "number": {
+        "value": 80, /* Number of particles */
+        "density": {
+          "enable": true,
+          "value_area": 800
+        }
+      },
+      "color": {
+        "value": "#ffffff" /* Particle color */
+      },
+      "shape": {
+        "type": "circle"
+      },
+      "opacity": {
+        "value": 0.5,
+        "random": false
+      },
+      "size": {
+        "value": 3,
+        "random": true
+      },
+      "move": {
+        "enable": true,
+        "speed": 2,
+        "direction": "none",
+        "random": false,
+        "straight": false
+      },
+      "line_linked": {
+        "enable": true,
+        "distance": 150,
+        "color": "#ffffff",
+        "opacity": 0.4,
+        "width": 1
+      }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": {
+          "enable": true,
+          "mode": "repulse"
+        }
+      }
+    }
+  });
         </script>
       </div>
     </main>
