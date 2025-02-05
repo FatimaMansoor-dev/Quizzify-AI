@@ -76,7 +76,6 @@
             outline: none;
             background-color: transparent;
         }
- 
 
         .idea-button {
             background: url('../static/idea.png') no-repeat center center;
@@ -95,6 +94,41 @@
             font-weight: bold;
             text-align: center;
             color: white;
+        }
+
+        .youtube-url-container {
+            width: 400px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid white;
+            margin-top: 30px;
+        }
+
+        .youtube-url-container input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid white;
+            background-color: transparent;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .youtube-url-container button {
+            width: 50%;
+            padding: 10px;
+            border: none;
+            background-color: rgb(28, 6, 109);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .youtube-url-container button:hover {
+            background-color: rgb(50, 35, 160);
         }
 
         /* Responsive Styles */
@@ -116,18 +150,18 @@
             .label {
                 font-size: 1rem; /* Slightly smaller text size for labels */
             }
+
             .navbar {
-    width: 100%; /* Ensure navbar spans the full screen width */
-    padding: 6px 2px; /* Even smaller padding */
-    box-sizing: border-box; /* Ensure padding is part of the width calculation */
-  }
+                width: 100%; /* Ensure navbar spans the full screen width */
+                padding: 6px 2px; /* Even smaller padding */
+                box-sizing: border-box; /* Ensure padding is part of the width calculation */
+            }
 
-  .navbar-brand {
-    font-size: 1.7rem; /* Further reduce font size */
-    display: flex;
-  }
+            .navbar-brand {
+                font-size: 1.7rem; /* Further reduce font size */
+                display: flex;
+            }
 
-  
         }
     </style>
 </head>
@@ -143,17 +177,31 @@
 
     <div class="button-container">
         <div class="button-box">
-            
             <button class="button idea-button" onclick="window.location.href='/topic?email={{ email }}'"></button>
             <div class="label">Quiz on Topic</div>
         </div>
         <div class="button-box">
             <button class="button doc-button" onclick="window.location.href='/upload'"></button>
-
             <div class="label">Quiz from Document</div>
         </div>
     </div>
 
-    
+    <!-- YouTube URL Input Box -->
+    <div class="youtube-url-container">
+        <input type="text" id="youtube-url" placeholder="Enter YouTube URL">
+        <button onclick="handleYouTubeUrl()">Generate Quiz</button>
+    </div>
+
+    <script>
+        function handleYouTubeUrl() {
+            const url = document.getElementById("youtube-url").value;
+            if (url) {
+                // Process the YouTube URL (You can call your backend or process the video ID here)
+                alert("You entered: " + url);
+            } else {
+                alert("Please enter a valid YouTube URL.");
+            }
+        }
+    </script>
 </body>
 </html>
