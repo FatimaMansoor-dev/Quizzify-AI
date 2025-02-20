@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill-in-the-Blank Quiz</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .quiz-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .question {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: left;
+            position: relative;
+        }
+        .correct-answer {
+            color: red;
+            font-weight: bold;
+            display: none;
+        }
+        .show-answer-btn {
+            background: none;
+            border: none;
+            color: #007BFF;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h2>Fill-in-the-Blank Quiz</h2>
+        <div id="questions"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get("message") || "**Question 1:** The sky is blue. **Answer:** True\n**Question 2:** The Earth is flat. **Answer:** False";
+
+        function parseQuiz(message) {
+            let questionsContainer = document.getElementById("questions");
+            let questionBlocks = message.trim().split("\n\n");
+
+            questionBlocks.forEach((block, index) => {
+                let questionMatch = block.match(/\*\*Question \d+:\*\*\s*(.+)/);
+                let answerMatch = block.match(/\*\*Answer:\*\*\s*(.+)/);
+
+                if (questionMatch && answerMatch) {
+                    let questionText = questionMatch[1].trim();
+                    let correctAnswer = answerMatch[1].trim();
+
+                    let questionDiv = document.createElement("div");
+                    questionDiv.classList.add("question");
+                    questionDiv.innerHTML = `
+                        <p>${questionText}</p>
+                        <button class='show-answer-btn' onclick='showAnswer(${index})'>👁 Show Answer</button>
+                        <p class='correct-answer' id='answer${index}'>Correct Answer: <strong>${correctAnswer}</strong></p>
+                    `;
+                    questionsContainer.appendChild(questionDiv);
+                }
+            });
+        }
+
+        function showAnswer(index) {
+            document.getElementById(`answer${index}`).style.display = "block";
+        }
+
+        parseQuiz(message);
+    </script>
+</body>
+</html>

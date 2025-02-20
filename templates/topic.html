@@ -8,7 +8,7 @@
         body {
             /* background-color: rgb(0, 0, 0); */
             background: linear-gradient(
-      rgba(0, 0, 0, 0.3), /* Reduce gradient intensity */
+      rgba(241, 2, 2, 0.3), /* Reduce gradient intensity */
       rgba(0, 0, 0, 0.3)
     ),
     url('../static/quiz.jpg') no-repeat center center fixed;
@@ -173,6 +173,8 @@
         <div class="radio-group">
             <label><input type="radio" name="questionType" value="MCQs" required> MCQs</label>
             <label><input type="radio" name="questionType" value="blanks" required> Fill in the Blank </label>
+            <label><input type="radio" name="questionType" value="truefalse" required> True/False </label>
+            <label><input type="radio" name="questionType" value="qa" required> short q/a </label>
         </div>
         
         <label for="difficulty">Select Difficulty Level:</label>
@@ -218,14 +220,20 @@
             const params = new URLSearchParams({
                 message: result.message,
                 email: email,
-                difficulty: difficulty
+                difficulty: difficulty,
+                type: result.type
             });
 
             if (type === "MCQs") {
-                window.location.href = `/quiz?${params.toString()}`;
-            } else {
-                window.location.href = `/blank?${params.toString()}`;
-            }
+    window.location.href = `/quiz?${params.toString()}`;
+} else if (type === "truefalse") {
+    window.location.href = `/truefalse?${params.toString()}`;
+} else if (type === "qa") {
+    window.location.href = `/qa?${params.toString()}`;
+}else {
+    window.location.href = `/blank?${params.toString()}`;
+}
+
         } else {
             alert("Failed to generate quiz. Please try again.");
         }

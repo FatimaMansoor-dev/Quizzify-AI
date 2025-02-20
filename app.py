@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 import random
 from flask_mail import Mail, Message
 from groq import Groq
+import re
+from youtube_transcript_api import YouTubeTranscriptApi
+
 
 app = Flask(__name__)
 app.secret_key = 'your-unique-secret-key'
@@ -250,6 +253,11 @@ def options():
     email = request.args.get('email')
     return render_template('options.html', email=email)
 
+@app.route('/youtube')
+def youtube():
+    email = request.args.get('email')
+    return render_template('youtube.html', email=email)
+
 
 @app.route('/upload')
 def upload():
@@ -301,7 +309,7 @@ def generate_on_topic():
             return jsonify({"message": extended_answer, "email": email})
         except Exception as e:
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
-    else:
+    elif type == 'blanks':
         prompt = f"""
         Generate 10 meaningfull {difficulty} fill in the blank questions on {topic} along with their answers. there should be
         only one blank in a question and that should make sense. Reply in the format:
@@ -333,6 +341,90 @@ def generate_on_topic():
         except Exception as e:
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
 
+    elif type == 'truefalse':
+        prompt = f"""
+        Generate 10 meaningfull {difficulty} True/False questions on {topic} along with their answers. Reply in the format:
+        **Question 1:** [statement]
+        **Answer:** [True/False]
+        **Question 2:** [statement]
+        **Answer:** [True/False]
+        """
+
+        try:
+            completion = client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=[
+                    {"role": "system", "content": "You are responsible to generate fill in the blank pair"},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.3,
+                max_tokens=1024,
+                top_p=1,
+                stream=True,
+                stop=None,
+            )
+
+            extended_answer = ""
+            for response_chunk in completion:
+                extended_answer += response_chunk.choices[0].delta.content or ""
+            print(extended_answer)
+            return jsonify({"message": extended_answer, "email": email, "difficulty": difficulty, "type": 'truefalse'})
+        except Exception as e:
+            return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
+
+    else:
+        prompt = f"""
+        Generate 10 {difficulty} descriptive question answers on {topic}. Reply in the format:
+        **Question 1:** [question]
+        **Answer:** [answer]
+        **Question 2:** [question]
+        **Answer:** [answer]
+        """
+
+        try:
+            completion = client.chat.completions.create(
+                model="llama3-8b-8192",
+                messages=[
+                    {"role": "system", "content": "You are responsible to generate question answer pairs"},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.3,
+                max_tokens=1024,
+                top_p=1,
+                stream=True,
+                stop=None,
+            )
+
+            extended_answer = ""
+            for response_chunk in completion:
+                extended_answer += response_chunk.choices[0].delta.content or ""
+            print(extended_answer)
+            return jsonify({"message": extended_answer, "email": email, "difficulty": difficulty, "type": 'generalqa'})
+        except Exception as e:
+            return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
+
+@app.route('/generate_transcript', methods=['POST'])
+def generate_transcript():
+    youtube_url = request.form.get("youtube_url")  # Get data from form submission
+    
+    if not youtube_url:
+        return jsonify({'error': 'Missing YouTube URL'}), 400
+
+    # Extract video ID from YouTube URL
+    pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+|(?:v|embed|shorts|watch)\/?|watch\?v=)|youtu\.be\/)([^\"&?\/\s]{11})"
+    match = re.search(pattern, youtube_url)
+    
+    if not match:
+        return jsonify({'error': 'Invalid YouTube URL'}), 400
+    
+    video_id = match.group(1)
+
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        text_paragraph = " ".join([entry['text'] for entry in transcript])
+        return jsonify({'transcript': text_paragraph})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/quiz')
 def quiz():
@@ -346,6 +438,19 @@ def blank():
     message = request.args.get('message', 'No message provided')
     email = request.args.get('email', 'No email provided')
     return render_template('blank.html', email=email, message=message)
+
+
+@app.route('/truefalse')
+def truefalse():
+    message = request.args.get('message', 'No message provided')
+    email = request.args.get('email', 'No email provided')
+    return render_template('truefalse.html', email=email, message=message)
+
+@app.route('/qa')
+def generalqa():
+    message = request.args.get('message', 'No message provided')
+    email = request.args.get('email', 'No email provided')
+    return render_template('qa.html', email=email, message=message)
 
 
 
