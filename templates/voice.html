@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture Transcriber</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button, select {
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        #transcript, #quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e6e6e6;
+            min-height: 50px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        audio {
+            margin-top: 15px;
+            width: 100%;
+        }
+        .options {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="userEmail" value="{{ email }}">
+    <div class="container">
+        <h2>🎤 Lecture Transcriber</h2>
+        <p>Upload an audio file to transcribe and generate a quiz.</p>
+
+        <!-- Recording Controls -->
+        <button id="startRecording">Start Recording</button>
+        <button id="stopRecording" disabled>Stop Recording</button>
+
+        <!-- Audio Player -->
+        <audio id="audioPlayer" controls hidden></audio>
+
+        <h3>Transcription:</h3>
+        <div id="transcript">Waiting for input...</div>
+
+        <!-- Quiz Options -->
+        <div class="options">
+            <label for="difficulty">Difficulty Level:</label>
+            <select id="difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+
+            <label for="questionType">Question Type:</label>
+            <select id="questionType">
+                <option value="MCQs">Multiple Choice</option>
+                <option value="True/False">True/False</option>
+                <option value="blanks">Fill in the blanks</option>
+                <option value="qa">short Question Answers</option>
+            </select>
+        </div>
+
+        <!-- Generate Quiz Button -->
+        <button id="generateQuiz" disabled>Generate Quiz</button>
+
+    </div>
+
+    <script>
+        let userEmail = document.getElementById("userEmail").value;
+    const startBtn = document.getElementById("startRecording");
+    const stopBtn = document.getElementById("stopRecording");
+    const transcriptOutput = document.getElementById("transcript");
+    const generateQuizBtn = document.getElementById("generateQuiz");
+    const difficultySelect = document.getElementById("difficulty");
+    const questionTypeSelect = document.getElementById("questionType");
+
+    let latestTranscript = ""; // Store the latest transcript
+
+    // Speech Recognition
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let interimTranscript = "";
+
+    startBtn.addEventListener("click", () => {
+        transcriptOutput.textContent = "Listening...";
+        latestTranscript = "";
+        interimTranscript = "";
+        recognition.start();
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    });
+
+    stopBtn.addEventListener("click", () => {
+        recognition.stop();
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    });
+
+    // Capture partial results
+    recognition.onresult = (event) => {
+        interimTranscript = "";
+        for (let i = 0; i < event.results.length; i++) {
+            interimTranscript += event.results[i][0].transcript + " ";
+        }
+        transcriptOutput.textContent = interimTranscript;
+    };
+
+    // Finalize transcript when recognition stops
+    recognition.onend = () => {
+        latestTranscript = interimTranscript.trim();
+        console.log("Final Transcript:", latestTranscript);
+        transcriptOutput.textContent = latestTranscript || "No speech detected.";
+        generateQuizBtn.disabled = !latestTranscript;
+    };
+
+    // Function to Generate Quiz
+    generateQuizBtn.addEventListener("click", async () => {
+        if (!latestTranscript.trim()) {
+            alert("No transcript available.");
+            return;
+        }
+
+        console.log("Sending transcript:", latestTranscript);
+
+        let difficulty = difficultySelect.value;
+        let questionType = questionTypeSelect.value;
+
+        try {
+            let response = await fetch("/generateOnTopic", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    email: userEmail,
+                    topic: latestTranscript, 
+                    difficulty: difficulty, 
+                    type: questionType 
+                })
+            });
+
+            let data = await response.json();
+
+            if (response.ok) {
+    const params = new URLSearchParams({
+        message: data.message,  // ✅ Use 'data' from above
+        email: userEmail,
+        difficulty: difficulty
+    });
+    console.log(params);
+
+    if (questionTypeSelect.value === "MCQs") {  // ✅ Fix condition by using '.value'
+        window.location.href = `/quiz?${params.toString()}`;
+    } else if (questionTypeSelect.value === "True/False") {  // ✅ Fix value case
+        window.location.href = `/truefalse?${params.toString()}`;
+    } else if (questionTypeSelect.value === "qa") {
+        window.location.href = `/qa?${params.toString()}`;
+    } else {
+        window.location.href = `/blank?${params.toString()}`;
+    }
+} else {
+    quizOutput.textContent = "Error: " + data.error;
+            }
+        } catch (error) {
+            console.error("Quiz generation error:", error);
+            quizOutput.textContent = "Failed to generate quiz.";
+        }
+    });
+    </script>
+
+</body>
+</html>

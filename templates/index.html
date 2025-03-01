@@ -3,158 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizXpert 🏆</title>
   <link rel="stylesheet" href="../static/styles.css">
-  <title>QuizXpert</title>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    body { overflow: hidden; text-align: center; }
+    .main-heading { font-size: 3rem; margin-top: 20px; font-weight: bold; }
+    .container { position: relative; z-index: 10; text-align: center; margin-top: 30px; }
+    .branding h2 { font-size: 1.5rem; opacity: 0; }
+    .form-container { transform: translateY(30px); opacity: 0; }
+    .password-box { position: relative; display: flex; align-items: center; }
+    .password-box button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      position: absolute;
+      right: 10px;
+    }
+  </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <div id="particles-js"></div>
 
-  <div class="container">
-    <aside>
-      <div class="title-overlay">
-        <h1>
-          <span class="bounce">Q</span>
-          <span class="bounce">u</span>
-          <span class="bounce">i</span>
-          <span class="bounce">z</span>
-          <span class="bounce">X</span>
-          <span class="bounce">p</span>
-          <span class="bounce">e</span>
-          <span class="bounce">r</span>
-          <span class="bounce">t</span>
-        </h1>
-        <h2>Ace Your Next Exam Like a PRO!</h2>
-      </div>
-    </aside>
-    <main>
-      <div class="overlay">
-        <form class="login-form" id="auth-form" action="/login" method="POST">
-          <h2 id="form-title">Login</h2>
+  <h1 class="main-heading">QuizXpert 🏆</h1>  <!-- Moved outside the container -->
 
+  <div class="container">
+    <aside class="branding">
+      <h2 class="tagline">Ace Your Next Exam Like a PRO!</h2>
+    </aside>
+
+    <main class="login-area">
+      <div class="form-container">
+        <form id="auth-form" action="/login" method="POST">
+          <h2 id="form-title">Login</h2>
+          
           {% if message %}
-          <p id="message-box" style="color: red; text-align: center;">{{ message }}</p>
+          <p class="message">{{ message }}</p>
           {% endif %}
 
-          <div id="additional-fields" style="display: none;">
-            <label for="first-name">First Name</label>
-            <input type="text" id="first-name" name="first_name" placeholder="Enter your first name">
-            
-            <label for="last-name">Last Name</label>
-            <input type="text" id="last-name" name="last_name" placeholder="Enter your last name">
+          <div id="extra-fields" class="hidden">
+            <input type="text" name="first_name" placeholder="First Name">
+            <input type="text" name="last_name" placeholder="Last Name">
           </div>
 
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email" required>
-          
-          <label for="password">Password</label>
-          <div class="password-container">
-            <input type="password" id="password" name="password" placeholder="Enter your password" minlength="9" required>
-            <button type="button" class="toggle-password" id="toggle-password">🙈</button>
+          <input type="email" name="email" placeholder="Email" required>
+          <div class="password-box">
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <button type="button" id="toggle-password">👁️</button>
           </div>
-          
-          <button type="submit" id="submit-button">Submit</button>
-          <p id="toggle-message">
-            Don't have an account? 
-            <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>
+
+          <button type="submit" class="btn">Submit</button>
+
+          <p id="toggle-auth">
+            Don't have an account? <span class="link">Sign Up</span>
           </p>
         </form>
-        
-        <script>
-          const formTitle = document.getElementById('form-title');
-          const authForm = document.getElementById('auth-form');
-          const toggleMessage = document.getElementById('toggle-message');
-          const additionalFields = document.getElementById('additional-fields');
-
-          function toggleFormMode() {
-  if (formTitle.textContent === 'Login') {
-    formTitle.textContent = 'Sign Up';
-    authForm.action = '/signup';
-    additionalFields.style.display = 'block'; // Show First Name and Last Name inputs
-    authForm.style.marginTop = '50px'; // Increase margin top when signing up
-
-    toggleMessage.innerHTML = `Already have an account? 
-      <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Login</span>`;
-  } else {
-    formTitle.textContent = 'Login';
-    authForm.action = '/login';
-    additionalFields.style.display = 'none'; // Hide First Name and Last Name inputs
-    authForm.style.marginTop = '0'; // Reset margin-top when logging in
-
-    toggleMessage.innerHTML = `Don't have an account? 
-      <span id="toggle-auth-mode" style="color: blue; cursor: pointer;">Sign Up</span>`;
-  }
-  attachToggleListener();
-}
-
-
-          function attachToggleListener() {
-            const toggleAuthMode = document.getElementById('toggle-auth-mode');
-            toggleAuthMode.addEventListener('click', toggleFormMode);
-          }
-
-          attachToggleListener();
-
-          const togglePassword = document.getElementById('toggle-password');
-          const passwordField = document.getElementById('password');
-
-          togglePassword.addEventListener('click', () => {
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
-            togglePassword.textContent = type === 'password' ? '🙈' : '👁️';
-          });
-
-          particlesJS("particles-js", {
-    "particles": {
-      "number": {
-        "value": 80, /* Number of particles */
-        "density": {
-          "enable": true,
-          "value_area": 800
-        }
-      },
-      "color": {
-        "value": "#ffffff" /* Particle color */
-      },
-      "shape": {
-        "type": "circle"
-      },
-      "opacity": {
-        "value": 0.5,
-        "random": false
-      },
-      "size": {
-        "value": 3,
-        "random": true
-      },
-      "move": {
-        "enable": true,
-        "speed": 2,
-        "direction": "none",
-        "random": false,
-        "straight": false
-      },
-      "line_linked": {
-        "enable": true,
-        "distance": 150,
-        "color": "#ffffff",
-        "opacity": 0.4,
-        "width": 1
-      }
-    },
-    "interactivity": {
-      "detect_on": "canvas",
-      "events": {
-        "onhover": {
-          "enable": true,
-          "mode": "repulse"
-        }
-      }
-    }
-  });
-        </script>
       </div>
     </main>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      gsap.from(".main-heading", { duration: 1, y: -50, opacity: 0, ease: "bounce.out" });
+      gsap.to(".tagline", { duration: 1, delay: 0.5, opacity: 1, y: 0 });
+      gsap.to(".form-container", { duration: 1, delay: 1, opacity: 1, y: 0 });
+
+      // Toggle login/signup mode
+      const formTitle = document.getElementById("form-title");
+      const authForm = document.getElementById("auth-form");
+      const extraFields = document.getElementById("extra-fields");
+      const toggleAuth = document.querySelector("#toggle-auth .link");
+
+      toggleAuth.addEventListener("click", () => {
+        if (formTitle.textContent === "Login") {
+          formTitle.textContent = "Sign Up";
+          authForm.action = "/signup";
+          extraFields.classList.remove("hidden");
+          toggleAuth.textContent = "Login";
+        } else {
+          formTitle.textContent = "Login";
+          authForm.action = "/login";
+          extraFields.classList.add("hidden");
+          toggleAuth.textContent = "Sign Up";
+        }
+      });
+
+      // Password toggle (👁️ -> 🙈)
+      const togglePassword = document.getElementById("toggle-password");
+      const passwordField = document.getElementById("password");
+
+      togglePassword.addEventListener("click", function () {
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+          togglePassword.textContent = "🙈";
+        } else {
+          passwordField.type = "password";
+          togglePassword.textContent = "👁️";
+        }
+      });
+    });
+  </script>
 </body>
 </html>

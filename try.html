@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizXpert</title>
+    <title>QuizRise Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -74,9 +74,9 @@
     <!-- Hero Section -->
     <!-- Hero Section -->
 <section class="h-screen flex flex-col justify-center items-center text-center px-6 relative z-10 font-poppins">
-    <img src="../static/qlogo.png" alt="QuizRise Logo" class="w-25 h-28 mb-4"> 
-    <h1 class="text-7xl font-bold gradient-text ">AI Quiz Generator</h1>
-    <h2 class="text-7xl font-bold text-pink-400 mt-2 gradient-text mb-6">Make Learning Easy</h2>
+    <img src="../static/qlogo.png" alt="QuizRise Logo" class="w-32 h-32 mb-4"> <!-- Added Logo -->
+    <h1 class="text-7xl font-bold gradient-text">AI Quiz Generator</h1>
+    <h2 class="text-7xl font-bold text-pink-400 mt-2 gradient-text">Make Learning Easy</h2>
     <p class="mt-4 text-gray-300 max-w-xl">Create questions from any text, URL, PDF, or YouTube videos with the AI-powered online quiz builder.</p>
     <a href="#" class="mt-6 inline-block bg-indigo-500 px-6 py-3 rounded-lg text-lg">Create Your First Quiz Now!</a>
 </section>
@@ -87,86 +87,47 @@
     <section class="w-full bg-gray-100 py-16 text-gray-900">
         <div class="text-center mb-10">
             <h2 class="text-4xl font-bold text-pink-500">Key Features</h2>
-            <p class="text-xl font-semibold mt-2">Discover the Key Features of QuizXpert AI Question Generator</p>
+            <p class="text-xl font-semibold mt-2">Discover the Key Features of QuizRise AI Question Generator</p>
         </div>
         <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">📄</span>
                 <h3 class="font-bold text-lg mt-2">Multiple question types</h3>
                 <p class="text-gray-600 mt-2">Generate multiple-choice, true-false, and fill-in-the-blank questions with ease.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">📜</span>
                 <h3 class="font-bold text-lg mt-2">From the text, YouTube, URL, or PDF</h3>
                 <p class="text-gray-600 mt-2">Effortlessly generate questions from any content, including text, PDFs, and YouTube videos.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">🏆</span>
                 <h3 class="font-bold text-lg mt-2">Streaks & Badges</h3>
                 <p class="text-gray-600 mt-2">Keep learning fun and engaging by earning streaks and badges as you progress.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">🔗</span>
                 <h3 class="font-bold text-lg mt-2">Share as a Link</h3>
                 <p class="text-gray-600 mt-2">Effortlessly share your exams with our 'Share as a Link' feature.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">📥</span>
                 <h3 class="font-bold text-lg mt-2">Export to PDF or TXT</h3>
                 <p class="text-gray-600 mt-2">Save and export your quizzes as PDF or TXT files for easy sharing.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center">
                 <span class="text-3xl">📊</span>
                 <h3 class="font-bold text-lg mt-2">Analyze the Results</h3>
                 <p class="text-gray-600 mt-2">Analyze student results and identify learning trends.</p>
-                <a href="{{ url_for('sign') }}" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
+                <a href="#" class="text-indigo-500 mt-4 block">Let’s Get Started</a>
             </div>
         </div>
     </section>
-
-    <!-- How It Works Section -->
-<section class="py-16 bg-gray-100 text-center">
-    <h2 class="text-4xl font-bold text-pink-600">How it works</h2>
-    <p class="mt-4 text-xl text-gray-800">
-        Turn your content into <span class="text-pink-500 font-semibold">quizzes</span> with the magic of <span class="font-semibold">AI</span>.
-    </p>
-
-    <div class="mt-10 flex flex-col md:flex-row items-center justify-center gap-10 px-6">
-        <!-- Image -->
-        <div class="max-w-md">
-            <img src="your-image-path.png" alt="Quiz Generator" class="rounded-lg shadow-lg">
-        </div>
-        
-        <!-- Text Content -->
-        <div class="max-w-md text-left">
-            <h3 class="text-lg text-indigo-600 font-bold">1. Create</h3>
-            <h2 class="text-2xl font-bold text-gray-900">Create Quizzes in Seconds</h2>
-            <p class="mt-2 text-gray-700">
-                AI-Powered. Easily turn any content into quizzes with answers.
-                <a href="#" class="text-indigo-500 font-semibold">Create quiz from PDF</a>, 
-                <a href="#" class="text-indigo-500 font-semibold">create quiz from YouTube video</a>, 
-                <a href="#" class="text-indigo-500 font-semibold">create quiz from text</a>, 
-                <a href="#" class="text-indigo-500 font-semibold">create quiz from Website</a> – you have all these ways.
-            </p>
-            <p class="mt-2 text-gray-700">
-                Multiple question types. You can use the 
-                <a href="#" class="text-indigo-500 font-semibold">multiple choice question generator</a>, 
-                <a href="#" class="text-indigo-500 font-semibold">true-false question generator</a>, 
-                or <a href="#" class="text-indigo-500 font-semibold">fill-in-the-blank question generator</a>.
-            </p>
-            <a href="{{ url_for('sign') }}" class="mt-4 inline-block bg-indigo-500 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md">
-    Get Started
-</a>
-
-        </div>
-    </div>
-</section>
-
     <script>
         const sparkleContainer = document.getElementById('sparkles');
         function createSparkle() {

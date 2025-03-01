@@ -1,172 +1,163 @@
-html, body {
+/* General Styles */
+body {
+  font-family: "Poppins", sans-serif;
   margin: 0;
   padding: 0;
-  height: 100%
+  /* display: flex; */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #ce779f, #76a3f0);
+  overflow: hidden;
 }
 
+/* Particle Background */
 #particles-js {
-  position: fixed;
+  position: absolute;
   width: 100%;
   height: 100%;
+<<<<<<< HEAD
   background: #0d0d0d; 
   z-index: -1; /* Keeps it behind everything */
+=======
+  z-index: 0;
+>>>>>>> 45ba368 (new ui start)
 }
 
+/* Container */
 .container {
   display: flex;
-  top: 7rem;
-  height: 100%;
-  position: relative;
-}
-
-.title-overlay {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  text-align: center;
-  white-space: nowrap;
-}
-.title-overlay {
-  text-align: center;
-  margin-bottom: 40px; /* Adds space below the text */
-  padding: 20px; /* Optional: add some padding */
-}
-
-.title-overlay h1 {
-  color: white;
-  font-size: 5rem;
-  margin: 0; 
-  /* text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 
-               0 0 20px rgba(58, 68, 196, 0.6), 
-               0 0 30px rgba(1, 42, 155, 0.4), 
-               0 0 40px rgba(86, 10, 156, 0.349); */ 
-}
-
-
-
-aside h2 {
-  color: white;
-  padding-bottom: 30px;
-}
-
-.login-form {
-  position: absolute;
-  top: 47%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.7); /* Darker and more transparent */
-  border-radius: 8px;
-  padding: 20px 30px;
-  /* box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 
-              0 0 20px rgba(255, 255, 255, 0.6), 
-              0 0 30px rgba(255, 255, 255, 0.4); Glowing white border */
-  border: 2px solid rgba(255, 255, 255, 0.8); /* Solid white border */
-  width: 300px;
-  z-index: 1;
-  text-align: center;
-}
-
-.login-form:hover {
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-}
-
-.login-form h2 {
-  margin-bottom: 15px;
-  color: #ffffff; /* White text for contrast */
-  font-size: 1.5rem;
-}
-
-.login-form label {
-  display: block;
-  text-align: left;
-  margin-bottom: 5px;
-  font-size: 0.9rem;
-  color: #cccccc; /* Light grey for labels */
-}
-
-.login-form input {
-  width: 90%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #555; /* Darker border */
-  background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
-  border-radius: 4px;
-  font-size: 1rem;
-  color: #ffffff; /* White text */
-}
-
-.login-form input::placeholder {
-  color: #aaaaaa; /* Lighter placeholder text */
-}
-
-#submit-button {
+  max-width: 900px;
   width: 100%;
-  padding: 10px;
-  background-color: #57479e; /* Purple color */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 1;
+  margin: auto; /* Centers the container */
+}
+
+
+/* Sidebar (Branding) */
+.branding {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  text-align: center;
+}
+
+.animated-title span {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: bold;
   color: #fff;
-  border: none;
-  border-radius: 50px; /* Makes the button round */
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
 }
 
-#submit-button:hover {
-  background-color: #6048b6; /* Darker purple for hover effect */
+.tagline {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-top: 10px;
 }
 
-
-
-#toggle-message{
-  color: white;
-}
-
-.password-container .toggle-password {
-  top: 0.5rem;
-}
-
-
-#side {
-  position: absolute;
-  left: 71%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: auto;
-  top: 4rem;
-}
-
-.password-container {
-  position: relative;
+/* Login Form */
+.login-area {
+  flex: 1;
+  padding: 40px;
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 
-.password-container input {
+.form-container {
   width: 100%;
-  padding-right: 50px; /* Reserve space for the eye icon */
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.password-container .toggle-password {
+h2 {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease-in-out;
+}
+
+input:focus {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Password Field */
+.password-box {
+  position: relative;
+}
+
+.password-box button {
   position: absolute;
   right: 10px;
-  cursor: pointer;
-  background: none;
+  top: 50%;
+  transform: translateY(-50%);
   border: none;
-  padding: 0;
-  font-size: 1.2em;
-  color: #666;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
 }
 
-@media (max-width: 768px) {
-  .login-form {
-    width: 80%;
-  }
-  .title-overlay h1 {
-    font-size: 1.9rem; /* Further reduce size for small screens */
-  }
- 
+/* Submit Button */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #6a11cb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
 }
+
+.btn:hover {
+  background: #2575fc;
+}
+
+/* Toggle Auth Mode */
+.link {
+  color: #2575fc;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Hidden Fields */
+.hidden {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .branding {
+    display: none;
+  }
+}
+<<<<<<< HEAD
 
 @media (max-width: 480px) {
   .login-form {
@@ -182,3 +173,5 @@ aside h2 {
   }
   
 }
+=======
+>>>>>>> 45ba368 (new ui start)

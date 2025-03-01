@@ -3,205 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Quiz</title>
+    <title>QuizRise Clone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: black;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+        /* Reset styles */
+        * {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            color: white;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
+        body {
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+
+        /* Header */
+        header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .navbar-brand {
-            font-size: 3.5rem;
-            color: rgb(28, 6, 109);
-            text-decoration: none;
+        .logo {
+            font-size: 24px;
             font-weight: bold;
+            color: #6a0dad;
+        }
+
+        .user-info {
             display: flex;
             align-items: center;
-            text-shadow: 0 0 5px white, 0 0 10px white, 0 0 20px white;
+            gap: 15px;
         }
 
-        .navbar-brand img {
-            margin-right: 15px;
-            width: 100px;
-            height: 100px;
+        .profile {
+            background-color: gray;
+            color: white;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        main {
+            padding: 50px 20px;
         }
 
         h1 {
-            margin: 20px 0;
-            text-align: center;
-            font-size: 2.5rem;
+            font-size: 26px;
+            margin-bottom: 30px;
         }
 
-        .button-container {
-            display: flex;
+        /* Options Grid */
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            max-width: 700px;
+            margin: auto;
         }
 
-        .button-box {
-            width: 400px;
-            height: 400px;
-            border: 2px solid white;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-
-        .button {
-            background-size: contain;
-            width: 100%;
-            height: 90%;
-            border: none;
+        /* Common Option Box Style */
+        .option {
+            border-radius: 12px;
             cursor: pointer;
-            outline: none;
-            background-color: transparent;
+            text-align: left;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .idea-button {
-            background: url('../static/idea.png') no-repeat center center;
+        .option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .doc-button {
-            background: url('../static/doc.png') no-repeat center center;
+        /* Upper Section (Heading) */
+        .option .header {
+            background-color: #f5f5f5;
+            padding: 12px 20px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
         }
 
-        .button:hover {
-            filter: brightness(1.2);
+        /* Lower Section (Content) */
+        .option .content {
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 400;
+            border-radius: 0 0 12px 12px;
         }
 
-        .label {
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-            color: white;
+        /* Specific Backgrounds for Lower Section */
+        .pdf .content {
+            background-color: #e0f7e9;
+            color: #129c54;
         }
 
-        .youtube-url-container {
-            width: 400px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.8);
-            border: 2px solid white;
-            margin-top: 30px;
+        .text .content {
+            background-color: #e0e0e0;
+            color: #5a5a5a;
         }
 
-        .youtube-url-container input {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid white;
-            background-color: transparent;
-            color: white;
-            font-size: 1rem;
+        .url .content {
+            background-color: #f0e0ff;
+            color: #8c3bbd;
         }
 
-        .youtube-url-container button {
-            width: 50%;
-            padding: 10px;
-            border: none;
-            background-color: rgb(28, 6, 109);
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .youtube-url-container button:hover {
-            background-color: rgb(50, 35, 160);
-        }
-
-        /* Responsive Styles */
-        @media screen and (max-width: 768px) {
-            .button-container {
-                flex-direction: column; /* Stack boxes vertically */
-            }
-
-            .button-box {
-                width: 90%; /* Make boxes smaller */
-                height: auto;
-                padding: 15px;
-            }
-
-            .button {
-                height: 60vw; /* Adjust button size relative to viewport width */
-            }
-
-            .label {
-                font-size: 1rem; /* Slightly smaller text size for labels */
-            }
-
-            .navbar {
-                width: 100%; /* Ensure navbar spans the full screen width */
-                padding: 6px 2px; /* Even smaller padding */
-                box-sizing: border-box; /* Ensure padding is part of the width calculation */
-            }
-
-            .navbar-brand {
-                font-size: 1.7rem; /* Further reduce font size */
-                display: flex;
-            }
-
+        .youtube .content {
+            background-color: #fde0e0;
+            color: #d32f2f;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a class="navbar-brand" href="#">
-            <!-- <img src="../static/logo.png" class="d-inline-block align-top" alt="Logo"> -->
-            QuizXpert
-        </a>
-    </nav>
+    <header>
+        <div class="logo">QuizXpert</div>
+        <!-- <div class="user-info">
+            <div class="profile">D</div>
+        </div> -->
+    </header>
 
-    <h1>Make Your Choice!</h1>
-
-    <div class="button-container">
-        <div class="button-box">
-            <button class="button idea-button" onclick="window.location.href='/topic?email={{ email }}'"></button>
-            <div class="label">Quiz on Topic</div>
+    <main>
+        <h1>Select a Source to Create Questions</h1>
+        <div class="options">
+            <div class="option pdf">
+                <div class="header">📄 From PDF</div>
+                <div class="content">Create a quiz based on your PDF</div>
+            </div>
+            <div class="option text" onclick="window.location.href='/topic?email={{ email }}'">
+                <div class="header">📝 From Topic</div>
+                <div class="content">Create a quiz based on your custom Topic</div>
+            </div>
+            <div class="option voice">
+                <div class="header"  onclick="window.location.href='/voice?email={{ email }}'">🔗 From MP3 Recording</div>
+                <div class="content">Create a quiz based on a Voice Lecture</div>
+            </div>
+            
+            
+            <div class="option url">
+                <div class="header">🔗 From URL</div>
+                <div class="content">Create a quiz based on a website URL</div>
+            </div>
+            <div class="option youtube">
+                <div class="header" onclick="window.location.href='/youtube?email={{ email }}'">🎥 From YouTube</div>
+                <div class="content">Create a quiz based on a YouTube video</div>
+            </div>
         </div>
-        <div class="button-box">
-            <button class="button doc-button" onclick="window.location.href='/upload'"></button>
-            <div class="label">Quiz from Document</div>
-        </div>
-    </div>
-
-    <!-- YouTube URL Input Box -->
-    <div class="youtube-url-container">
-        <input type="text" id="youtube-url" placeholder="Enter YouTube URL">
-        <button onclick="handleYouTubeUrl()">Generate Quiz</button>
-    </div>
-
-    <script>
-        function handleYouTubeUrl() {
-            const url = document.getElementById("youtube-url").value;
-            if (url) {
-                // Process the YouTube URL (You can call your backend or process the video ID here)
-                alert("You entered: " + url);
-            } else {
-                alert("Please enter a valid YouTube URL.");
-            }
-        }
-    </script>
+    </main>
 </body>
 </html>

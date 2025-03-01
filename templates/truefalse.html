@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fill-in-the-Blank Quiz</title>
+    <title>True/False Quiz</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -27,25 +27,15 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        h2 {
+            margin-bottom: 10px;
+        }
         .question {
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
             text-align: left;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .correct-answer {
-            color: red;
-            font-weight: bold;
-            display: none; /* Initially hidden */
         }
         .progress {
             width: 100%;
@@ -92,7 +82,7 @@
 <body>
 
     <div class="quiz-container">
-        <h2>Fill-in-the-Blank Quiz</h2>
+        <h2>True/False Quiz</h2>
         <div class="progress">
             <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -105,36 +95,44 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const message = urlParams.get("message") || "**Question 1:** The sky is blue. **Answer:** True\n**Question 2:** The Earth is flat. **Answer:** False";
+        const message = urlParams.get("message") || "no quiz found";
         const correctAnswers = {};
 
         function parseQuiz(message) {
             let questionsContainer = document.getElementById("questions");
-            let questionBlocks = message.trim().split("\n\n"); // Splitting by double newlines
-
+            let lines = message.split("\n");
             let totalQuestions = 0;
 
-            questionBlocks.forEach((block, index) => {
-                let questionMatch = block.match(/\*\*Question \d+:\*\*\s*(.+)/);
-                let answerMatch = block.match(/\*\*Answer:\*\*\s*(.+)/);
-
-                if (questionMatch && answerMatch) {
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].startsWith("**Question")) {
                     totalQuestions++;
-                    let questionText = questionMatch[1].trim();
-                    let correctAnswer = answerMatch[1].trim();
+                    let questionText = lines[i].replace("**", "").replace("**", "");
 
+                    // Extract the correct answer (True/False)
+                    let answerMatch = message.match(/\*\*Answer:\*\*\s*(.+)/);
+                    let correctAnswer = answerMatch ? answerMatch[1].trim().toLowerCase() : "";
+
+                    // Store correct answer in lowercase
                     correctAnswers[totalQuestions] = correctAnswer;
 
                     let questionDiv = document.createElement("div");
                     questionDiv.classList.add("question");
                     questionDiv.innerHTML = `
-                        <p>${questionText}</p>
-                        <input type="text" name="q${totalQuestions}" data-question="${totalQuestions}" required>
-                        <p class='correct-answer' id='answer${totalQuestions}'>Correct Answer: <strong>${correctAnswer}</strong></p>
+                        <p>${questionText.replace(/\(Ans: .*?\)/, "")}</p>
+                        <label>
+                            <input type="radio" name="q${totalQuestions}" value="true" required> True
+                        </label>
+                        <label>
+                            <input type="radio" name="q${totalQuestions}" value="false" required> False
+                        </label>
                     `;
                     questionsContainer.appendChild(questionDiv);
                 }
-            });
+            }
+
+            if (totalQuestions === 0) {
+                questionsContainer.innerHTML = "<p>No valid questions found.</p>";
+            }
 
             updateProgress(0, totalQuestions);
         }
@@ -145,8 +143,8 @@
         }
 
         document.getElementById("quiz-form").addEventListener("input", function() {
-            let filledInputs = document.querySelectorAll("input[type='text']").length;
-            updateProgress(filledInputs, Object.keys(correctAnswers).length);
+            let answeredQuestions = document.querySelectorAll("input[type='radio']:checked").length;
+            updateProgress(answeredQuestions, Object.keys(correctAnswers).length);
         });
 
         document.getElementById("quiz-form").addEventListener("submit", function(event) {
@@ -154,22 +152,22 @@
             let score = 0;
             let totalQuestions = Object.keys(correctAnswers).length;
 
-            document.querySelectorAll("input[type='text']").forEach(input => {
-                let userAnswer = input.value.trim().toLowerCase();
-                let questionNum = input.dataset.question;
-                let correctAnswer = correctAnswers[questionNum].toLowerCase();
-                let answerDisplay = document.getElementById(`answer${questionNum}`);
+            for (let i = 1; i <= totalQuestions; i++) {
+                let selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selectedOption) {
+                    let userAnswer = selectedOption.value.toLowerCase();
+                    let correctAnswer = correctAnswers[i];
 
-                if (userAnswer === correctAnswer) {
-                    score++;
-                    input.style.border = "2px solid green";
-                } else {
-                    input.style.border = "2px solid red";
+                    console.log(`Q${i}: User selected = ${userAnswer}, Correct = ${correctAnswer}`);
+
+                    if (userAnswer === correctAnswer) {
+                        score++;
+                        selectedOption.parentElement.style.color = "green";
+                    } else {
+                        selectedOption.parentElement.style.color = "red";
+                    }
                 }
-
-                // Always show the correct answer after submission
-                answerDisplay.style.display = "block";
-            });
+            }
 
             let scoreContainer = document.getElementById("score-container");
             scoreContainer.innerHTML = `You scored <strong>${score}/${totalQuestions}</strong>!`;

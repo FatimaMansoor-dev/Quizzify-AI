@@ -173,6 +173,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const message = urlParams.get("message") || "No quiz data provided.";
 const email = urlParams.get("email") || "No email provided.";
 const difficulty = urlParams.get("difficulty") || "No difficulty provided.";
+const type = urlParams.get("type") || "No type provided.";
 
 // Function to parse the message into questions
 function parseQuestions(message) {
