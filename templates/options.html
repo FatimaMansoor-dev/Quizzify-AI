@@ -139,7 +139,7 @@
         <h1>Select a Source to Create Questions</h1>
         <div class="options">
             <div class="option pdf">
-                <div class="header">📄 From PDF</div>
+                <div class="header" onclick="window.location.href='/pdf?email={{ email }}'">📄 From PDF</div>
                 <div class="content">Create a quiz based on your PDF</div>
             </div>
             <div class="option text" onclick="window.location.href='/topic?email={{ email }}'">

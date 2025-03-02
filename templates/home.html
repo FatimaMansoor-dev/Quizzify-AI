@@ -46,6 +46,15 @@
     font-family: 'Poppins', sans-serif;
 }
 
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    /* background-color: rgba(0, 0, 0, 0.8); Ensure visibility */
+    z-index: 1000;
+}
+
+
     </style>
 </head>
 <body class="text-white w-screen flex flex-col">
@@ -53,19 +62,20 @@
     
     <!-- Navbar -->
     <nav class="flex justify-between items-center p-6 w-full absolute top-0">
-        <div class="text-2xl font-bold flex items-center">
+        <!-- <div class="text-2xl font-bold flex items-center">
             <span class="text-gray-300">Quiz</span><span class="text-indigo-500">Rise</span>
-        </div>
+        </div> -->
         <ul class="hidden md:flex space-x-6">
-            <li><a href="#" class="hover:text-indigo-400 text-gray-300">How it works</a></li>
-            <li><a href="#" class="hover:text-indigo-400 text-gray-300">Help center</a></li>
-            <li><a href="#" class="hover:text-indigo-400 text-gray-300">Discover</a></li>
-            <li><a href="#" class="hover:text-indigo-400 text-gray-300">Pricing</a></li>
+            <li><a href="#started" class="hover:text-indigo-400 text-gray-300">How it works</a></li>
+            <!-- <li><a href="#" class="hover:text-indigo-400 text-gray-300">Help center</a></li> -->
+            <li><a href="#features" class="hover:text-indigo-400 text-gray-300">Features</a></li>
+            <!-- <li><a href="#" class="hover:text-indigo-400 text-gray-300">Pricing</a></li> -->
             <li><a href="#" class="hover:text-indigo-400 text-gray-300">FAQ</a></li>
         </ul>
         <div class="hidden md:flex space-x-4">
-            <a href="/login" class="text-gray-300">Log in</a>
-            <a href="/sign" class="bg-indigo-500 px-4 py-2 rounded-lg">Get started</a>
+            <!-- <a href="/login" class="text-gray-300">Log in</a> -->
+            <!-- <a href="/sign" class="bg-indigo-500 px-4 py-2 rounded-lg">Get started</a> -->
+
         </div>
         
         <button class="md:hidden text-gray-300" id="menu-btn">☰</button>
@@ -78,13 +88,11 @@
     <h1 class="text-7xl font-bold gradient-text ">AI Quiz Generator</h1>
     <h2 class="text-7xl font-bold text-pink-400 mt-2 gradient-text mb-6">Make Learning Easy</h2>
     <p class="mt-4 text-gray-300 max-w-xl">Create questions from any text, URL, PDF, or YouTube videos with the AI-powered online quiz builder.</p>
-    <a href="#" class="mt-6 inline-block bg-indigo-500 px-6 py-3 rounded-lg text-lg">Create Your First Quiz Now!</a>
+    <a href="/sign" class="mt-6 inline-block bg-indigo-500 px-6 py-3 rounded-lg text-lg">Create Your First Quiz Now!</a>
 </section>
 
-    
-
     <!-- Features Section -->
-    <section class="w-full bg-gray-100 py-16 text-gray-900">
+    <section class="w-full bg-gray-100 py-16 text-gray-900" id="features">
         <div class="text-center mb-10">
             <h2 class="text-4xl font-bold text-pink-500">Key Features</h2>
             <p class="text-xl font-semibold mt-2">Discover the Key Features of QuizXpert AI Question Generator</p>
@@ -130,7 +138,7 @@
     </section>
 
     <!-- How It Works Section -->
-<section class="py-16 bg-gray-100 text-center">
+<section class="py-16 bg-gray-100 text-center" id="started">
     <h2 class="text-4xl font-bold text-pink-600">How it works</h2>
     <p class="mt-4 text-xl text-gray-800">
         Turn your content into <span class="text-pink-500 font-semibold">quizzes</span> with the magic of <span class="font-semibold">AI</span>.

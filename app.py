@@ -261,10 +261,12 @@ def youtube():
     email = request.args.get('email')
     return render_template('youtube.html', email=email)
 
+@app.route('/pdf')
+def pdf():
+    email = request.args.get('email')
+    return render_template('pdf.html', email=email)
 
-@app.route('/upload')
-def upload():
-    return render_template('main.html')
+
 
 
 @app.route('/topic')
@@ -281,8 +283,10 @@ def generate_on_topic():
     topic = data.get('topic')
     type = data.get('type')
     difficulty = data.get('difficulty')
+    print(data)
 
     if type == 'MCQs':
+        print('in mcq')
         prompt = f"""
         Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic} in this format:
         **Question 1:** [question]?
@@ -310,8 +314,8 @@ def generate_on_topic():
             extended_answer = ""
             for response_chunk in completion:
                 extended_answer += response_chunk.choices[0].delta.content or ""
-            # print(extended_answer)
-            return jsonify({"message": extended_answer, "email": email, difficulty:difficulty})
+            print(extended_answer)
+            return jsonify({"message": extended_answer, "email": email, "difficulty":difficulty})
         except Exception as e:
             return jsonify({"error": f"An error occurred while generating the quiz: {e}"}), 500
     elif type == 'blanks':
