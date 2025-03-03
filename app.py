@@ -1,5 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session
 import requests
+from flask import jsonify, send_from_directory
+import requests
+from bs4 import BeautifulSoup
+from flask_cors import CORS
 import json
 from datetime import datetime, timedelta
 import random
@@ -14,6 +18,8 @@ import io
 
 app = Flask(__name__)
 app.secret_key = 'your-unique-secret-key'
+
+CORS(app)
 
 # Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -265,6 +271,31 @@ def youtube():
 def pdf():
     email = request.args.get('email')
     return render_template('pdf.html', email=email)
+
+@app.route('/website')
+def website():
+    email = request.args.get('email')
+    return render_template('website.html', email=email)
+
+@app.route('/scrape', methods=['POST'])
+def scrape():
+    data = request.get_json()
+    url = data.get('url')
+    headers = {'User-Agent': 'Mozilla/5.0 (compatible; QuizRiseScraper/1.0)'}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract content from the <body> as an example
+        content = soup.body.get_text(separator=' ', strip=True) if soup.body else ""
+        
+        if content:
+            return jsonify({'success': True, 'content': content})
+        else:
+            return jsonify({'success': False, 'message': "No content extracted"})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
 
 

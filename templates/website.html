@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Wizard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #fff;
+      padding: 0.5rem 1.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    .navbar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .upgrade-btn {
+      background-color: #6c63ff;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .upgrade-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* ARROW PROGRESS BAR */
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 10px;
+    }
+    .step {
+      position: relative;
+      background: #ccc;
+      color: white;
+      padding: 20px 30px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 5px 0 0 5px;
+      flex: 1;
+      /* arrow shape */
+      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      height: 60px;
+    }
+    .step span {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      background: white;
+      color: #6c63ff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .step.active {
+      background: #6c63ff;
+    }
+
+    /* STEP CONTAINERS */
+    .step-container {
+      display: none; /* hidden by default */
+    }
+    .step-container.active {
+      display: block; /* show active step */
+    }
+
+    /* FORM ELEMENTS */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .help-text {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    /* RADIO GROUPS */
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .radio-group label {
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* BUTTONS */
+    .btn {
+      background-color: #6c63ff;
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+    <input type="hidden" id="userEmail" value="{{ email }}">
+
+  <!-- NAVIGATION BAR -->
+  <div class="navbar">
+    <div class="navbar-title">QuizRise</div>
+    <button class="upgrade-btn">Upgrade</button>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="container">
+    <!-- Arrow Progress Bar -->
+    <div class="progress">
+      <div class="step active" id="progress-step1">
+        <span>1</span> Paste URL
+      </div>
+      <div class="step" id="progress-step2">
+        <span>2</span> Configure Quiz
+      </div>
+      <div class="step" id="progress-step3">
+        <span>3</span> Output Options
+      </div>
+    </div>
+
+    <!-- STEP 1: PASTE URL -->
+    <div class="step-container active" id="step1">
+      <div class="form-group">
+        <label for="website-url">Website URL</label>
+        <input 
+          type="text" 
+          id="website-url" 
+          placeholder="E.g. https://en.wikipedia.org/wiki/Human_brain"
+        >
+        <p class="help-text">
+          Must be a publicly accessible website. We will scrape the content from the URL.
+        </p>
+        <p class="status" id="status-message"></p>
+      </div>
+      <button class="btn" id="scrape-btn">Scrape</button>
+    </div>
+
+    <!-- STEP 2: CONFIGURE QUIZ -->
+    <div class="step-container" id="step2">
+        <div class="form-group">
+          <label>What type of questions?</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="quizType" value="MCQs" checked>
+              Multiple Choice
+            </label>
+            <label>
+              <input type="radio" name="quizType" value="truefalse">
+              True False
+            </label>
+            <label>
+              <input type="radio" name="quizType" value="blanks">
+              Fill in the blank
+            </label>
+            <label>
+                <input type="radio" name="quizType" value="qa">
+                Short Question/ Answers
+              </label>
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <label>Difficulty</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="quizDifficulty" value="Low">
+              Low
+            </label>
+            <label>
+              <input type="radio" name="quizDifficulty" value="Medium" checked>
+              Medium
+            </label>
+            <label>
+              <input type="radio" name="quizDifficulty" value="High">
+              High
+            </label>
+          </div>
+        </div>
+      
+        <button class="btn" id="prev-step2">Previous</button>
+        <button class="btn" id="next-step2">Next Step</button>
+      </div>
+      
+    <!-- STEP 3: OUTPUT OPTIONS -->
+    <div class="step-container" id="step3">
+      <div class="form-group">
+        <label>Would you like the quiz emailed to you?</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="sendEmail" value="yes" checked>
+            Yes
+          </label>
+          <label>
+            <input type="radio" name="sendEmail" value="no">
+            No
+          </label>
+        </div>
+      </div>
+
+      <button class="btn" id="finish-step3">Finish</button>
+    </div>
+
+  </div>
+
+  <script>
+    let email = document.getElementById("userEmail").value;
+    // Global variables to store user selections
+    let scrapedText = "";
+    let selectedDifficulty = "Medium";
+    let selectedQuestionType = "Multiple Choice";
+
+    // Step references
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+
+    // Progress bar references
+    const progressStep1 = document.getElementById("progress-step1");
+    const progressStep2 = document.getElementById("progress-step2");
+    const progressStep3 = document.getElementById("progress-step3");
+
+    // Buttons and fields
+    const scrapeBtn = document.getElementById("scrape-btn");
+    const websiteUrl = document.getElementById("website-url");
+    const statusMessage = document.getElementById("status-message");
+
+    const nextStep2Btn = document.getElementById("next-step2");
+    const finishStep3Btn = document.getElementById("finish-step3");
+
+    // STEP 1: SCRAPE
+    scrapeBtn.addEventListener("click", async () => {
+  const url = websiteUrl.value.trim();
+  statusMessage.textContent = "";
+
+  if (!isValidURL(url)) {
+    statusMessage.textContent = "❌ Invalid URL format.";
+    return;
+  }
+
+  statusMessage.textContent = "🔄 Scraping in progress...";
+
+  try {
+    // Call your Flask /scrape endpoint
+    const response = await fetch("/scrape", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      statusMessage.textContent = "✅ Scraping successful!";
+      scrapedText = trimToTokens(data.content, 500); // Trim the text
+      goToStep2();
+    } else {
+      statusMessage.textContent = "❌ Scraping failed. Try another URL.";
+    }
+  } catch (err) {
+    statusMessage.textContent = "❌ Error contacting server.";
+  }
+});
+function trimToTokens(text, tokenLimit) {
+  const tokens = text.split(/\s+/); // Splitting by spaces to count words as tokens
+  return tokens.slice(0, tokenLimit).join(" "); // Keep only the first `tokenLimit` tokens
+}
+
+
+    // Move from Step 1 to Step 2
+    function goToStep2() {
+      step1.classList.remove("active");
+      step1.style.display = "none";
+      step2.classList.add("active");
+      step2.style.display = "block";
+
+      progressStep1.classList.remove("active");
+      progressStep2.classList.add("active");
+    }
+
+    // STEP 2: Next Step -> Step 3
+    nextStep2Btn.addEventListener("click", () => {
+      // Gather user choices
+      selectedQuestionType = document.querySelector('input[name="quizType"]:checked').value;
+      selectedDifficulty = document.querySelector('input[name="quizDifficulty"]:checked').value;
+
+      step2.classList.remove("active");
+      step2.style.display = "none";
+      step3.classList.add("active");
+      step3.style.display = "block";
+
+      progressStep2.classList.remove("active");
+      progressStep3.classList.add("active");
+    });
+
+    // Show/Hide email field if user chooses "No"
+    document.querySelectorAll('input[name="sendEmail"]').forEach(radio => {
+      radio.addEventListener("change", () => {
+        if (radio.value === "no" && radio.checked) {
+          emailContainer.style.display = "none";
+        } else {
+          emailContainer.style.display = "block";
+        }
+      });
+    });
+
+    // STEP 3: Finish
+    finishStep3Btn.addEventListener("click", async () => {
+      // Check if user wants email
+      const sendEmailValue = document.querySelector('input[name="sendEmail"]:checked').value;
+    //   let userEmail = userEmailInput.value.trim();
+      
+      // If user selected "no", ignore the email field
+      if (sendEmailValue === "no") {
+        userEmail = "";
+      }
+
+      try {
+        // POST to /generateOnTopic with all the data
+        const response = await fetch("/generateOnTopic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: scrapedText,
+            difficulty: selectedDifficulty,
+            type: selectedQuestionType,
+            email: email,
+            sendEmail: sendEmailValue
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+      // Build URL parameters for redirection
+      const params = new URLSearchParams({
+        message: data.message,
+        email: email,
+        difficulty: selectedDifficulty
+      });
+
+      // Redirect based on question type
+      if (selectedQuestionType === "MCQs") {
+        window.location.href = `/quiz?${params.toString()}`;
+      } else if (selectedQuestionType === "truefalse") {
+        window.location.href = `/truefalse?${params.toString()}`;
+      } else if (selectedQuestionType === "qa") {
+        window.location.href = `/qa?${params.toString()}`;
+      } else {
+        window.location.href = `/blank?${params.toString()}`;
+      }
+        } else {
+          alert("Quiz generation failed: " + data.error);
+        }
+      } catch (error) {
+        console.error("Error generating quiz:", error);
+        alert("An error occurred while generating the quiz.");
+      }
+    });
+
+    // Basic URL validation
+    function isValidURL(str) {
+      try {
+        new URL(str);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>
