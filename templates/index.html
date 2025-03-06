@@ -1,108 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuizXpert 🏆</title>
-  <link rel="stylesheet" href="../static/styles.css">
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuizRise - Create an Account</title>
   <style>
-    body { overflow: hidden; text-align: center; }
-    .main-heading { font-size: 3rem; margin-top: 20px; font-weight: bold; }
-    .container { position: relative; z-index: 10; text-align: center; margin-top: 30px; }
-    .branding h2 { font-size: 1.5rem; opacity: 0; }
-    .form-container { transform: translateY(30px); opacity: 0; }
-    .password-box { position: relative; display: flex; align-items: center; }
-    .password-box button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2rem;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #ffffff;
+      position: relative;
+    }
+    
+    /* Top-right Toggle Button */
+    .top-right-login {
       position: absolute;
-      right: 10px;
+      top: 20px;
+      right: 30px;
+    }
+    .top-right-login a {
+      text-decoration: none;
+      color: #0c0c0c;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 8px 14px;
+      border: 1px solid #a5a2a2;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .top-right-login a:hover {
+      background: #fff;
+      color: #192742;
+    }
+    
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      background: #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    /* Right-side styling with fixed height */
+    .right-side {
+      margin-left: 10rem;
+      min-height: 500px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    /* Left side (Reviews/Branding) */
+    .left-side {
+      width: 500px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #192742;
+      color: #fff;
+      border-radius: 12px;
+    }
+    
+    .left-side h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+    
+    .review-cards {
+      width: 100%;
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 0 175px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .review-cards::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .review-card {
+      flex: 0 0 350px;
+      background: rgba(255, 254, 254, 0.938);
+      padding: 15px 20px;
+      color: black;
+      border-radius: 12px;
+      scroll-snap-align: center;
+      min-height: 250px;
+    }
+    
+    .review-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .review-card p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    
+    /* Right Side (Form) */
+    .right-side h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .form-group {
+      margin-bottom: 18px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #6c63ff;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .action-btn:hover {
+      background: #5a52d2;
+    }
+    
+    .or-divider {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 0.85rem;
+      color: #999;
+      position: relative;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: "";
+      display: inline-block;
+      width: 10%;
+      height: 1px;
+      background: #ccc;
+      vertical-align: middle;
+      margin: 0 5px;
+    }
+    
+    .google-btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .google-btn:hover {
+      background: #f5f5f5;
+    }
+    .google-btn img {
+      height: 18px;
+      margin-right: 8px;
+    }
+    
+    #inner {
+      margin-top: -1.4rem;
+      margin-bottom: 2rem;
+      color: #555;
+      font-size: 0.7rem;
+    }
+    
+    /* Mobile View */
+    @media (max-width: 768px) {
+      .left-side {
+        display: none;
+      }
+      .right-side {
+        width: 100%;
+        margin-left: 0;
+      }
+      .container {
+        flex-direction: column;
+        border-radius: 0;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="particles-js"></div>
-
-  <h1 class="main-heading">QuizXpert 🏆</h1>  <!-- Moved outside the container -->
-
-  <div class="container">
-    <aside class="branding">
-      <h2 class="tagline">Ace Your Next Exam Like a PRO!</h2>
-    </aside>
-
-    <main class="login-area">
-      <div class="form-container">
-        <form id="auth-form" action="/login" method="POST">
-          <h2 id="form-title">Login</h2>
-          
-          {% if message %}
-          <p class="message">{{ message }}</p>
-          {% endif %}
-
-          <div id="extra-fields" class="hidden">
-            <input type="text" name="first_name" placeholder="First Name">
-            <input type="text" name="last_name" placeholder="Last Name">
-          </div>
-
-          <input type="email" name="email" placeholder="Email" required>
-          <div class="password-box">
-            <input type="password" id="password" name="password" placeholder="Password" required>
-            <button type="button" id="toggle-password">👁️</button>
-          </div>
-
-          <button type="submit" class="btn">Submit</button>
-
-          <p id="toggle-auth">
-            Don't have an account? <span class="link">Sign Up</span>
-          </p>
-        </form>
-      </div>
-    </main>
+  <!-- Top-right Toggle Button -->
+  <div class="top-right-login">
+    <a href="#" id="toggle-mode">Login</a>
   </div>
-
+  
+  <div class="container">
+    <!-- Left Side (Reviews/Branding) -->
+    <div class="left-side">
+      <h1>QuizRise</h1>
+      <div class="review-cards">
+        <!-- Card 1 -->
+        <div class="review-card">
+          <h3>Capterra</h3>
+          <p><strong>Aug 29, 2024</strong></p>
+          <p>"It is amazing their AI gives you answers to the quizzes and flashcards. In other sites you have to choose the answers yourself."</p>
+          <p><em>- Ardh R. (2)</em></p>
+        </div>
+        <!-- Card 2 -->
+        <div class="review-card">
+          <h3>Capterra</h3>
+          <p><strong>Aug 29, 2024</strong></p>
+          <p>"One improvement I'd like to see is the ability to track progress better. But overall it's great."</p>
+          <p><em>- Sarah B.</em></p>
+        </div>
+        <!-- Card 3 -->
+        <div class="review-card">
+          <h3>Capterra</h3>
+          <p><strong>Aug 29, 2024</strong></p>
+          <p>"Learn new things quickly. It's so easy to remember the answers."</p>
+          <p><em>- Mark T.</em></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Side (Form) -->
+    <div class="right-side">
+      <h2 id="form-heading">Create an account</h2>
+      <p id="inner">Enter your email below to create your account</p>
+      <form id="auth-form" action="/signup" method="POST">
+        <!-- First Name field: visible only in register mode -->
+        <div class="form-group" id="first-name-group">
+          <label for="first-name">First Name</label>
+          <input type="text" id="first-name" name="first_name" placeholder="John" required>
+        </div>
+        <!-- Last Name field: visible only in register mode -->
+        <div class="form-group" id="last-name-group">
+          <label for="last-name">Last Name</label>
+          <input type="text" id="last-name" name="last_name" placeholder="Doe" required>
+        </div>
+        <div class="form-group" id="email-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="johndoe@gmail.com" required>
+        </div>
+        <div class="form-group" id="password-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="********" required>
+        </div>
+        <button type="submit" class="action-btn" id="form-button">Register</button>
+        <div class="or-divider" id="or-divider">OR CONTINUE WITH</div>
+        <button type="button" class="google-btn" id="google-btn" onclick="window.location.href='/auth/google'">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+          <strong>Register With Google</strong>
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Script to center the second card on load -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      gsap.from(".main-heading", { duration: 1, y: -50, opacity: 0, ease: "bounce.out" });
-      gsap.to(".tagline", { duration: 1, delay: 0.5, opacity: 1, y: 0 });
-      gsap.to(".form-container", { duration: 1, delay: 1, opacity: 1, y: 0 });
+    window.addEventListener("DOMContentLoaded", () => {
+      const reviewCardsContainer = document.querySelector('.review-cards');
+      const secondCard = reviewCardsContainer.children[1];
+      reviewCardsContainer.scrollLeft =
+        secondCard.offsetLeft +
+        secondCard.offsetWidth / 2 -
+        reviewCardsContainer.offsetWidth / 2;
+    });
 
-      // Toggle login/signup mode
-      const formTitle = document.getElementById("form-title");
-      const authForm = document.getElementById("auth-form");
-      const extraFields = document.getElementById("extra-fields");
-      const toggleAuth = document.querySelector("#toggle-auth .link");
+    let isLoginMode = false; // Default is register mode
+    document.getElementById('toggle-mode').addEventListener('click', function(e) {
+      e.preventDefault();
 
-      toggleAuth.addEventListener("click", () => {
-        if (formTitle.textContent === "Login") {
-          formTitle.textContent = "Sign Up";
-          authForm.action = "/signup";
-          extraFields.classList.remove("hidden");
-          toggleAuth.textContent = "Login";
-        } else {
-          formTitle.textContent = "Login";
-          authForm.action = "/login";
-          extraFields.classList.add("hidden");
-          toggleAuth.textContent = "Sign Up";
-        }
-      });
+      const firstNameGroup = document.getElementById('first-name-group');
+      const lastNameGroup = document.getElementById('last-name-group');
+      const firstNameInput = document.getElementById('first-name');
+      const lastNameInput = document.getElementById('last-name');
+      const googleBtn = document.getElementById('google-btn');
+      const orDivider = document.getElementById('or-divider');
 
-      // Password toggle (👁️ -> 🙈)
-      const togglePassword = document.getElementById("toggle-password");
-      const passwordField = document.getElementById("password");
-
-      togglePassword.addEventListener("click", function () {
-        if (passwordField.type === "password") {
-          passwordField.type = "text";
-          togglePassword.textContent = "🙈";
-        } else {
-          passwordField.type = "password";
-          togglePassword.textContent = "👁️";
-        }
-      });
+      if (!isLoginMode) {
+        // Switch to Login mode
+        document.getElementById('form-heading').textContent = "Login";
+        document.getElementById('inner').textContent = "Enter your email and password to login";
+        // Hide first and last name fields and remove required attributes
+        firstNameGroup.style.display = "none";
+        lastNameGroup.style.display = "none";
+        firstNameInput.removeAttribute('required');
+        lastNameInput.removeAttribute('required');
+        // Change form action and button text
+        document.getElementById('auth-form').action = "/login";
+        document.getElementById('form-button').textContent = "Login";
+        // Update third-party option text for login
+        orDivider.style.display = "block";
+        googleBtn.style.display = "inline-flex";
+        googleBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"><strong>Continue With Google</strong>`;
+        // Toggle top-right button text
+        this.textContent = "Register";
+      } else {
+        // Switch back to Register mode
+        document.getElementById('form-heading').textContent = "Create an account";
+        document.getElementById('inner').textContent = "Enter your email below to create your account";
+        // Show first and last name fields and add required attributes back
+        firstNameGroup.style.display = "block";
+        lastNameGroup.style.display = "block";
+        firstNameInput.setAttribute('required', 'required');
+        lastNameInput.setAttribute('required', 'required');
+        // Change form action and button text
+        document.getElementById('auth-form').action = "/signup";
+        document.getElementById('form-button').textContent = "Register";
+        // Update third-party option text for registration
+        orDivider.style.display = "block";
+        googleBtn.style.display = "inline-flex";
+        googleBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"><strong>Register With Google</strong>`;
+        // Toggle top-right button text
+        this.textContent = "Login";
+      }
+      
+      // Toggle the mode flag
+      isLoginMode = !isLoginMode;
     });
   </script>
 </body>
