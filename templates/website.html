@@ -159,10 +159,27 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    /* LOADING OVERLAY */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #6c63ff;
+      z-index: 2000;
+      display: none;
+    }
   </style>
 </head>
 <body>
-    <input type="hidden" id="userEmail" value="{{ email }}">
+  <input type="hidden" id="userEmail" value="{{ email }}">
 
   <!-- NAVIGATION BAR -->
   <div class="navbar">
@@ -204,49 +221,49 @@
 
     <!-- STEP 2: CONFIGURE QUIZ -->
     <div class="step-container" id="step2">
-        <div class="form-group">
-          <label>What type of questions?</label>
-          <div class="radio-group">
-            <label>
-              <input type="radio" name="quizType" value="MCQs" checked>
-              Multiple Choice
-            </label>
-            <label>
-              <input type="radio" name="quizType" value="truefalse">
-              True False
-            </label>
-            <label>
-              <input type="radio" name="quizType" value="blanks">
-              Fill in the blank
-            </label>
-            <label>
-                <input type="radio" name="quizType" value="qa">
-                Short Question/ Answers
-              </label>
-          </div>
+      <div class="form-group">
+        <label>What type of questions?</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="quizType" value="MCQs" checked>
+            Multiple Choice
+          </label>
+          <label>
+            <input type="radio" name="quizType" value="truefalse">
+            True False
+          </label>
+          <label>
+            <input type="radio" name="quizType" value="blanks">
+            Fill in the blank
+          </label>
+          <label>
+            <input type="radio" name="quizType" value="qa">
+            Short Question/ Answers
+          </label>
         </div>
-      
-        <div class="form-group">
-          <label>Difficulty</label>
-          <div class="radio-group">
-            <label>
-              <input type="radio" name="quizDifficulty" value="Low">
-              Low
-            </label>
-            <label>
-              <input type="radio" name="quizDifficulty" value="Medium" checked>
-              Medium
-            </label>
-            <label>
-              <input type="radio" name="quizDifficulty" value="High">
-              High
-            </label>
-          </div>
-        </div>
-      
-        <button class="btn" id="prev-step2">Previous</button>
-        <button class="btn" id="next-step2">Next Step</button>
       </div>
+      
+      <div class="form-group">
+        <label>Difficulty</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="quizDifficulty" value="Low">
+            Low
+          </label>
+          <label>
+            <input type="radio" name="quizDifficulty" value="Medium" checked>
+            Medium
+          </label>
+          <label>
+            <input type="radio" name="quizDifficulty" value="High">
+            High
+          </label>
+        </div>
+      </div>
+      
+      <button class="btn" id="prev-step2">Previous</button>
+      <button class="btn" id="next-step2">Next Step</button>
+    </div>
       
     <!-- STEP 3: OUTPUT OPTIONS -->
     <div class="step-container" id="step3">
@@ -263,11 +280,12 @@
           </label>
         </div>
       </div>
-
       <button class="btn" id="finish-step3">Finish</button>
     </div>
-
   </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">Loading... Please wait</div>
 
   <script>
     let email = document.getElementById("userEmail").value;
@@ -290,47 +308,53 @@
     const scrapeBtn = document.getElementById("scrape-btn");
     const websiteUrl = document.getElementById("website-url");
     const statusMessage = document.getElementById("status-message");
+    const loadingOverlay = document.getElementById("loadingOverlay");
 
     const nextStep2Btn = document.getElementById("next-step2");
     const finishStep3Btn = document.getElementById("finish-step3");
 
     // STEP 1: SCRAPE
     scrapeBtn.addEventListener("click", async () => {
-  const url = websiteUrl.value.trim();
-  statusMessage.textContent = "";
+      const url = websiteUrl.value.trim();
+      statusMessage.textContent = "";
 
-  if (!isValidURL(url)) {
-    statusMessage.textContent = "❌ Invalid URL format.";
-    return;
-  }
+      if (!isValidURL(url)) {
+        statusMessage.textContent = "❌ Invalid URL format.";
+        return;
+      }
 
-  statusMessage.textContent = "🔄 Scraping in progress...";
+      // Show loading overlay during scraping
+      loadingOverlay.style.display = "flex";
+      statusMessage.textContent = "🔄 Scraping in progress...";
 
-  try {
-    // Call your Flask /scrape endpoint
-    const response = await fetch("/scrape", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url })
+      try {
+        // Call your Flask /scrape endpoint
+        const response = await fetch("/scrape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+        const data = await response.json();
+
+        // Hide loading overlay once scraping completes
+        loadingOverlay.style.display = "none";
+        if (data.success) {
+          statusMessage.textContent = "✅ Scraping successful!";
+          scrapedText = trimToTokens(data.content, 500); // Trim the text
+          goToStep2();
+        } else {
+          statusMessage.textContent = "❌ Scraping failed. Try another URL.";
+        }
+      } catch (err) {
+        loadingOverlay.style.display = "none";
+        statusMessage.textContent = "❌ Error contacting server.";
+      }
     });
-    const data = await response.json();
 
-    if (data.success) {
-      statusMessage.textContent = "✅ Scraping successful!";
-      scrapedText = trimToTokens(data.content, 500); // Trim the text
-      goToStep2();
-    } else {
-      statusMessage.textContent = "❌ Scraping failed. Try another URL.";
+    function trimToTokens(text, tokenLimit) {
+      const tokens = text.split(/\s+/); // Splitting by spaces to count words as tokens
+      return tokens.slice(0, tokenLimit).join(" "); // Keep only the first `tokenLimit` tokens
     }
-  } catch (err) {
-    statusMessage.textContent = "❌ Error contacting server.";
-  }
-});
-function trimToTokens(text, tokenLimit) {
-  const tokens = text.split(/\s+/); // Splitting by spaces to count words as tokens
-  return tokens.slice(0, tokenLimit).join(" "); // Keep only the first `tokenLimit` tokens
-}
-
 
     // Move from Step 1 to Step 2
     function goToStep2() {
@@ -358,27 +382,16 @@ function trimToTokens(text, tokenLimit) {
       progressStep3.classList.add("active");
     });
 
-    // Show/Hide email field if user chooses "No"
-    document.querySelectorAll('input[name="sendEmail"]').forEach(radio => {
-      radio.addEventListener("change", () => {
-        if (radio.value === "no" && radio.checked) {
-          emailContainer.style.display = "none";
-        } else {
-          emailContainer.style.display = "block";
-        }
-      });
-    });
-
     // STEP 3: Finish
     finishStep3Btn.addEventListener("click", async () => {
       // Check if user wants email
       const sendEmailValue = document.querySelector('input[name="sendEmail"]:checked').value;
-    //   let userEmail = userEmailInput.value.trim();
-      
-      // If user selected "no", ignore the email field
       if (sendEmailValue === "no") {
-        userEmail = "";
+        email = "";
       }
+
+      // Show loading overlay during quiz generation and emailing
+      loadingOverlay.style.display = "flex";
 
       try {
         // POST to /generateOnTopic with all the data
@@ -390,33 +403,36 @@ function trimToTokens(text, tokenLimit) {
             difficulty: selectedDifficulty,
             type: selectedQuestionType,
             email: email,
-            sendEmail: sendEmailValue
+            is_email: sendEmailValue === "yes"
           })
         });
 
         const data = await response.json();
-        if (response.ok) {
-      // Build URL parameters for redirection
-      const params = new URLSearchParams({
-        message: data.message,
-        email: email,
-        difficulty: selectedDifficulty
-      });
+        // Hide loading overlay after response is received
+        loadingOverlay.style.display = "none";
 
-      // Redirect based on question type
-      if (selectedQuestionType === "MCQs") {
-        window.location.href = `/quiz?${params.toString()}`;
-      } else if (selectedQuestionType === "truefalse") {
-        window.location.href = `/truefalse?${params.toString()}`;
-      } else if (selectedQuestionType === "qa") {
-        window.location.href = `/qa?${params.toString()}`;
-      } else {
-        window.location.href = `/blank?${params.toString()}`;
-      }
+        if (response.ok) {
+          // Build URL parameters for redirection based on question type
+          const params = new URLSearchParams({
+            message: data.message,
+            email: email,
+            difficulty: selectedDifficulty
+          });
+
+          if (selectedQuestionType === "MCQs") {
+            window.location.href = `/quiz?${params.toString()}`;
+          } else if (selectedQuestionType === "truefalse") {
+            window.location.href = `/truefalse?${params.toString()}`;
+          } else if (selectedQuestionType === "qa") {
+            window.location.href = `/qa?${params.toString()}`;
+          } else {
+            window.location.href = `/blank?${params.toString()}`;
+          }
         } else {
           alert("Quiz generation failed: " + data.error);
         }
       } catch (error) {
+        loadingOverlay.style.display = "none";
         console.error("Error generating quiz:", error);
         alert("An error occurred while generating the quiz.");
       }

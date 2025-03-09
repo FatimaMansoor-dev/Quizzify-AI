@@ -11,15 +11,11 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-
-    /* Entire page white */
     body {
       background-color: #fff;
       min-height: 100vh;
       width: 100vw;
     }
-
-    /* Navbar at the top */
     .navbar {
       width: 100%;
       background: #fff;
@@ -48,37 +44,29 @@
       border-radius: 50%;
       font-size: 20px;
     }
-
-    /* Each step section (#step1, #step2, #step3) 
-       is spaced down to avoid overlapping the fixed navbar */
     #step1, #step2, #step3 {
-      margin-top: 80px; /* to clear navbar */
-      padding: 0 20px 40px; /* some horizontal and bottom spacing */
+      margin-top: 80px;
+      padding: 0 20px 40px;
     }
-
-    /* The gray bar that holds the arrow steps */
     .progress-bar {
       width: 100%;
-      background: #f0f0f0; /* Light gray background */
+      background: #f0f0f0;
       padding: 20px 0;
-      margin-bottom: 40px; /* space below the bar */
+      margin-bottom: 40px;
     }
-    /* The container for the steps inside the gray bar */
     .progress {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       max-width: 1000px;
-      margin: 0 auto; /* center horizontally */
-      padding: 0 20px; /* optional horizontal padding */
+      margin: 0 auto;
+      padding: 0 20px;
     }
-
-    /* Arrow steps */
     .step {
       position: relative;
       flex: 1;
-      background: #fff;       /* White for inactive step so it stands out on gray bar */
-      color: #6a1fe2;         /* Purple text for inactive step */
+      background: #fff;
+      color: #6a1fe2;
       font-weight: bold;
       text-align: center;
       padding: 15px 10px;
@@ -91,7 +79,6 @@
       min-height: 80px;
       transition: background 0.3s, color 0.3s;
     }
-    /* Step number circle */
     .step span {
       position: absolute;
       top: 50%;
@@ -108,22 +95,19 @@
       font-weight: bold;
       font-size: 18px;
     }
-    /* Step title & paragraph */
     .step > strong {
       font-size: 18px;
-      color: inherit; /* inherits from .step */
+      color: inherit;
     }
     .step p {
-      color: #000; /* black for step description text */
+      color: #000;
       font-size: 14px;
       margin-top: 5px;
     }
-    /* Active step styling */
     .step.active {
-      background: #7a4dc1; /* Purple */
+      background: #7a4dc1;
       color: #fff;
     }
-    /* Make the arrow tip match the active color if not last step */
     .step.active:not(:last-child)::after {
       content: "";
       position: absolute;
@@ -135,18 +119,14 @@
       border-bottom: 40px solid transparent;
       border-left: 20px solid #7a4dc1;
     }
-
-    /* White box for input or config sections */
     .white-box {
       background: #fafafa;
       border: 1px solid #ccc;
       border-radius: 10px;
       padding: 30px;
       max-width: 600px;
-      margin: 0 auto; /* center the box */
+      margin: 0 auto;
     }
-
-    /* Textarea in step1 */
     #text-input {
       width: 100%;
       height: 200px;
@@ -159,8 +139,6 @@
       color: #333;
       margin-top: 10px;
     }
-
-    /* Toggles for question types and difficulty */
     .question-types, .question-count {
       display: flex;
       gap: 10px;
@@ -179,8 +157,6 @@
       color: white;
       border-color: #7a4dc1;
     }
-
-    /* Next / Back / Submit buttons */
     .next-btn {
       background: #7a4dc1;
       color: white;
@@ -193,35 +169,43 @@
       float: right;
     }
     .next-btn:hover {
-      background: #5c3aa0; /* slightly darker purple on hover */
+      background: #5c3aa0;
     }
-    /* A "Back" button variant can override color */
     .back-btn {
       background: gray !important;
       margin-right: 10px;
     }
-
-    /* Clear floats if needed */
     .clearfix::after {
       content: "";
       display: block;
       clear: both;
     }
+    /* Loading overlay styles */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #7a4dc1;
+      z-index: 2000;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <!-- Hidden input to store userEmail if needed -->
   <input type="hidden" id="userEmail" value="{{ email }}">
-
-  <!-- Navbar -->
   <div class="navbar">
     <span>QuizXpert</span>
     <span class="email-initial" id="emailInitial"></span>
   </div>
-
   <!-- Step 1: Enter Text -->
   <div id="step1">
-    <!-- Gray bar for steps -->
     <div class="progress-bar">
       <div class="progress">
         <div class="step active">
@@ -241,7 +225,6 @@
         </div>
       </div>
     </div>
-
     <h2 style="text-align:center; margin-bottom: 20px;">Enter or Paste Your Text</h2>
     <div class="white-box clearfix">
       <p>Type or paste up to 4000 characters:</p>
@@ -253,7 +236,6 @@
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
   </div>
-
   <!-- Step 2: Configure Quiz -->
   <div id="step2" style="display: none;">
     <div class="progress-bar">
@@ -275,7 +257,6 @@
         </div>
       </div>
     </div>
-
     <h2 style="text-align:center; margin-bottom: 20px;">Configure Quiz</h2>
     <div class="white-box clearfix">
       <div>
@@ -298,7 +279,6 @@
       <button id="next-step2" class="next-btn">Next Step →</button>
     </div>
   </div>
-
   <!-- Step 3: Output Options -->
   <div id="step3" style="display: none;">
     <div class="progress-bar">
@@ -320,7 +300,6 @@
         </div>
       </div>
     </div>
-
     <h2 style="text-align:center; margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
     <div class="white-box clearfix">
       <label style="display:block; margin-bottom:5px;">
@@ -329,55 +308,42 @@
       <label style="display:block; margin-bottom:15px;">
         <input type="radio" name="emailOption" value="no" checked /> No, Thanks
       </label>
-
       <button id="back-step2" class="next-btn back-btn">← Back</button>
       <button id="submit-quiz" class="next-btn">Submit Quiz</button>
     </div>
   </div>
-
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">Loading... Please wait</div>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Display the first letter of the user's email in the navbar circle
       let email = document.getElementById("userEmail").value;
       if (email) {
         document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
       }
-
-      // Step elements
       const step1 = document.getElementById("step1");
       const step2 = document.getElementById("step2");
       const step3 = document.getElementById("step3");
-
-      // Buttons
       const nextStep1Btn = document.getElementById("next-step1");
       const nextStep2Btn = document.getElementById("next-step2");
       const backStep2Btn = document.getElementById("back-step2");
       const submitQuizBtn = document.getElementById("submit-quiz");
-
-      // Text input
       const textInput = document.getElementById("text-input");
+      const loadingOverlay = document.getElementById("loadingOverlay");
 
-      // Step 1 -> Step 2
       nextStep1Btn.addEventListener("click", function () {
         const userText = textInput.value.trim();
         if (!userText) {
           alert("Please enter some text first!");
           return;
         }
-        // Store in localStorage for use in final submission
         localStorage.setItem("topicText", userText);
-
-        // Show step2, hide step1
         step1.style.display = "none";
         step2.style.display = "block";
-
-        // Update arrow steps
         const steps = document.querySelectorAll(".progress .step");
         steps[0].classList.remove("active");
         steps[1].classList.add("active");
       });
 
-      // Toggle buttons for question types
       const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
       questionTypeButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -386,7 +352,6 @@
         });
       });
 
-      // Toggle buttons for difficulty levels
       const questionCountButtons = document.querySelectorAll('.question-count .toggle-btn');
       questionCountButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -395,42 +360,29 @@
         });
       });
 
-      // Step 2 -> Step 3
       nextStep2Btn.addEventListener("click", function () {
         step2.style.display = "none";
         step3.style.display = "block";
-
-        // Update arrow steps
         const steps = document.querySelectorAll(".progress .step");
         steps[1].classList.remove("active");
         steps[2].classList.add("active");
       });
 
-      // Step 3 -> Step 2 (back)
       backStep2Btn.addEventListener("click", function () {
         step3.style.display = "none";
         step2.style.display = "block";
-
-        // Update arrow steps
         const steps = document.querySelectorAll(".progress .step");
         steps[2].classList.remove("active");
         steps[1].classList.add("active");
       });
 
-      // Submit Quiz
       submitQuizBtn.addEventListener("click", async () => {
-        // Get email option
         const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-
-        // Get selected difficulty
         const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
         const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
-
-        // Get selected question type
         const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
         let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
 
-        // Convert question type to short code if desired
         if (questionType === "Multiple Choice") {
           questionType = "MCQs";
         } else if (questionType === "True False") {
@@ -440,39 +392,35 @@
         } else if (questionType === "General Question Answers") {
           questionType = "qa";
         }
-
-        // Retrieve user-entered text
+        
         const userText = localStorage.getItem("topicText") || "";
+        
+        // Build the payload with is_email as a boolean value
+        const payload = {
+          difficulty: difficulty,
+          type: questionType,
+          topic: userText,
+          email: email,
+          is_email: selectedOption === "yes"
+        };
 
-        // Build the payload
-        // Build the payload
-const payload = {
-  difficulty: difficulty,
-  type: questionType,
-  topic: userText,
-  email: email,
-  on_email: selectedOption   // Pass the email option value
-};
-
-
+        // Show loading overlay while processing
+        loadingOverlay.style.display = "flex";
         try {
-          // Send the POST request
           const response = await fetch("/generateOnTopic", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-
           const data = await response.json();
+          // Hide loading overlay when done
+          loadingOverlay.style.display = "none";
           if (response.ok) {
-            // Build URL parameters for redirection
             const params = new URLSearchParams({
               message: data.message,
               email: email,
               difficulty: difficulty
             });
-
-            // Redirect based on question type
             if (questionType === "MCQs") {
               window.location.href = `/quiz?${params.toString()}`;
             } else if (questionType === "truefalse") {
@@ -487,6 +435,7 @@ const payload = {
           }
         } catch (error) {
           console.error("Error generating quiz:", error);
+          loadingOverlay.style.display = "none";
           alert("An error occurred while generating the quiz.");
         }
       });

@@ -2,128 +2,300 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lecture Transcriber</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lecture Transcriber & Quiz Generator</title>
   <style>
-    body {
+    /* Global Reset & Fonts */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: Arial, sans-serif;
-      background-color: #f3f4f6;
-      text-align: center;
-      padding: 20px;
     }
+    body {
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+    }
+    /* Navbar */
+    .navbar {
+      width: 100%;
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-size: 28px;
+      font-weight: bold;
+      position: fixed;
+      top: 0;
+      left: 0;
+      color: #7a4dc1;
+      z-index: 1000;
+    }
+    .email-initial {
+      background: #7a4dc1;
+      color: white;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+    /* Main container */
     .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 1000px;
+      text-align: center;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
+      margin-top: 80px;
+      background-color: #fff;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
-    button, select {
-      background-color: #6a0dad;
+    /* Progress Bar */
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0 40px 0;
+      gap: 10px;
+    }
+    .step {
+      position: relative;
+      background: #ccc;
+      color: white;
+      padding: 30px 40px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 5px 0 0 5px;
+      flex: 1;
+      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      height: 80px;
+    }
+    .step span {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      background: white;
+      color: #7a4dc1;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .step.active {
+      background: #7a4dc1;
+    }
+    /* Step Containers */
+    .step-container {
+      display: none;
+    }
+    .step-container.active {
+      display: block;
+    }
+    /* Button Styles */
+    .next-btn, .record-btn {
+      background: #7a4dc1;
       color: white;
       border: none;
-      padding: 10px 20px;
-      margin: 10px;
+      padding: 15px 25px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
-      border-radius: 5px;
+      margin: 10px;
     }
-    button:disabled {
+    .next-btn:disabled, .record-btn:disabled {
       background-color: gray;
       cursor: not-allowed;
     }
-    #transcript, #quiz {
-      margin-top: 20px;
-      padding: 10px;
-      background: #e6e6e6;
-      min-height: 50px;
-      border-radius: 5px;
-      text-align: left;
-    }
-    audio {
-      margin-top: 15px;
+    /* Textarea */
+    textarea {
       width: 100%;
+      height: 150px;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
     }
-    .options {
-      margin-top: 15px;
+    /* Toggle Button Groups for Quiz Config */
+    .toggle-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .toggle-btn {
+      background-color: #f1f1f1;
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .toggle-btn.active {
+      background-color: #7a4dc1;
+      color: white;
+      border-color: #7a4dc1;
+    }
+    /* Radio Button Options */
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 20px 0;
+      font-size: 18px;
+    }
+    label {
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <input type="hidden" id="userEmail" value="{{ email }}" />
-  <div class="container">
-    <h2>🎤 Lecture Transcriber</h2>
-    <p>Upload an audio file to transcribe and generate a quiz.</p>
-
-    <!-- Recording Controls -->
-    <button id="startRecording">Start Recording</button>
-    <button id="stopRecording" disabled>Stop Recording</button>
-
-    <!-- Audio Player -->
-    <audio id="audioPlayer" controls hidden></audio>
-
-    <h3>Transcription:</h3>
-    <textarea id="transcript" rows="5" cols="50">Waiting for input...</textarea>
-    
-    <!-- Quiz Options -->
-    <div class="options">
-      <label for="difficulty">Difficulty Level:</label>
-      <select id="difficulty">
-        <option value="Easy">Easy</option>
-        <option value="Medium">Medium</option>
-        <option value="Hard">Hard</option>
-      </select>
-
-      <label for="questionType">Question Type:</label>
-      <select id="questionType">
-        <option value="MCQs">Multiple Choice</option>
-        <option value="True/False">True/False</option>
-        <option value="blanks">Fill in the blanks</option>
-        <option value="qa">Short Question Answers</option>
-      </select>
-    </div>
-
-    <!-- Generate Quiz Button -->
-    <button id="generateQuiz" disabled>Generate Quiz</button>
-
+  <!-- Hidden field for user email -->
+  <input type="hidden" id="userEmail" value="{{ email }}">
+  <!-- Navbar -->
+  <div class="navbar">
+    <span>Lecture Transcriber &amp; Quiz Generator</span>
+    <span class="email-initial" id="emailInitial"></span>
   </div>
-
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Progress Bar -->
+    <div class="progress">
+      <div class="step active" id="progress-step1">
+        <span>1</span> Record Lecture
+      </div>
+      <div class="step" id="progress-step2">
+        <span>2</span> Configure Quiz
+      </div>
+      <div class="step" id="progress-step3">
+        <span>3</span> Output Options
+      </div>
+    </div>
+    <!-- Step 1: Lecture Transcriber -->
+    <div class="step-container active" id="step1">
+      <h2>Lecture Transcriber</h2>
+      <p>Record your lecture and get it transcribed.</p>
+      <div class="transcriber-controls">
+        <button id="startRecording" class="record-btn">Start Recording</button>
+        <button id="stopRecording" class="record-btn" disabled>Stop Recording</button>
+      </div>
+      <audio id="audioPlayer" controls hidden></audio>
+      <h3>Transcription:</h3>
+      <textarea id="transcript" readonly>Waiting for input...</textarea>
+      <button class="next-btn" id="next-step1">Next Step →</button>
+    </div>
+    <!-- Step 2: Configure Quiz -->
+    <div class="step-container" id="step2">
+      <h2>Configure Quiz</h2>
+      <!-- <p>Select your question type and difficulty level.</p> -->
+      <div>
+        <p style="font-weight: bold; margin-bottom: 10px;">Question Type:</p>
+        <div class="toggle-group question-types">
+          <button class="toggle-btn active">Multiple Choice</button>
+          <button class="toggle-btn">True False</button>
+          <button class="toggle-btn">Fill in the blank</button>
+          <button class="toggle-btn">General Q&amp;A</button>
+        </div>
+      </div>
+      <div>
+        <p style="font-weight: bold; margin-bottom: 10px;">Difficulty Level:</p>
+        <div class="toggle-group difficulty">
+          <button class="toggle-btn">Easy</button>
+          <button class="toggle-btn active">Medium</button>
+          <button class="toggle-btn">Hard</button>
+        </div>
+      </div>
+      <div style="margin-top: 30px;">
+        <button class="next-btn" id="prev-step2">← Back</button>
+        <button class="next-btn" id="next-step2">Next Step →</button>
+      </div>
+    </div>
+    <!-- Step 3: Output Options -->
+    <div class="step-container" id="step3">
+      <h2>Output Options</h2>
+      <p>Would you like the quiz emailed to you?</p>
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="sendEmail" value="yes" checked> Yes
+        </label>
+        <label>
+          <input type="radio" name="sendEmail" value="no"> No
+        </label>
+      </div>
+      <div style="margin-top: 30px;">
+        <button class="next-btn" id="prev-step3" style="background: gray;">← Back</button>
+        <button class="next-btn" id="submit-quiz">Submit Quiz</button>
+      </div>
+    </div>
+  </div>
   <script>
-    let userEmail = document.getElementById("userEmail").value;
-    const startBtn = document.getElementById("startRecording");
-    const stopBtn = document.getElementById("stopRecording");
+    // Set email initial in navbar
+    document.addEventListener("DOMContentLoaded", function () {
+      let email = document.getElementById("userEmail").value;
+      document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
+    });
+    
+    // Step container elements
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+    
+    // Progress bar steps
+    const progressStep1 = document.getElementById("progress-step1");
+    const progressStep2 = document.getElementById("progress-step2");
+    const progressStep3 = document.getElementById("progress-step3");
+    
+    // Lecture Transcriber Elements
+    const startRecordingBtn = document.getElementById("startRecording");
+    const stopRecordingBtn = document.getElementById("stopRecording");
     const transcriptOutput = document.getElementById("transcript");
-    const generateQuizBtn = document.getElementById("generateQuiz");
-    const difficultySelect = document.getElementById("difficulty");
-    const questionTypeSelect = document.getElementById("questionType");
-    const quizOutput = document.getElementById("quiz");
-
-    let finalTranscript = ""; // Accumulates confirmed transcript text
-
-    // Initialize Speech Recognition
+    let finalTranscript = "";
+    
+    // Initialize Speech Recognition API
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "en-US";
     recognition.continuous = true;
     recognition.interimResults = true;
-
-    startBtn.addEventListener("click", () => {
-      transcriptOutput.textContent = "Listening...";
+    
+    startRecordingBtn.addEventListener("click", () => {
+      transcriptOutput.value = "Listening...";
       finalTranscript = "";
       recognition.start();
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
+      startRecordingBtn.disabled = true;
+      stopRecordingBtn.disabled = false;
     });
-
-    stopBtn.addEventListener("click", () => {
+    
+    stopRecordingBtn.addEventListener("click", () => {
       recognition.stop();
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
+      startRecordingBtn.disabled = false;
+      stopRecordingBtn.disabled = true;
     });
-
+    
     recognition.onresult = (event) => {
       let interimTranscript = "";
-      // Process only new results using event.resultIndex
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
           finalTranscript += event.results[i][0].transcript + " ";
@@ -131,49 +303,128 @@
           interimTranscript += event.results[i][0].transcript + " ";
         }
       }
-      transcriptOutput.textContent = finalTranscript + interimTranscript;
+      transcriptOutput.value = (finalTranscript + interimTranscript).trim();
     };
-
+    
     recognition.onend = () => {
-      transcriptOutput.textContent = finalTranscript.trim() || "No speech detected.";
-      generateQuizBtn.disabled = !finalTranscript.trim();
+      transcriptOutput.value = finalTranscript.trim() || "No speech detected.";
     };
-
-    generateQuizBtn.addEventListener("click", async () => {
+    
+    // Navigation Buttons for Step 1
+    const nextStep1Btn = document.getElementById("next-step1");
+    nextStep1Btn.addEventListener("click", () => {
+      if (!finalTranscript.trim()) {
+        alert("No transcript available. Please record your lecture.");
+        return;
+      }
+      step1.classList.remove("active");
+      step1.style.display = "none";
+      step2.classList.add("active");
+      step2.style.display = "block";
+      progressStep1.classList.remove("active");
+      progressStep2.classList.add("active");
+    });
+    
+    // Navigation Buttons for Step 2
+    const nextStep2Btn = document.getElementById("next-step2");
+    const prevStep2Btn = document.getElementById("prev-step2");
+    
+    nextStep2Btn.addEventListener("click", () => {
+      step2.classList.remove("active");
+      step2.style.display = "none";
+      step3.classList.add("active");
+      step3.style.display = "block";
+      progressStep2.classList.remove("active");
+      progressStep3.classList.add("active");
+    });
+    
+    prevStep2Btn.addEventListener("click", () => {
+      step2.classList.remove("active");
+      step2.style.display = "none";
+      step1.classList.add("active");
+      step1.style.display = "block";
+      progressStep2.classList.remove("active");
+      progressStep1.classList.add("active");
+    });
+    
+    // Navigation Buttons for Step 3
+    const prevStep3Btn = document.getElementById("prev-step3");
+    prevStep3Btn.addEventListener("click", () => {
+      step3.classList.remove("active");
+      step3.style.display = "none";
+      step2.classList.add("active");
+      step2.style.display = "block";
+      progressStep3.classList.remove("active");
+      progressStep2.classList.add("active");
+    });
+    
+    // Toggle button functionality for Quiz Config (Question Type and Difficulty)
+    const questionTypeButtons = document.querySelectorAll(".question-types .toggle-btn");
+    questionTypeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        questionTypeButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+    const difficultyButtons = document.querySelectorAll(".difficulty .toggle-btn");
+    difficultyButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        difficultyButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+    
+    // Submit Quiz: Send payload to backend
+    const submitQuizBtn = document.getElementById("submit-quiz");
+    submitQuizBtn.addEventListener("click", async () => {
       if (!finalTranscript.trim()) {
         alert("No transcript available.");
         return;
       }
-
-      console.log("Sending transcript:", finalTranscript);
-      let difficulty = difficultySelect.value;
-      let questionType = questionTypeSelect.value;
-
+      let email = document.getElementById("userEmail").value;
+      
+      // Get selected difficulty
+      const difficultyBtn = document.querySelector(".difficulty .toggle-btn.active");
+      const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
+      
+      // Get selected question type and convert to backend values
+      const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
+      let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
+      if (questionType === "Multiple Choice") {
+        questionType = "MCQs";
+      } else if (questionType === "True False") {
+        questionType = "truefalse";
+      } else if (questionType === "Fill in the blank") {
+        questionType = "blanks";
+      } else if (questionType === "General Q&A") {
+        questionType = "qa";
+      }
+      
+      // Get email option
+      let sendEmailValue = document.querySelector("input[name='sendEmail']:checked").value;
+      
       try {
         let response = await fetch("/generateOnTopic", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: userEmail,
+            email: email,
             topic: finalTranscript,
             difficulty: difficulty,
             type: questionType,
+            is_email: sendEmailValue === "yes"
           }),
         });
-
         let data = await response.json();
-
         if (response.ok) {
           const params = new URLSearchParams({
             message: data.message,
-            email: userEmail,
+            email: email,
             difficulty: difficulty,
           });
-          console.log(params);
-
           if (questionType === "MCQs") {
             window.location.href = `/quiz?${params.toString()}`;
-          } else if (questionType === "True/False") {
+          } else if (questionType === "truefalse") {
             window.location.href = `/truefalse?${params.toString()}`;
           } else if (questionType === "qa") {
             window.location.href = `/qa?${params.toString()}`;
@@ -181,11 +432,11 @@
             window.location.href = `/blank?${params.toString()}`;
           }
         } else {
-          quizOutput.textContent = "Error: " + data.error;
+          alert("Quiz generation failed: " + data.error);
         }
       } catch (error) {
-        console.error("Quiz generation error:", error);
-        quizOutput.textContent = "Failed to generate quiz.";
+        console.error("Error generating quiz:", error);
+        alert("An error occurred while generating the quiz.");
       }
     });
   </script>

@@ -177,25 +177,11 @@
       margin: 0 5px;
     }
     
+    /* Google button container */
     .google-btn {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: #fff;
-      color: #333;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
+      display: flex;
       justify-content: center;
-    }
-    .google-btn:hover {
-      background: #f5f5f5;
-    }
-    .google-btn img {
-      height: 18px;
-      margin-right: 8px;
     }
     
     #inner {
@@ -220,6 +206,8 @@
       }
     }
   </style>
+  <!-- Load Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <!-- Top-right Toggle Button -->
@@ -281,16 +269,60 @@
         </div>
         <button type="submit" class="action-btn" id="form-button">Register</button>
         <div class="or-divider" id="or-divider">OR CONTINUE WITH</div>
-        <button type="button" class="google-btn" id="google-btn" onclick="window.location.href='/auth/google'">
-          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
-          <strong>Register With Google</strong>
-        </button>
+        <!-- Google button will be rendered here -->
+        <div id="google-btn" class="google-btn"></div>
       </form>
     </div>
   </div>
   
-  <!-- Script to center the second card on load -->
+  <!-- Scripts -->
   <script>
+    // Callback to handle the response from Google
+    function handleCredentialResponse(response) {
+      console.log("Encoded JWT ID token: " + response.credential);
+      // Send the token to your backend for verification and registration/login
+      fetch('/auth/google', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ token: response.credential })
+})
+.then(res => res.text())  // Use text() if you expect HTML
+.then(html => {
+  // Option 1: Replace the current document with the received HTML
+  document.open();
+  document.write(html);
+  document.close();
+
+  // Option 2: Alternatively, extract a URL from the HTML and redirect:
+  // window.location.href = '/userProfile?email=' + encodeURIComponent(email);
+})
+.catch(err => {
+  console.error('Error:', err);
+});
+
+    }
+
+    // Initialize Google Identity Services and render the button
+    window.onload = function() {
+      google.accounts.id.initialize({
+        client_id: '419341207216-n9a6ckit9g43339vbm3do7ucv9pu17io.apps.googleusercontent.com',
+        callback: handleCredentialResponse
+      });
+      // Render the initial Google button in "register" (signup) mode
+      renderGoogleButton('signup');
+    };
+
+    // Function to render the Google button with appropriate text
+    function renderGoogleButton(mode) {
+      // Clear any previous button content
+      document.getElementById('google-btn').innerHTML = "";
+      google.accounts.id.renderButton(
+        document.getElementById('google-btn'),
+        { theme: "outline", size: "large", text: mode === 'login' ? "signin_with" : "signup_with" }
+      );
+    }
+
+    // Center the second review card on load
     window.addEventListener("DOMContentLoaded", () => {
       const reviewCardsContainer = document.querySelector('.review-cards');
       const secondCard = reviewCardsContainer.children[1];
@@ -308,8 +340,6 @@
       const lastNameGroup = document.getElementById('last-name-group');
       const firstNameInput = document.getElementById('first-name');
       const lastNameInput = document.getElementById('last-name');
-      const googleBtn = document.getElementById('google-btn');
-      const orDivider = document.getElementById('or-divider');
 
       if (!isLoginMode) {
         // Switch to Login mode
@@ -323,10 +353,8 @@
         // Change form action and button text
         document.getElementById('auth-form').action = "/login";
         document.getElementById('form-button').textContent = "Login";
-        // Update third-party option text for login
-        orDivider.style.display = "block";
-        googleBtn.style.display = "inline-flex";
-        googleBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"><strong>Continue With Google</strong>`;
+        // Re-render Google button for login mode
+        renderGoogleButton('login');
         // Toggle top-right button text
         this.textContent = "Register";
       } else {
@@ -341,10 +369,8 @@
         // Change form action and button text
         document.getElementById('auth-form').action = "/signup";
         document.getElementById('form-button').textContent = "Register";
-        // Update third-party option text for registration
-        orDivider.style.display = "block";
-        googleBtn.style.display = "inline-flex";
-        googleBtn.innerHTML = `<img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"><strong>Register With Google</strong>`;
+        // Re-render Google button for signup mode
+        renderGoogleButton('signup');
         // Toggle top-right button text
         this.textContent = "Login";
       }

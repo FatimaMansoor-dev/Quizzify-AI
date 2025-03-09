@@ -8,81 +8,73 @@
 </head>
 <style>
     /* Step 2 Container */
-#step-2 {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: auto;
-}
-
-/* Question Type and Number Section */
-.step-section {
-    border-radius: 10px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-}
-
-/* Labels */
-.step-section h3 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-/* Options */
-.option-group {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-/* Buttons for Question Type & Difficulty */
-.option-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #a855f7; /* Purple border */
-    border-radius: 10px;
-    padding: 10px 15px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #a855f7;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.option-btn.selected {
-    background: #a855f7;
-    color: white;
-}
-
-/* Next Step Button */
-.next-step {
-    display: block;
-    width: 150px;
-    background: #a855f7;
-    color: white;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: 0.3s;
-}
-
-.next-step:hover {
-    background: #7e22ce;
-}
-
+    #step-2 {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: auto;
+    }
+    /* Question Type and Number Section */
+    .step-section {
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+    /* Labels */
+    .step-section h3 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    /* Options */
+    .option-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    /* Buttons for Question Type & Difficulty */
+    .option-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #a855f7; /* Purple border */
+        border-radius: 10px;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #a855f7;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .option-btn.selected {
+        background: #a855f7;
+        color: white;
+    }
+    /* Next Step Button */
+    .next-step {
+        display: block;
+        width: 150px;
+        background: #a855f7;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: 0.3s;
+    }
+    .next-step:hover {
+        background: #7e22ce;
+    }
 </style>
 <body class="bg-gray-100 flex justify-center items-center min-h-screen">
     <input type="hidden" id="userEmail" value="{{ email }}">
-
     <div class="bg-white w-[90%] max-w-4xl p-6 shadow-lg rounded-lg">
         
         <!-- Header -->
@@ -90,7 +82,6 @@
             <div class="text-purple-600 text-xl font-bold flex items-center">
                 <span class="mr-2">📖</span> QuizRise
             </div>
-            
         </div>
 
         <!-- Progress Steps -->
@@ -111,11 +102,11 @@
             </div>
         </div>
 
-        <!-- Input Section -->
+        <!-- Input Section (Step 1) -->
         <form id="quizForm" class="bg-gray-50 p-4 rounded-md mb-6">
             <label class="block text-gray-700 font-semibold mb-2">YouTube Video URL 🎥</label>
             <input type="text" id="youtube_url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=example" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-            <p id="errorMessage" class="text-red-500 text-sm mt-2 hidden"></p> <!-- Error Message -->
+            <p id="errorMessage" class="text-red-500 text-sm mt-2 hidden"></p>
         </form>
 
         <!-- Next Button for Step 1 -->
@@ -123,11 +114,9 @@
             <button id="nextStepBtn" class="bg-purple-600 text-white px-6 py-2 rounded-md text-lg">Next Step</button>
         </div>
 
-
-         <!-- Step 2: Configure Quiz -->
-         <div id="step-2" style="display: none;">
+        <!-- Step 2: Configure Quiz -->
+        <div id="step-2" style="display: none;">
             <h2 class="text-center text-purple-600 font-bold text-xl">Configure Quiz</h2>
-
             <!-- Question Type -->
             <div class="step-section">
                 <h3>What type of questions?</h3>
@@ -137,7 +126,6 @@
                     <div class="option-btn">blanks</div>
                 </div>
             </div>
-
             <!-- Difficulty Level -->
             <div class="step-section">
                 <h3>Select Difficulty Level</h3>
@@ -153,11 +141,12 @@
         <div class="flex justify-end mt-4">
             <button class="next-step hidden" id="nextToStep3">Next Step →</button>
         </div>
-              <!-- Step 3: Output Options -->
+
+        <!-- Step 3: Output Options -->
         <div id="step-3" style="display: none;">
             <h2 class="text-center text-purple-600 font-bold text-xl">Output Options</h2>
             <div class="step-section">
-                <h3>Do you want notes and summary?</h3>
+                <h3>Do you want the quiz emailed to you?</h3>
                 <div class="option-group">
                     <div class="option-btn selected">Yes</div>
                     <div class="option-btn">No</div>
@@ -167,66 +156,59 @@
                 <button class="next-step bg-green-500" id="generateQuiz">Generate Quiz</button>
             </div>
         </div>
-
-        
     </div>
 
     <script>
-        let transcriptText = ""; // Store transcript globally
+        let transcriptText = ""; // Will store transcript from YouTube
         let questionType = "";
         let difficulty = "";
-    // Step 1: Handle YouTube URL Submission
-    document.getElementById("nextStepBtn").addEventListener("click", async function(event) {
-            event.preventDefault(); // Prevent form submission
-
+        
+        // Step 1: Handle YouTube URL Submission
+        document.getElementById("nextStepBtn").addEventListener("click", async function(event) {
+            event.preventDefault();
             let youtubeUrl = document.getElementById("youtube_url").value;
             let errorMessage = document.getElementById("errorMessage");
             let step1 = document.getElementById("quizForm");
             let step2 = document.getElementById("step-2");
             let nextStepBtn = document.getElementById("nextToStep3");
 
-            errorMessage.classList.add("hidden"); // Hide previous errors
+            errorMessage.classList.add("hidden");
             
-
-try {
-    let response = await fetch("/generate_transcript", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ youtube_url: youtubeUrl })
-    });
-
-    let data = await response.json();
-    // console.log("Transcript Response:", data.transcript);
-
-    if (response.ok) {
-        transcriptText = data.transcript; // Store the transcript
-        step1.style.display = "none"; 
-        document.getElementById("nextStepBtn").style.display = "none"; 
-
-        step2.style.display = "block"; 
-        nextStepBtn.classList.remove("hidden"); 
-    } else {
-        errorMessage.textContent = data.error || "Error fetching transcript.";
-        errorMessage.classList.remove("hidden");
-    }
-} catch (error) {
-    console.error("Network error:", error);
-    errorMessage.textContent = "Something went wrong. Please try again.";
-    errorMessage.classList.remove("hidden");
-}
+            try {
+                let response = await fetch("/generate_transcript", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ youtube_url: youtubeUrl })
+                });
+                let data = await response.json();
+                if (response.ok) {
+                    transcriptText = data.transcript;
+                    step1.style.display = "none"; 
+                    document.getElementById("nextStepBtn").style.display = "none"; 
+                    step2.style.display = "block"; 
+                    nextStepBtn.classList.remove("hidden"); 
+                } else {
+                    errorMessage.textContent = data.error || "Error fetching transcript.";
+                    errorMessage.classList.remove("hidden");
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+                errorMessage.textContent = "Something went wrong. Please try again.";
+                errorMessage.classList.remove("hidden");
+            }
         });
 
-        // Step 2: Handle Next Step to Step 3
+        // Step 2: Next Step to Step 3
         document.getElementById("nextToStep3").addEventListener("click", function() {
+            // Get selections from Step 2
             questionType = document.querySelector(".step-section:nth-of-type(1) .selected")?.textContent || "Not Selected";
             difficulty = document.querySelector(".step-section:nth-of-type(2) .selected")?.textContent || "Not Selected";
-            // console.log(difficulty);
             document.getElementById("step-2").style.display = "none";
             document.getElementById("nextToStep3").style.display = "none";
             document.getElementById("step-3").style.display = "block";
         });
 
-        // Option Selection Logic
+        // Option Selection Logic for all option buttons
         document.querySelectorAll(".option-btn").forEach(button => {
             button.addEventListener("click", function () {
                 let parent = this.closest(".step-section");
@@ -235,62 +217,60 @@ try {
             });
         });
 
-        
+        // Submit Quiz Event Listener (Step 3)
         document.getElementById("generateQuiz").addEventListener("click", async function() {
             let userEmail = document.getElementById("userEmail").value;
-            let includeNotesElement = document.querySelector("#step-3 .step-section .selected");
-    //         let questionTypeElement = document.querySelector(".step-section:nth-of-type(1) .selected");
-    // let difficultyElement = document.querySelector(".step-section:nth-of-type(2) .selected");
-    // let includeNotesElement = document.querySelector(".step-section:nth-of-type(3) .selected");
-    let includeNotes = includeNotesElement.textContent === "Yes";
-    console.log(transcriptText, questionType, difficulty);
-
-    if (!questionType || !difficulty || !includeNotes) {
-        alert("Please make sure all selections are made before generating the quiz.");
-        return;
-    }
-    
-    try {
-        let response = await fetch("/generateOnTopic", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+            // Retrieve the selection for email option
+            let emailOptionElement = document.querySelector("#step-3 .step-section .selected");
+            let isEmail = emailOptionElement.textContent === "Yes";
+            
+            // Validate that questionType and difficulty have been selected
+            if (!questionType || !difficulty) {
+                alert("Please make sure all selections are made before generating the quiz.");
+                return;
+            }
+            
+            // Build the payload, including the is_email property as a boolean
+            const payload = {
                 email: userEmail,
                 topic: transcriptText,
                 type: questionType,
-                difficulty: difficulty
-                // include_notes: includeNotes
-            })
-        });
-
-
-        if (response.ok) {
-            const result = await response.json();
-            const params = new URLSearchParams({
-                message: result.message,
-                email: userEmail,
                 difficulty: difficulty,
-                type: result.type});
-
-if (questionType === "MCQs") {
-window.location.href = `/quiz?${params.toString()}`;
-} else if (questionType === "true/false") {
-window.location.href = `/truefalse?${params.toString()}`;
-} else if (questionType === "qa") {
-window.location.href = `/qa?${params.toString()}`;
-}else {
-window.location.href = `/blank?${params.toString()}`;
-}
-        } else {
-            alert("Error: " + data.error);
-        }
-    } catch (error) {
-        console.error("Network error:", error);
-        alert("Something went wrong. Please try again.");
-    }
-});
-
-
+                is_email: isEmail
+            };
+            
+            try {
+                let response = await fetch("/generateOnTopic", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    const params = new URLSearchParams({
+                        message: result.message,
+                        email: userEmail,
+                        difficulty: difficulty,
+                        type: result.type
+                    });
+                    if (questionType === "MCQs") {
+                        window.location.href = `/quiz?${params.toString()}`;
+                    } else if (questionType.toLowerCase() === "true/false") {
+                        window.location.href = `/truefalse?${params.toString()}`;
+                    } else if (questionType === "qa") {
+                        window.location.href = `/qa?${params.toString()}`;
+                    } else {
+                        window.location.href = `/blank?${params.toString()}`;
+                    }
+                } else {
+                    let data = await response.json();
+                    alert("Quiz generation failed: " + data.error);
+                }
+            } catch (error) {
+                console.error("Error generating quiz:", error);
+                alert("An error occurred while generating the quiz.");
+            }
+        });
     </script>
 </body>
 </html>

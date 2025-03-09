@@ -12,7 +12,6 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-
     body {
       background-color: #f9f9f9;
       display: flex;
@@ -22,7 +21,6 @@
       width: 100vw;
       margin: 0 auto;
     }
-
     /* Navbar */
     .navbar {
       width: 100%;
@@ -50,24 +48,21 @@
       border-radius: 50%;
       font-size: 20px;
     }
-
     /* Main container */
     .container {
-  padding: 40px;
-  width: 100%;
-  max-width: 1000px;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-  margin-top: 80px;
-  background-color: #fff;
-  min-height: 90vh; /* Makes it take almost full screen height */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centers content vertically */
-}
-
-
+      padding: 40px;
+      width: 100%;
+      max-width: 1000px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
+      margin-top: 80px;
+      background-color: #fff;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
     /* Progress bar */
     .progress {
       display: flex;
@@ -85,7 +80,6 @@
       font-weight: bold;
       border-radius: 5px 0 0 5px;
       flex: 1;
-      /* Arrow shape */
       clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
       display: flex;
       align-items: center;
@@ -112,12 +106,10 @@
     .step.active {
       background: #7a4dc1;
     }
-
     /* Step containers */
     #step2 {
-      display: none; /* hidden initially */
+      display: none;
     }
-
     /* Upload Section (Step 1) */
     .upload-section {
       margin: 40px 0;
@@ -148,7 +140,6 @@
       font-weight: bold;
       margin-top: 10px;
     }
-
     /* Configure Quiz (Step 2) */
     .quiz-config {
       display: flex;
@@ -169,7 +160,6 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
-
     /* Toggles/Buttons for question types, question count, etc. */
     .question-types,
     .question-count {
@@ -194,7 +184,6 @@
       color: #666;
       margin-top: -10px;
     }
-
     /* Next button */
     .next-btn {
       background: #7a4dc1;
@@ -215,7 +204,6 @@
     <span>QuizXpert</span>
     <span class="email-initial" id="emailInitial"></span>
   </div>
-
   <!-- Main Container -->
   <div class="container">
     <!-- Step 1: Upload PDF -->
@@ -231,7 +219,6 @@
           <span>3</span> Output Options
         </div>
       </div>
-
       <h2 style="margin-bottom: 20px;">Upload your PDF</h2>
       <div class="upload-section">
         <label for="pdf-upload" class="upload-box">
@@ -240,10 +227,8 @@
           <div id="pdf-preview"></div>
         </label>
       </div>
-
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
-
     <!-- Step 2: Configure Quiz -->
     <div id="step2">
       <div class="progress">
@@ -257,9 +242,7 @@
           <span>3</span> Output Options
         </div>
       </div>
-
       <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
-
       <div class="quiz-config">
         <div>
           <p style="margin-bottom: 5px;">What type of questions?</p>
@@ -270,7 +253,6 @@
             <button class="toggle-btn">General Question Answers</button>
           </div>
         </div>
-
         <div>
           <p style="margin-bottom: 5px;">Difficulty Level?</p>
           <div class="question-count">
@@ -279,208 +261,189 @@
             <button class="toggle-btn">Hard</button>
           </div>
         </div>
-
         <button id="next-step2" class="next-btn">Next Step →</button>
       </div>
     </div>
-
     <!-- Step 3: Output Options -->
-<div id="step3" style="display: none;">
-  <div class="progress">
-    <div class="step">
-      <span>1</span> Upload PDF
+    <div id="step3" style="display: none;">
+      <div class="progress">
+        <div class="step">
+          <span>1</span> Upload PDF
+        </div>
+        <div class="step">
+          <span>2</span> Configure Quiz
+        </div>
+        <div class="step active">
+          <span>3</span> Output Options
+        </div>
+      </div>
+      <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
+      <div class="quiz-config">
+        <label>
+          <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
+        </label>
+        <label>
+          <input type="radio" name="emailOption" value="no" checked /> No, Thanks
+        </label>
+      </div>
+      <div style="margin-top: 20px;">
+        <button id="back-step2" class="next-btn" style="background: gray;">← Back</button>
+        <button id="submit-quiz" class="next-btn">Submit Quiz</button>
+      </div>
     </div>
-    <div class="step">
-      <span>2</span> Configure Quiz
-    </div>
-    <div class="step active">
-      <span>3</span> Output Options
-    </div>
   </div>
-
-  <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
-
-  <div class="quiz-config">
-    <label>
-      <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
-    </label>
-    <label>
-      <input type="radio" name="emailOption" value="no" checked /> No, Thanks
-    </label>
-  </div>
-
-  <div style="margin-top: 20px;">
-    <button id="back-step2" class="next-btn" style="background: gray;">← Back</button>
-    <button id="submit-quiz" class="next-btn">Submit Quiz</button>
-  </div>
-</div>
-
-  </div>
-
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-     // Set the email initial
-     let email = document.getElementById("userEmail").value;
-  document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
-
-  const fileInput = document.getElementById("pdf-upload");
-  const pdfPreview = document.getElementById("pdf-preview");
-  const nextStep1Btn = document.getElementById("next-step1");
-  let extractedText = "";
-
-  // Show chosen file name
-  fileInput.addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (file) {
-      pdfPreview.textContent = `Selected: ${file.name}`;
-    }
-  });
-
-  // Handle Step 1 -> Step 2 transition
-  nextStep1Btn.addEventListener("click", function () {
-    if (!fileInput.files.length) {
-      alert("Please upload a PDF first!");
-      return;
-    }
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = async function () {
-      try {
-        const typedarray = new Uint8Array(this.result);
-        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-        extractedText = "";
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          extractedText += content.items.map(item => item.str).join(" ") + "\n";
+      // Set email initial in navbar
+      let email = document.getElementById("userEmail").value;
+      document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
+      
+      // PDF upload elements
+      const fileInput = document.getElementById("pdf-upload");
+      const pdfPreview = document.getElementById("pdf-preview");
+      const nextStep1Btn = document.getElementById("next-step1");
+      let extractedText = "";
+      
+      // Show chosen file name when a file is selected
+      fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          pdfPreview.textContent = `Selected: ${file.name}`;
         }
-        localStorage.setItem("pdfText", extractedText);
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
-      } catch (error) {
-        console.error("Error reading PDF:", error);
-        alert("Failed to read PDF. Please try again.");
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  });
-
-  // Toggle buttons for question types
-  const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
-  questionTypeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      questionTypeButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-    });
-  });
-
-  // Toggle buttons for difficulty levels
-  const questionCountButtons = document.querySelectorAll('.question-count .toggle-btn');
-  questionCountButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      questionCountButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-    });
-  });
-
-  // Handle step transitions
-  const step1 = document.getElementById("step1");
-  const step2 = document.getElementById("step2");
-  const step3 = document.getElementById("step3");
-
-  const nextStep2Btn = document.getElementById("next-step2");
-  const backStep2Btn = document.getElementById("back-step2");
-  const submitQuizBtn = document.getElementById("submit-quiz");
-
-  nextStep2Btn.addEventListener("click", function () {
-    step2.style.display = "none";
-    step3.style.display = "block";
-  });
-
-  backStep2Btn.addEventListener("click", function () {
-    step3.style.display = "none";
-    step2.style.display = "block";
-  });
-
-  // Submit Quiz event listener (only one, within DOMContentLoaded)
-  submitQuizBtn.addEventListener("click", async () => {
-  // Get email option
-  const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-
-  // Get selected difficulty
-  const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
-  const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
-
-  // Get selected question type text
-  const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
-  let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
-
-  // Convert question type to desired value
-  if (questionType === "Multiple Choice") {
-    questionType = "MCQs";
-  } else if (questionType === "True False") {
-    questionType = "truefalse";
-  } else if (questionType === "Fill in the blank") {
-    questionType = "blanks";
-  }
-
-  // Retrieve the extracted PDF text
-  const extractedText = localStorage.getItem("pdfText") || "";
-
-  // Build the payload
-  const payload = {
-    difficulty: difficulty,
-    type: questionType,
-    topic: extractedText,
-    email: email // Ensure that the variable 'email' is defined in your scope
-  };
-
-  try {
-    // Send the POST request using await fetch
-    const response = await fetch("/generateOnTopic", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    // Parse the JSON response
-    const data = await response.json();
-
-    if (response.ok) {
-      // Build URL parameters for redirection
-      const params = new URLSearchParams({
-        message: data.message,
-        email: email,
-        difficulty: difficulty
       });
-
-      // Redirect based on question type
-      if (questionType === "MCQs") {
-        window.location.href = `/quiz?${params.toString()}`;
-      } else if (questionType === "truefalse") {
-        window.location.href = `/truefalse?${params.toString()}`;
-      } else if (questionType === "qa") {
-        window.location.href = `/qa?${params.toString()}`;
-      } else {
-        window.location.href = `/blank?${params.toString()}`;
-      }
-    } else {
-      alert("Quiz generation failed: " + data.error);
-    }
-  } catch (error) {
-    console.error("Error generating quiz:", error);
-    alert("An error occurred while generating the quiz.");
-  }
-});
-
-
-
-});
-
-
+      
+      // Handle Step 1 -> Step 2 transition after reading PDF
+      nextStep1Btn.addEventListener("click", function () {
+        if (!fileInput.files.length) {
+          alert("Please upload a PDF first!");
+          return;
+        }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function () {
+          try {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            extractedText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const content = await page.getTextContent();
+              extractedText += content.items.map(item => item.str).join(" ") + "\n";
+            }
+            localStorage.setItem("pdfText", extractedText);
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+          } catch (error) {
+            console.error("Error reading PDF:", error);
+            alert("Failed to read PDF. Please try again.");
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+      
+      // Toggle buttons for question types
+      const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
+      questionTypeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          questionTypeButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
+      });
+      
+      // Toggle buttons for difficulty levels
+      const questionCountButtons = document.querySelectorAll('.question-count .toggle-btn');
+      questionCountButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          questionCountButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
+      });
+      
+      // Handle step transitions
+      const step1 = document.getElementById("step1");
+      const step2 = document.getElementById("step2");
+      const step3 = document.getElementById("step3");
+      
+      const nextStep2Btn = document.getElementById("next-step2");
+      const backStep2Btn = document.getElementById("back-step2");
+      const submitQuizBtn = document.getElementById("submit-quiz");
+      
+      nextStep2Btn.addEventListener("click", function () {
+        step2.style.display = "none";
+        step3.style.display = "block";
+      });
+      
+      backStep2Btn.addEventListener("click", function () {
+        step3.style.display = "none";
+        step2.style.display = "block";
+      });
+      
+      // Submit Quiz event listener
+      submitQuizBtn.addEventListener("click", async () => {
+        // Get the user's email option selection for receiving the quiz
+        const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
+        // Get selected difficulty from toggle buttons
+        const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
+        const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
+        // Get selected question type text
+        const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
+        let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
+        
+        // Convert question type to desired backend value
+        if (questionType === "Multiple Choice") {
+          questionType = "MCQs";
+        } else if (questionType === "True False") {
+          questionType = "truefalse";
+        } else if (questionType === "Fill in the blank") {
+          questionType = "blanks";
+        }
+        
+        // Retrieve extracted PDF text
+        const extractedText = localStorage.getItem("pdfText") || "";
+        
+        // Build the payload including the is_email property as a boolean
+        const payload = {
+          difficulty: difficulty,
+          type: questionType,
+          topic: extractedText,
+          email: email,
+          is_email: selectedOption === "yes"
+        };
+        
+        try {
+          // Send the POST request to your backend endpoint
+          const response = await fetch("/generateOnTopic", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (response.ok) {
+            const params = new URLSearchParams({
+              message: data.message,
+              email: email,
+              difficulty: difficulty
+            });
+            if (questionType === "MCQs") {
+              window.location.href = `/quiz?${params.toString()}`;
+            } else if (questionType === "truefalse") {
+              window.location.href = `/truefalse?${params.toString()}`;
+            } else if (questionType === "qa") {
+              window.location.href = `/qa?${params.toString()}`;
+            } else {
+              window.location.href = `/blank?${params.toString()}`;
+            }
+          } else {
+            alert("Quiz generation failed: " + data.error);
+          }
+        } catch (error) {
+          console.error("Error generating quiz:", error);
+          alert("An error occurred while generating the quiz.");
+        }
+      });
+    });
   </script>
 </body>
 </html>
