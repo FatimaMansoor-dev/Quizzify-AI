@@ -114,6 +114,13 @@
       color: #28a745;
       margin-top: 5px;
     }
+    /* We keep source hidden by default; reveal after submission */
+    .source {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 5px;
+      display: none; /* hidden initially */
+    }
     .nav-container {
       text-align: center;
       margin-top: 20px;
@@ -138,6 +145,9 @@
       font-weight: 700;
       color: #1C0E6D;
       text-align: center;
+    }
+    .hidden {
+      display: none;
     }
     @media (max-width: 480px) {
       h1 {
@@ -167,40 +177,79 @@
     </div>
     <div class="result" id="result"></div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.3"></script>
   <script>
-    // Extract URL parameters (if any)
+    // 1) Extract URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get("message") || "No quiz data provided.";
     const email = urlParams.get("email") || "No email provided.";
     const difficulty = urlParams.get("difficulty") || "No difficulty provided.";
-    const type = urlParams.get("type") || "No type provided.";
 
-    // Function to parse the message into questions
-    function parseQuestions(message) {
-      const questionBlocks = message.split(/\*\*Question \d+:\*\*/).slice(1);
-      return questionBlocks.map((block) => {
-        const [questionPart, answerPart] = block.split("**Answer:**");
-        // Use regex to separate question text from options (assuming options on new lines)
-        const questionMatch = questionPart.match(/^(.*?)\n(.*)$/s);
-        const questionText = questionMatch ? questionMatch[1].trim() : questionPart.trim();
-        const options = questionMatch 
-          ? questionMatch[2].trim().split("\n").map(opt => opt.trim())
-          : [];
-        const correctAnswerMatch = answerPart.match(/[A-D]\)/);
-        const correctAnswer = correctAnswerMatch ? correctAnswerMatch[0][0] : null;
-        return {
-          question: questionText,
-          options,
-          correctAnswer,
-        };
-      });
+    function parseQuestions(fullText) {
+  // 1) Split on **Question n:**
+  const questionBlocks = fullText.split(/\*\*Question\s+\d+:\*\*/).slice(1);
+
+  return questionBlocks.map(block => {
+    // block = "Where is ...?\nA) ...\nB) ...\nC) ...\nD) ...\n\n**Answer:** A) ...\nSource: ..."
+
+    // 2) Split into the question/options part vs. answer part
+    const [qPart, aPartRaw] = block.split(/\*\*Answer:\*\*/);
+
+    // If there's no valid answer chunk, we handle it safely
+    const aPart = aPartRaw ? aPartRaw.trim() : "";
+
+    // -- (A) Process question/options --
+    const qLines = qPart
+      ? qPart.trim().split("\n").filter(line => line.trim() !== "")
+      : [];
+    // First line is the question text, subsequent lines are options
+    const questionText = qLines[0] || "No question found";
+    const options = qLines.slice(1).map(line => line.trim());
+
+    // -- (B) Process the answer part --
+    let correctAnswer = null;
+    let source = "";
+
+    if (aPart) {
+      // Split the answer part by lines
+      const answerLines = aPart.split("\n").map(l => l.trim());
+
+      // (i) Find the line that contains the letter (A/B/C/D)
+      //     e.g. "A) Karachi, Pakistan"
+      const answerLine = answerLines.find(line => /^[A-D]\)/i.test(line));
+      if (answerLine) {
+        // Extract just the letter
+        const match = answerLine.match(/^([A-D])\)/i);
+        if (match) {
+          correctAnswer = match[1].toUpperCase(); 
+        }
+      }
+
+      // (ii) Try to find the source line(s)
+      //      We allow either `Source: "some text"` or `Source: some text` (no quotes).
+      //      If the user puts it on the same line, that also works as a fallback.
+      const joinedAnswerText = answerLines.join(" ");
+      const sourceMatch = joinedAnswerText.match(/Source:\s*["']?([^"']+)["']?/i);
+      if (sourceMatch) {
+        source = sourceMatch[1].trim();
+      }
     }
 
-    // Parse quiz questions from the message string
+    return {
+      question: questionText,
+      options,
+      correctAnswer,
+      source
+    };
+  });
+}
+
+
+    // 3) Parse the quiz data
     const questions = parseQuestions(message);
 
-    // Render all questions at once
+    // 4) Render the quiz (source hidden by default)
     const quizContainer = document.getElementById("quiz");
 
     function loadAllQuiz() {
@@ -218,6 +267,8 @@
                 `;
               }).join('')}
             </div>
+            <!-- Source is hidden by default -->
+            <div class="source">Source: ${q.source}</div>
           </div>
         `;
       }).join('');
@@ -225,54 +276,74 @@
 
     loadAllQuiz();
 
+    // 5) Submission logic: highlight answers, reveal source
     function submitQuiz() {
       let score = 0;
-      // Iterate over each question block
+
       questions.forEach((q, index) => {
-        const questionBlock = document.querySelector(`.question-block[data-index="${index}"]`);
-        // Disable all radio inputs for this question
-        const inputs = questionBlock.querySelectorAll('input[type="radio"]');
-        inputs.forEach(input => input.disabled = true);
-        // Get the user's selected answer (if any)
-        const selected = questionBlock.querySelector(`input[name="question${index}"]:checked`);
+        const block = document.querySelector(`.question-block[data-index="${index}"]`);
+        // Disable radio inputs
+        const radios = block.querySelectorAll('input[type="radio"]');
+        radios.forEach(r => r.disabled = true);
+
+        // User's chosen answer
+        const selected = block.querySelector(`input[name="question${index}"]:checked`);
         const userAnswer = selected ? selected.value : null;
-        // Find all option labels
-        const labels = questionBlock.querySelectorAll('.options label');
+
+        // Mark correct/incorrect
+        const labels = block.querySelectorAll('.options label');
         labels.forEach(label => {
-          const optionLetter = label.getAttribute('data-option');
-          // Mark correct answer label in green
-          if (optionLetter === q.correctAnswer) {
+          const letter = label.getAttribute('data-option');
+          if (letter === q.correctAnswer) {
             label.classList.add("correct");
           }
-          // If this label is the one selected and it isn't correct, mark it red
-          if (userAnswer === optionLetter && userAnswer !== q.correctAnswer) {
+          if (userAnswer === letter && userAnswer !== q.correctAnswer) {
             label.classList.add("incorrect");
-            // Append an element to show the correct answer text (if not already added)
-            if (!questionBlock.querySelector('.correct-answer')) {
-              const correctLabel = questionBlock.querySelector(`.options label[data-option="${q.correctAnswer}"]`);
-              const correctText = correctLabel ? correctLabel.textContent.trim() : q.correctAnswer;
-              const correctAnsElem = document.createElement("div");
-              correctAnsElem.className = "correct-answer";
-              correctAnsElem.textContent = `Correct Answer: ${correctText}`;
-              questionBlock.querySelector(".options").appendChild(correctAnsElem);
-            }
+            // Show correct answer + source if not already appended
+            if (!block.querySelector('.correct-answer')) {
+  const correctLabel = block.querySelector(
+    `.options label[data-option="${q.correctAnswer}"]`
+  );
+  const correctText = correctLabel
+    ? correctLabel.textContent.trim()
+    : q.correctAnswer;
+
+  const div = document.createElement("div");
+  div.className = "correct-answer";
+  // Remove the (Source: ${q.source}) part:
+  div.textContent = `Correct Answer: ${correctText}`;
+
+  block.querySelector(".options").appendChild(div);
+}
+
           }
         });
+
+        // Reveal the hidden source now
+        const sourceDiv = block.querySelector('.source');
+        if (sourceDiv) {
+          sourceDiv.style.display = 'block';
+        }
+
         if (userAnswer === q.correctAnswer) {
           score++;
         }
       });
-      
-      // Display result and launch confetti
+
+      // Show results
       const resultContainer = document.getElementById("result");
       resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      
-      // Hide the submit button and show the "Return Home" button
+
+      // Optional confetti
+      if (window.confetti) {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      // Hide submit, show return
       document.getElementById("submit-btn").classList.add("hidden");
       document.getElementById("return-btn").classList.remove("hidden");
-      
-      // Send results to backend
+
+      // Send results to backend (optional)
       fetch("/insertResults", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -288,6 +359,7 @@
       });
     }
 
+    // 6) Return Home
     function returnHome() {
       window.location.href = `/userProfile?email=${email}`;
     }

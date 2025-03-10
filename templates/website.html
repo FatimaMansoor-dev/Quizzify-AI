@@ -1,76 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Quiz Wizard</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Wizard</title>
+  <!-- Import Roboto font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* Global Reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
     }
     body {
-      background-color: #f8f9fa;
-      color: #333;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      margin: 0 auto;
     }
-
-    /* NAVBAR */
+    /* Navbar */
     .navbar {
+      width: 100%;
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-size: 28px;
+      font-weight: bold;
+      position: fixed;
+      top: 0;
+      left: 0;
+      color: #7a4dc1;
+      font-family: cursive;
+      z-index: 2;
+    }
+    .email-initial {
+      background: #7a4dc1;
+      color: white;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      background-color: #fff;
-      padding: 0.5rem 1.5rem;
-      border-bottom: 1px solid #ddd;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 20px;
     }
-    .navbar-title {
-      font-size: 1.25rem;
-      font-weight: 600;
+    /* Progress Container */
+    .progress-container {
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 80px; /* to account for navbar */
+      padding: 20px 0;
     }
-    .upgrade-btn {
-      background-color: #6c63ff;
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .upgrade-btn:hover {
-      opacity: 0.9;
-    }
-
-    /* MAIN CONTAINER */
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      background-color: #fff;
-      padding: 2rem;
-      border-radius: 6px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    /* ARROW PROGRESS BAR */
     .progress {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 2rem;
       gap: 10px;
     }
     .step {
       position: relative;
       background: #ccc;
-      color: white;
-      padding: 20px 30px;
+      /* Make the text purple for non-active steps */
+      color: #7a4dc1;
+      padding: 30px 40px;
       text-align: center;
-      font-size: 1rem;
+      font-size: 20px;
       font-weight: bold;
       border-radius: 5px 0 0 5px;
       flex: 1;
-      /* arrow shape */
       clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
       display: flex;
       align-items: center;
@@ -84,83 +88,126 @@
       left: 15px;
       transform: translateY(-50%);
       background: white;
-      color: #6c63ff;
+      color: #7a4dc1;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 18px;
+      border: 2px dotted #7a4dc1;
     }
     .step.active {
-      background: #6c63ff;
+      background: #7a4dc1;
+      /* Keep text white on the active step */
+      color: #fff;
     }
-
-    /* STEP CONTAINERS */
+    /* Main Container */
+    .container {
+      padding: 40px;
+      width: 100%;
+      max-width: 1500px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
+      background-color: #fff;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      margin-bottom: 40px;
+    }
+    /* Step Containers */
     .step-container {
-      display: none; /* hidden by default */
+      border: 1px solid #d3d3d3;
+      border-radius: 10px;
+      padding: 30px;
+      display: inline-block;
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
+      background: linear-gradient(135deg, #ffffff, #f0f0f0);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease-in-out;
     }
-    .step-container.active {
-      display: block; /* show active step */
+    /* Optional: Fade-in animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-
-    /* FORM ELEMENTS */
+    /* Form Elements */
     .form-group {
       margin-bottom: 1.5rem;
+      text-align: left;
     }
     .form-group label {
-      display: block;
+      font-weight: bold;
       margin-bottom: 0.5rem;
-      font-weight: 500;
+      display: block;
     }
     .form-group input[type="text"] {
       width: 100%;
-      padding: 0.6rem;
+      padding: 10px;
+      font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 1rem;
     }
     .help-text {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
+      margin-top: 10px;
+      font-size: 14px;
       color: #666;
     }
     .status {
       margin-top: 10px;
-      font-size: 0.9rem;
+      font-size: 14px;
+      color: #28a745;
     }
-
-    /* RADIO GROUPS */
-    .radio-group {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-    .radio-group label {
-      font-weight: normal;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    /* BUTTONS */
-    .btn {
-      background-color: #6c63ff;
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
-      border-radius: 4px;
+    /* Toggle Buttons */
+    .toggle-btn {
+      background-color: #f1f1f1;
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      border-radius: 5px;
       cursor: pointer;
+      font-size: 14px;
+      display: inline-block;
+      margin: 5px;
+      position: relative;
+      padding-right: 40px;
     }
-    .btn[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .toggle-btn.active {
+      background-color: #7a4dc1;
+      color: white;
+      border-color: #7a4dc1;
     }
-
-    /* LOADING OVERLAY */
+    .toggle-btn.active::after {
+      content: "\2713";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 16px;
+    }
+    /* Next Button */
+    .next-btn {
+      background: #7a4dc1;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    /* Loading Overlay */
     #loadingOverlay {
       position: fixed;
       top: 0;
@@ -172,115 +219,100 @@
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      color: #6c63ff;
+      color: #7a4dc1;
       z-index: 2000;
       display: none;
+    }
+    /* Radio inputs inside toggle labels */
+    .email-options input {
+      display: none;
+    }
+    /* Additional spacing for back/prev buttons */
+    #prev-step2, #back-step2 {
+      background: gray;
     }
   </style>
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
-
-  <!-- NAVIGATION BAR -->
+  <!-- Navbar -->
   <div class="navbar">
-    <div class="navbar-title">QuizRise</div>
-    <button class="upgrade-btn">Upgrade</button>
+    <span>QuizXpert</span>
+    <span class="email-initial" id="emailInitial"></span>
   </div>
 
-  <!-- MAIN CONTENT CONTAINER -->
-  <div class="container">
-    <!-- Arrow Progress Bar -->
+  <!-- Progress Container -->
+  <div class="progress-container">
     <div class="progress">
-      <div class="step active" id="progress-step1">
+      <div class="step active" data-step="1">
         <span>1</span> Paste URL
       </div>
-      <div class="step" id="progress-step2">
+      <div class="step" data-step="2">
         <span>2</span> Configure Quiz
       </div>
-      <div class="step" id="progress-step3">
+      <div class="step" data-step="3">
         <span>3</span> Output Options
       </div>
     </div>
+  </div>
 
-    <!-- STEP 1: PASTE URL -->
-    <div class="step-container active" id="step1">
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Step 1: Paste URL -->
+    <div id="step1" class="step-container">
+      <h2 style="margin-bottom: 20px;">Paste Website URL</h2>
       <div class="form-group">
         <label for="website-url">Website URL</label>
-        <input 
-          type="text" 
-          id="website-url" 
-          placeholder="E.g. https://en.wikipedia.org/wiki/Human_brain"
-        >
-        <p class="help-text">
-          Must be a publicly accessible website. We will scrape the content from the URL.
-        </p>
+        <input type="text" id="website-url" placeholder="E.g. https://en.wikipedia.org/wiki/Human_brain">
+        <p class="help-text">Enter a publicly accessible URL to scrape content from.</p>
         <p class="status" id="status-message"></p>
       </div>
-      <button class="btn" id="scrape-btn">Scrape</button>
+      <button id="scrape-btn" class="next-btn" style="margin-top: 20px;">Scrape →</button>
     </div>
 
-    <!-- STEP 2: CONFIGURE QUIZ -->
-    <div class="step-container" id="step2">
-      <div class="form-group">
-        <label>What type of questions?</label>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="quizType" value="MCQs" checked>
-            Multiple Choice
-          </label>
-          <label>
-            <input type="radio" name="quizType" value="truefalse">
-            True False
-          </label>
-          <label>
-            <input type="radio" name="quizType" value="blanks">
-            Fill in the blank
-          </label>
-          <label>
-            <input type="radio" name="quizType" value="qa">
-            Short Question/ Answers
-          </label>
+    <!-- Step 2: Configure Quiz -->
+    <div id="step2" class="step-container" style="display: none;">
+      <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
+      <div class="quiz-config">
+        <div>
+          <p style="margin-bottom: 5px;">What type of questions?</p>
+          <div class="question-types">
+            <button class="toggle-btn active">Multiple Choice</button>
+            <button class="toggle-btn">True False</button>
+            <button class="toggle-btn">Fill in the blank</button>
+            <button class="toggle-btn">Short Q&A</button>
+          </div>
+        </div>
+        <div>
+          <p style="margin-bottom: 5px;">Difficulty Level?</p>
+          <div class="question-count">
+            <button class="toggle-btn">Easy</button>
+            <button class="toggle-btn active">Medium</button>
+            <button class="toggle-btn">Hard</button>
+          </div>
         </div>
       </div>
-      
-      <div class="form-group">
-        <label>Difficulty</label>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="quizDifficulty" value="Low">
-            Low
-          </label>
-          <label>
-            <input type="radio" name="quizDifficulty" value="Medium" checked>
-            Medium
-          </label>
-          <label>
-            <input type="radio" name="quizDifficulty" value="High">
-            High
-          </label>
-        </div>
+      <div style="text-align: right; margin-top: 20px;">
+        <button id="prev-step2" class="next-btn" style="margin-right: 10px;">← Previous</button>
+        <button id="next-step2" class="next-btn">Next Step →</button>
       </div>
-      
-      <button class="btn" id="prev-step2">Previous</button>
-      <button class="btn" id="next-step2">Next Step</button>
     </div>
-      
-    <!-- STEP 3: OUTPUT OPTIONS -->
-    <div class="step-container" id="step3">
-      <div class="form-group">
-        <label>Would you like the quiz emailed to you?</label>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="sendEmail" value="yes" checked>
-            Yes
-          </label>
-          <label>
-            <input type="radio" name="sendEmail" value="no">
-            No
-          </label>
-        </div>
+
+    <!-- Step 3: Output Options -->
+    <div id="step3" class="step-container" style="display: none;">
+      <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
+      <div class="quiz-config email-options">
+        <label class="toggle-btn active">
+          <input type="radio" name="sendEmail" value="yes" checked> Yes, send to my email
+        </label>
+        <label class="toggle-btn">
+          <input type="radio" name="sendEmail" value="no"> No, Thanks
+        </label>
       </div>
-      <button class="btn" id="finish-step3">Finish</button>
+      <div style="text-align: right; margin-top: 20px;">
+        <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+        <button id="finish-step3" class="next-btn">Finish</button>
+      </div>
     </div>
   </div>
 
@@ -288,165 +320,208 @@
   <div id="loadingOverlay">Loading... Please wait</div>
 
   <script>
-    let email = document.getElementById("userEmail").value;
-    // Global variables to store user selections
-    let scrapedText = "";
-    let selectedDifficulty = "Medium";
-    let selectedQuestionType = "Multiple Choice";
-
-    // Step references
-    const step1 = document.getElementById("step1");
-    const step2 = document.getElementById("step2");
-    const step3 = document.getElementById("step3");
-
-    // Progress bar references
-    const progressStep1 = document.getElementById("progress-step1");
-    const progressStep2 = document.getElementById("progress-step2");
-    const progressStep3 = document.getElementById("progress-step3");
-
-    // Buttons and fields
-    const scrapeBtn = document.getElementById("scrape-btn");
-    const websiteUrl = document.getElementById("website-url");
-    const statusMessage = document.getElementById("status-message");
-    const loadingOverlay = document.getElementById("loadingOverlay");
-
-    const nextStep2Btn = document.getElementById("next-step2");
-    const finishStep3Btn = document.getElementById("finish-step3");
-
-    // STEP 1: SCRAPE
-    scrapeBtn.addEventListener("click", async () => {
-      const url = websiteUrl.value.trim();
-      statusMessage.textContent = "";
-
-      if (!isValidURL(url)) {
-        statusMessage.textContent = "❌ Invalid URL format.";
-        return;
-      }
-
-      // Show loading overlay during scraping
-      loadingOverlay.style.display = "flex";
-      statusMessage.textContent = "🔄 Scraping in progress...";
-
-      try {
-        // Call your Flask /scrape endpoint
-        const response = await fetch("/scrape", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url })
-        });
-        const data = await response.json();
-
-        // Hide loading overlay once scraping completes
-        loadingOverlay.style.display = "none";
-        if (data.success) {
-          statusMessage.textContent = "✅ Scraping successful!";
-          scrapedText = trimToTokens(data.content, 500); // Trim the text
-          goToStep2();
-        } else {
-          statusMessage.textContent = "❌ Scraping failed. Try another URL.";
+    document.addEventListener("DOMContentLoaded", function () {
+      // Set email initial in navbar
+      let email = document.getElementById("userEmail").value;
+      document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
+      
+      // Global variables
+      let scrapedText = "";
+      let selectedDifficulty = "Medium";
+      let selectedQuestionType = "Multiple Choice";
+      
+      // Step references
+      const step1 = document.getElementById("step1");
+      const step2 = document.getElementById("step2");
+      const step3 = document.getElementById("step3");
+      
+      // Progress bar references
+      const progressSteps = document.querySelectorAll(".progress .step");
+      
+      // Buttons and fields
+      const scrapeBtn = document.getElementById("scrape-btn");
+      const websiteUrl = document.getElementById("website-url");
+      const statusMessage = document.getElementById("status-message");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      
+      const nextStep2Btn = document.getElementById("next-step2");
+      const prevStep2Btn = document.getElementById("prev-step2");
+      const finishStep3Btn = document.getElementById("finish-step3");
+      const backStep2Btn = document.getElementById("back-step2");
+      
+      // Step 1: Scrape
+      scrapeBtn.addEventListener("click", async () => {
+        const url = websiteUrl.value.trim();
+        statusMessage.textContent = "";
+        
+        if (!isValidURL(url)) {
+          statusMessage.textContent = "❌ Invalid URL format.";
+          return;
         }
-      } catch (err) {
-        loadingOverlay.style.display = "none";
-        statusMessage.textContent = "❌ Error contacting server.";
-      }
-    });
-
-    function trimToTokens(text, tokenLimit) {
-      const tokens = text.split(/\s+/); // Splitting by spaces to count words as tokens
-      return tokens.slice(0, tokenLimit).join(" "); // Keep only the first `tokenLimit` tokens
-    }
-
-    // Move from Step 1 to Step 2
-    function goToStep2() {
-      step1.classList.remove("active");
-      step1.style.display = "none";
-      step2.classList.add("active");
-      step2.style.display = "block";
-
-      progressStep1.classList.remove("active");
-      progressStep2.classList.add("active");
-    }
-
-    // STEP 2: Next Step -> Step 3
-    nextStep2Btn.addEventListener("click", () => {
-      // Gather user choices
-      selectedQuestionType = document.querySelector('input[name="quizType"]:checked').value;
-      selectedDifficulty = document.querySelector('input[name="quizDifficulty"]:checked').value;
-
-      step2.classList.remove("active");
-      step2.style.display = "none";
-      step3.classList.add("active");
-      step3.style.display = "block";
-
-      progressStep2.classList.remove("active");
-      progressStep3.classList.add("active");
-    });
-
-    // STEP 3: Finish
-    finishStep3Btn.addEventListener("click", async () => {
-      // Check if user wants email
-      const sendEmailValue = document.querySelector('input[name="sendEmail"]:checked').value;
-      if (sendEmailValue === "no") {
-        email = "";
-      }
-
-      // Show loading overlay during quiz generation and emailing
-      loadingOverlay.style.display = "flex";
-
-      try {
-        // POST to /generateOnTopic with all the data
-        const response = await fetch("/generateOnTopic", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            topic: scrapedText,
-            difficulty: selectedDifficulty,
-            type: selectedQuestionType,
-            email: email,
-            is_email: sendEmailValue === "yes"
-          })
-        });
-
-        const data = await response.json();
-        // Hide loading overlay after response is received
-        loadingOverlay.style.display = "none";
-
-        if (response.ok) {
-          // Build URL parameters for redirection based on question type
-          const params = new URLSearchParams({
-            message: data.message,
-            email: email,
-            difficulty: selectedDifficulty
+        
+        loadingOverlay.style.display = "flex";
+        statusMessage.textContent = "🔄 Scraping in progress...";
+        
+        try {
+          const response = await fetch("/scrape", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url })
           });
-
-          if (selectedQuestionType === "MCQs") {
-            window.location.href = `/quiz?${params.toString()}`;
-          } else if (selectedQuestionType === "truefalse") {
-            window.location.href = `/truefalse?${params.toString()}`;
-          } else if (selectedQuestionType === "qa") {
-            window.location.href = `/qa?${params.toString()}`;
+          const data = await response.json();
+          loadingOverlay.style.display = "none";
+          if (data.success) {
+            statusMessage.textContent = "✅ Scraping successful!";
+            scrapedText = trimToTokens(data.content, 500);
+            goToStep2();
           } else {
-            window.location.href = `/blank?${params.toString()}`;
+            statusMessage.textContent = "❌ Scraping failed. Try another URL.";
           }
-        } else {
-          alert("Quiz generation failed: " + data.error);
+        } catch (err) {
+          loadingOverlay.style.display = "none";
+          statusMessage.textContent = "❌ Error contacting server.";
         }
-      } catch (error) {
-        loadingOverlay.style.display = "none";
-        console.error("Error generating quiz:", error);
-        alert("An error occurred while generating the quiz.");
+      });
+      
+      function trimToTokens(text, tokenLimit) {
+        const tokens = text.split(/\s+/);
+        return tokens.slice(0, tokenLimit).join(" ");
       }
+      
+      function goToStep2() {
+        step1.style.display = "none";
+        step2.style.display = "block";
+        updateProgress(2);
+      }
+      
+      nextStep2Btn.addEventListener("click", () => {
+        // Gather user choices
+        selectedQuestionType = document.querySelector('.question-types .toggle-btn.active').textContent.trim();
+        selectedDifficulty = document.querySelector('.question-count .toggle-btn.active').textContent.trim();
+        step2.style.display = "none";
+        step3.style.display = "block";
+        updateProgress(3);
+      });
+      
+      prevStep2Btn.addEventListener("click", () => {
+        // (Optional) implement going back from step 2 to step 1 if desired.
+      });
+      
+      backStep2Btn.addEventListener("click", () => {
+        step3.style.display = "none";
+        step2.style.display = "block";
+        updateProgress(2);
+      });
+      
+      finishStep3Btn.addEventListener("click", async () => {
+        const sendEmailValue = document.querySelector('input[name="sendEmail"]:checked').value;
+        if (sendEmailValue === "no") {
+          email = "";
+        }
+        
+        loadingOverlay.style.display = "flex";
+        try {
+          const response = await fetch("/generateOnTopic", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic: scrapedText,
+              difficulty: selectedDifficulty,
+              type: mapQuestionType(selectedQuestionType),
+              email: email,
+              is_email: sendEmailValue === "yes"
+            })
+          });
+          const data = await response.json();
+          loadingOverlay.style.display = "none";
+          if (response.ok) {
+            const params = new URLSearchParams({
+              message: data.message,
+              email: email,
+              difficulty: selectedDifficulty
+            });
+            const mappedType = mapQuestionType(selectedQuestionType);
+            if (mappedType === "MCQs") {
+              window.location.href = `/quiz?${params.toString()}`;
+            } else if (mappedType === "truefalse") {
+              window.location.href = `/truefalse?${params.toString()}`;
+            } else if (mappedType === "qa") {
+              window.location.href = `/qa?${params.toString()}`;
+            } else {
+              window.location.href = `/blank?${params.toString()}`;
+            }
+          } else {
+            alert("Quiz generation failed: " + data.error);
+          }
+        } catch (error) {
+          loadingOverlay.style.display = "none";
+          console.error("Error generating quiz:", error);
+          alert("An error occurred while generating the quiz.");
+        }
+      });
+      
+      function updateProgress(stepNumber) {
+        progressSteps.forEach(step => {
+          const stepData = parseInt(step.getAttribute("data-step"));
+          if (stepData === stepNumber) {
+            step.classList.add("active");
+          } else {
+            step.classList.remove("active");
+          }
+        });
+      }
+      
+      function isValidURL(str) {
+        try {
+          new URL(str);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      function mapQuestionType(type) {
+        if (type === "Multiple Choice") {
+          return "MCQs";
+        } else if (type === "True False") {
+          return "truefalse";
+        } else if (type === "Fill in the blank") {
+          return "blanks";
+        } else if (type === "Short Q&A") {
+          return "qa";
+        }
+        return "MCQs";
+      }
+      
+      // Toggle buttons for question types
+      const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
+      questionTypeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          questionTypeButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
+      });
+      
+      // Toggle buttons for difficulty levels
+      const difficultyButtons = document.querySelectorAll('.question-count .toggle-btn');
+      difficultyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          difficultyButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
+      });
+      
+      // Toggle for email options
+      const emailOptionLabels = document.querySelectorAll('.email-options .toggle-btn');
+      emailOptionLabels.forEach(label => {
+        label.addEventListener('click', () => {
+          emailOptionLabels.forEach(l => l.classList.remove('active'));
+          label.classList.add('active');
+          label.querySelector('input').checked = true;
+        });
+      });
+      
     });
-
-    // Basic URL validation
-    function isValidURL(str) {
-      try {
-        new URL(str);
-        return true;
-      } catch {
-        return false;
-      }
-    }
   </script>
 </body>
 </html>

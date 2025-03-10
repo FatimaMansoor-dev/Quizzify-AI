@@ -114,6 +114,13 @@
       color: #28a745;
       margin-top: 5px;
     }
+    /* Hidden source text, revealed after submission */
+    .source {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 5px;
+      display: none;
+    }
     .nav-container {
       text-align: center;
       margin-top: 20px;
@@ -171,32 +178,56 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.3"></script>
   <script>
-    // Extract URL parameters
+    // 1) Extract URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get("message") || "No quiz data provided.";
     const email = urlParams.get("email") || "No email provided.";
     const difficulty = urlParams.get("difficulty") || "No difficulty provided.";
     const type = urlParams.get("type") || "No type provided.";
 
-    // Parse True/False quiz questions from the message string
+    /**
+     * 2) Parse True/False quiz questions from the message string
+     * Expected format:
+     * **Question 1:** <question text>
+     * **Answer:** true
+     * Source: "some text"
+     */
     function parseTrueFalseQuiz(message) {
-      // Assume the message is structured with **Question X:** and **Answer:** segments
-      const questionBlocks = message.split(/\*\*Question \d+:\*\*/).slice(1);
-      return questionBlocks.map((block) => {
-        const [questionPart, answerPart] = block.split("**Answer:**");
-        const questionText = questionPart ? questionPart.trim().split('\n')[0] : "No question text";
-        const correctAnswerMatch = answerPart ? answerPart.match(/(true|false)/i) : null;
-        const correctAnswer = correctAnswerMatch ? correctAnswerMatch[0].toLowerCase() : null;
+      // Split on **Question X:**
+      const questionBlocks = message.split(/\*\*Question\s+\d+:\*\*/).slice(1);
+
+      return questionBlocks.map(block => {
+        // block could be: "Is the sky blue?\n**Answer:** true\nSource: Some text"
+        const [questionPart, answerPartRaw] = block.split("**Answer:**");
+        const questionText = questionPart
+          ? questionPart.trim().split('\n')[0]
+          : "No question text";
+
+        const answerPart = answerPartRaw ? answerPartRaw.trim() : "";
+
+        // Extract the correct answer (true/false)
+        const correctAnswerMatch = answerPart.match(/\b(true|false)\b/i);
+        const correctAnswer = correctAnswerMatch
+          ? correctAnswerMatch[1].toLowerCase()
+          : null;
+
+        // Extract the source (optional). We allow quotes or no quotes.
+        // "Source: <text>"
+        const sourceMatch = answerPart.match(/Source:\s*["']?([^"']+)["']?/i);
+        const source = sourceMatch ? sourceMatch[1].trim() : "";
+
         return {
           question: questionText,
           correctAnswer,
+          source
         };
       });
     }
 
+    // 3) Parse the quiz data
     const questions = parseTrueFalseQuiz(message);
 
-    // Render all questions at once
+    // 4) Render the quiz
     const quizContainer = document.getElementById("quiz");
 
     function loadAllQuiz() {
@@ -212,6 +243,8 @@
                 <input type="radio" name="question${index}" value="false"> False
               </label>
             </div>
+            <!-- Hidden source text, revealed after submission -->
+            <div class="source">Source: ${q.source}</div>
           </div>
         `;
       }).join('');
@@ -219,28 +252,37 @@
 
     loadAllQuiz();
 
+    // 5) Submission logic
     function submitQuiz() {
       let score = 0;
+
       questions.forEach((q, index) => {
         const questionBlock = document.querySelector(`.question-block[data-index="${index}"]`);
-        // Disable inputs for this question
+        // Disable inputs
         const inputs = questionBlock.querySelectorAll('input[type="radio"]');
         inputs.forEach(input => input.disabled = true);
+
+        // User's selected answer
         const selected = questionBlock.querySelector(`input[name="question${index}"]:checked`);
         const userAnswer = selected ? selected.value.toLowerCase() : null;
+
+        // Highlight correct/incorrect
         const labels = questionBlock.querySelectorAll('.options label');
         labels.forEach(label => {
           const optionValue = label.getAttribute('data-option').toLowerCase();
-          // Mark correct answer label in green
           if (optionValue === q.correctAnswer) {
             label.classList.add("correct");
           }
-          // If user selected an incorrect answer, mark it red and display the correct answer
           if (userAnswer === optionValue && userAnswer !== q.correctAnswer) {
             label.classList.add("incorrect");
+            // Show correct answer if not already shown
             if (!questionBlock.querySelector('.correct-answer')) {
-              const correctLabel = questionBlock.querySelector(`.options label[data-option="${q.correctAnswer}"]`);
-              const correctText = correctLabel ? correctLabel.textContent.trim() : q.correctAnswer;
+              const correctLabel = questionBlock.querySelector(
+                `.options label[data-option="${q.correctAnswer}"]`
+              );
+              const correctText = correctLabel
+                ? correctLabel.textContent.trim()
+                : q.correctAnswer;
               const correctAnsElem = document.createElement("div");
               correctAnsElem.className = "correct-answer";
               correctAnsElem.textContent = `Correct Answer: ${correctText}`;
@@ -248,20 +290,33 @@
             }
           }
         });
+
+        // Reveal the hidden source
+        const sourceDiv = questionBlock.querySelector('.source');
+        if (sourceDiv) {
+          sourceDiv.style.display = 'block';
+        }
+
+        // Scoring
         if (userAnswer === q.correctAnswer) {
           score++;
         }
       });
-      
+
+      // Show results
       const resultContainer = document.getElementById("result");
       resultContainer.textContent = `You scored ${score} out of ${questions.length}!`;
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      
-      // Hide the Submit button and show the Return Home button
+
+      // Optional confetti
+      if (window.confetti) {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      // Hide submit, show return
       document.getElementById("submit-btn").classList.add("hidden");
       document.getElementById("return-btn").classList.remove("hidden");
-      
-      // Send quiz results to the backend
+
+      // Send results to backend (optional)
       fetch("/insertResults", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -277,6 +332,7 @@
       });
     }
 
+    // 6) Return Home
     function returnHome() {
       window.location.href = `/userProfile?email=${email}`;
     }

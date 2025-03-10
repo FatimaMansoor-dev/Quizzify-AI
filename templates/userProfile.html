@@ -209,19 +209,106 @@
       outline: 2px solid #ffc107;
     }
 
-    /* SIDEBAR */
-    #sidebar {
-      height: 100%; 
-      width: 0; 
-      position: fixed; 
-      top: 0; 
-      right: 0; 
-      background-color: rgba(255, 255, 255, 0.95);
-      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5); 
-      overflow-x: hidden; 
-      transition: 0.5s; 
-      padding-top: 60px;
-    }
+   /* SIDEBAR - new styles */
+/* SIDEBAR - default closed state */
+#sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 0;                /* Set width to 0 when closed */
+  height: 60%;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+  overflow: hidden;        /* Hide content when closed */
+  transition: width 0.5s, padding 0.5s;
+  padding: 0;              /* Remove padding when closed */
+}
+
+/* SIDEBAR - open state */
+#sidebar.open {
+  width: 250px;            /* Desired width when open */
+  padding: 0 1rem;         /* Add padding when open */
+}
+
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-brand {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #7a4dc1;
+  /* If you want cursive, add: font-family: cursive; */
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #333;
+  margin-right: 0;
+}
+
+.sidebar-section {
+  margin: 1rem 0;
+}
+
+.sidebar-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-menu li a {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.sidebar-menu li a:hover {
+  color: #7a4dc1;  /* Hover color to match your brand */
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
+/* Optional: Full width on smaller screens */
+@media (max-width: 768px) {
+  #sidebar.open {
+    width: 100%;
+  }
+}
+
+
 
     /* MEDIA QUERIES */
     @media (max-width: 768px) {
@@ -295,23 +382,37 @@
   </div> <!-- END main-wrapper -->
 
   <!-- SIDEBAR -->
-  <div id="sidebar">
-    <button style="position: absolute; top: 20px; left: 20px; font-size: 1.5rem; background: none; border: none; cursor: pointer;"
-            onclick="closeSidebar()">×</button>
-    <div style="padding: 20px; color: #333; font-size: 1rem;">
-      <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li id="streakTrackerSidebar" style="margin-bottom: 0.5rem; font-weight: 600;"></li>
-        <li>Last Score: <span id="lastScore">N/A</span></li>
-        <li>Maximum Score: <span id="maxScore">N/A</span></li>
-      </ul>
-      <br/>
-      <button style="background-color: #dc3545; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;"
-              onclick="window.location.href='/'">
-        Logout
-      </button>
-    </div>
+<div id="sidebar">
+  <!-- Sidebar Header / Brand -->
+  <div class="sidebar-header">
+    <div class="sidebar-brand">{{ first_name }}'s Classroom</div>
+    <button class="close-btn" onclick="closeSidebar()">×</button>
   </div>
+
+  <!-- User Info Section -->
+  <div class="sidebar-section">
+    <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
+   
+  </div>
+
+  <!-- Example Nav Links (adjust or remove as needed) -->
+  <div class="sidebar-section">
+    <ul class="sidebar-menu">
+      <li id="streakTrackerSidebar" style="margin-bottom: 0.5rem; font-weight: 600;"></li>
+      <li>Last Score: <span id="lastScore">N/A</span></li>
+      <li>Maximum Score: <span id="maxScore">N/A</span></li>
+    </ul>
+  </div>
+
+  <!-- Logout Button -->
+  <div class="sidebar-section">
+    <button class="logout-btn" onclick="window.location.href='/'">
+      Logout
+    </button>
+  </div>
+</div>
+<!-- End SIDEBAR -->
+
   <!-- Hidden fields passed from Flask -->
 <input type="hidden" id="userData" value='{{ user_data|tojson|safe }}'>
 <input type="hidden" id="badges" value='{{ message|default([])|tojson|safe }}'>
@@ -517,6 +618,28 @@
       }
       return streak;
     }
+    function openSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
+    sidebar.classList.add("open");
+    // Update the streak tracker if needed
+    const streakTrackerSidebar = document.getElementById("streakTrackerSidebar");
+    if (streakTrackerSidebar) {
+      const quizDatesElement = document.getElementById("quizDatesData");
+      const quizDates = JSON.parse(quizDatesElement.getAttribute("data-quiz-dates")) || [];
+      const streakCount = calculateCurrentStreak(quizDates);
+      streakTrackerSidebar.innerText = `Current Streak: ${streakCount} days`;
+    }
+  }
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
+    sidebar.classList.remove("open");
+  }
+}
+
   </script>
 </body>
 </html>

@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quiz Upload</title>
+  <!-- Import Roboto font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
     * {
@@ -36,6 +38,8 @@
       top: 0;
       left: 0;
       color: #7a4dc1;
+      font-family: cursive;
+      z-index: 2;
     }
     .email-initial {
       background: #7a4dc1;
@@ -48,32 +52,23 @@
       border-radius: 50%;
       font-size: 20px;
     }
-    /* Main container */
-    .container {
-      padding: 40px;
+    /* Progress Container */
+    .progress-container {
       width: 100%;
       max-width: 1000px;
-      text-align: center;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-      margin-top: 80px;
-      background-color: #fff;
-      min-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      margin-top: 80px; /* to account for navbar */
+      padding: 20px 0;
     }
-    /* Progress bar */
     .progress {
       display: flex;
       justify-content: space-between;
-      margin: 20px 0 40px 0;
       gap: 10px;
     }
     .step {
       position: relative;
       background: #ccc;
-      color: white;
+      /* Make the text purple for non-active steps */
+      color: #7a4dc1;
       padding: 30px 40px;
       text-align: center;
       font-size: 20px;
@@ -85,7 +80,7 @@
       align-items: center;
       justify-content: center;
       min-width: 120px;
-      height: 80px;
+      height: 60px;
     }
     .step span {
       position: absolute;
@@ -102,31 +97,60 @@
       justify-content: center;
       font-weight: bold;
       font-size: 18px;
+      border: 2px dotted purple;
     }
     .step.active {
       background: #7a4dc1;
+      /* Keep text white on the active step */
+      color: #fff;
     }
-    /* Step containers */
-    #step2 {
+    /* Main container */
+    .container {
+      padding: 40px;
+      width: 100%;
+      max-width: 1500px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
+      background-color: #fff;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    /* Hide steps by default except the first */
+    #step2, #step3 {
       display: none;
+    }
+    /* Thin-bordered containers for each step */
+    .step-container,
+    .upload-container {
+      border: 1px solid #d3d3d3;
+      border-radius: 10px;
+      padding: 20px;
+      display: inline-block;
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
     }
     /* Upload Section (Step 1) */
     .upload-section {
-      margin: 40px 0;
+      margin: 10px 0;
     }
     .upload-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      border: 3px dashed #7a4dc1;
+      border: 3px dashed #6e6d6e;
       padding: 50px;
       border-radius: 10px;
       cursor: pointer;
-      color: #7a4dc1;
-      font-size: 22px;
+      color: #6e6d6e;
+      font-family: 'Roboto', sans-serif;
+      font-size: 17px;
       width: 100%;
-      max-width: 600px;
       margin: auto;
+      height: 350px;
     }
     .upload-box p {
       margin-bottom: 10px;
@@ -160,7 +184,6 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
-    /* Toggles/Buttons for question types, question count, etc. */
     .question-types,
     .question-count {
       display: flex;
@@ -195,6 +218,92 @@
       font-size: 16px;
       align-self: flex-end;
     }
+    .step-container {
+  width: 90%;               /* Allow it to take most of the container’s width */
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 30px;
+  min-height: 60vh;         /* Ensure it covers a significant vertical space */
+  background: linear-gradient(135deg, #ffffff, #f0f0f0); /* Subtle gradient */
+  border: 1px solid #d3d3d3;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* Center the content vertically */
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Optional: Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+    .container {
+  padding: 40px;
+  width: 100%;
+  max-width: 1500px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
+  background-color: #fff;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  /* Remove or replace justify-content: center; */
+  justify-content: flex-start; 
+}
+
+.toggle-btn {
+  position: relative; /* make space for the pseudo-element */
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  padding-right: 40px;  /* extra right padding to accommodate the circle */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+}
+
+/* Add a circle on the right */
+.toggle-btn::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* When active, change background, border and add a tick mark */
+.toggle-btn.active {
+  background-color: #7a4dc1;
+  color: white;
+  border-color: #7a4dc1;
+}
+
+.toggle-btn.active::after {
+  content: "\2713";  /* Unicode checkmark */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: #7a4dc1;
+  border-color: #7a4dc1;
+}
+
   </style>
 </head>
 <body>
@@ -204,94 +313,93 @@
     <span>QuizXpert</span>
     <span class="email-initial" id="emailInitial"></span>
   </div>
+
+  <!-- Progress Container -->
+  <div class="progress-container">
+    <div class="progress">
+      <div class="step active" data-step="1">
+        <span>1</span> Upload PDF
+      </div>
+      <div class="step" data-step="2">
+        <span>2</span> Configure Quiz
+      </div>
+      <div class="step" data-step="3">
+        <span>3</span> Output Options
+      </div>
+    </div>
+  </div>
+
   <!-- Main Container -->
   <div class="container">
     <!-- Step 1: Upload PDF -->
     <div id="step1">
-      <div class="progress">
-        <div class="step active">
-          <span>1</span> Upload PDF
-        </div>
-        <div class="step">
-          <span>2</span> Configure Quiz
-        </div>
-        <div class="step">
-          <span>3</span> Output Options
-        </div>
-      </div>
-      <h2 style="margin-bottom: 20px;">Upload your PDF</h2>
       <div class="upload-section">
-        <label for="pdf-upload" class="upload-box">
-          <p>Click to upload PDF files</p>
-          <input type="file" id="pdf-upload" accept="application/pdf" />
-          <div id="pdf-preview"></div>
-        </label>
+        <div class="upload-container">
+          <!-- Add heading here -->
+          <h2 style="margin-bottom: 20px;">Upload PDF</h2>
+          <label for="pdf-upload" class="upload-box">
+            <img src="static/upload.svg" alt="Upload Icon" style="width:100px; margin-bottom:20px;">
+            <p>Click to upload PDF files</p>
+            <input type="file" id="pdf-upload" accept="application/pdf" />
+            <div id="pdf-preview"></div>
+          </label>
+        </div>
       </div>
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
+
     <!-- Step 2: Configure Quiz -->
-    <div id="step2">
-      <div class="progress">
-        <div class="step">
-          <span>1</span> Upload PDF
-        </div>
-        <div class="step active">
-          <span>2</span> Configure Quiz
-        </div>
-        <div class="step">
-          <span>3</span> Output Options
+<div id="step2">
+  <div class="step-container">
+    <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
+    <div class="quiz-config">
+      <div>
+        <p style="margin-bottom: 5px;">What type of questions?</p>
+        <div class="question-types">
+          <button class="toggle-btn active">Multiple Choice</button>
+          <button class="toggle-btn">True False</button>
+          <button class="toggle-btn">Fill in the blank</button>
+          <button class="toggle-btn">General Question Answers</button>
         </div>
       </div>
-      <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
-      <div class="quiz-config">
-        <div>
-          <p style="margin-bottom: 5px;">What type of questions?</p>
-          <div class="question-types">
-            <button class="toggle-btn active">Multiple Choice</button>
-            <button class="toggle-btn">True False</button>
-            <button class="toggle-btn">Fill in the blank</button>
-            <button class="toggle-btn">General Question Answers</button>
-          </div>
+      <div>
+        <p style="margin-bottom: 5px;">Difficulty Level?</p>
+        <div class="question-count">
+          <button class="toggle-btn">Easy</button>
+          <button class="toggle-btn active">Medium</button>
+          <button class="toggle-btn">Hard</button>
         </div>
-        <div>
-          <p style="margin-bottom: 5px;">Difficulty Level?</p>
-          <div class="question-count">
-            <button class="toggle-btn">Easy</button>
-            <button class="toggle-btn active">Medium</button>
-            <button class="toggle-btn">Hard</button>
-          </div>
-        </div>
-        <button id="next-step2" class="next-btn">Next Step →</button>
       </div>
     </div>
-    <!-- Step 3: Output Options -->
-    <div id="step3" style="display: none;">
-      <div class="progress">
-        <div class="step">
-          <span>1</span> Upload PDF
-        </div>
-        <div class="step">
-          <span>2</span> Configure Quiz
-        </div>
-        <div class="step active">
-          <span>3</span> Output Options
-        </div>
-      </div>
-      <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
-      <div class="quiz-config">
-        <label>
-          <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
-        </label>
-        <label>
-          <input type="radio" name="emailOption" value="no" checked /> No, Thanks
-        </label>
-      </div>
-      <div style="margin-top: 20px;">
-        <button id="back-step2" class="next-btn" style="background: gray;">← Back</button>
-        <button id="submit-quiz" class="next-btn">Submit Quiz</button>
-      </div>
+
+    <!-- Put the button inside the .step-container and align it to the right -->
+    <div style="text-align: right; margin-top: 20px;">
+      <button id="next-step2" class="next-btn">Next Step →</button>
     </div>
   </div>
+</div>
+
+   <!-- Step 3: Output Options -->
+<div id="step3">
+  <div class="step-container">
+    <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
+    <div class="quiz-config email-options">
+      <label class="toggle-btn">
+        <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
+      </label>
+      <label class="toggle-btn">
+        <input type="radio" name="emailOption" value="no" checked /> No, Thanks
+      </label>
+    </div>
+    <div style="text-align: right; margin-top: 20px;">
+      <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+      <button id="submit-quiz" class="next-btn">Submit Quiz</button>
+    </div>
+  </div>
+</div>
+
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // Set email initial in navbar
@@ -304,7 +412,6 @@
       const nextStep1Btn = document.getElementById("next-step1");
       let extractedText = "";
       
-      // Show chosen file name when a file is selected
       fileInput.addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -312,7 +419,7 @@
         }
       });
       
-      // Handle Step 1 -> Step 2 transition after reading PDF
+      // Transition from Step 1 to Step 2 after reading PDF
       nextStep1Btn.addEventListener("click", function () {
         if (!fileInput.files.length) {
           alert("Please upload a PDF first!");
@@ -333,6 +440,9 @@
             localStorage.setItem("pdfText", extractedText);
             document.getElementById("step1").style.display = "none";
             document.getElementById("step2").style.display = "block";
+            // Update progress bar
+            document.querySelector('.progress .step[data-step="1"]').classList.remove('active');
+            document.querySelector('.progress .step[data-step="2"]').classList.add('active');
           } catch (error) {
             console.error("Error reading PDF:", error);
             alert("Failed to read PDF. Please try again.");
@@ -360,7 +470,6 @@
       });
       
       // Handle step transitions
-      const step1 = document.getElementById("step1");
       const step2 = document.getElementById("step2");
       const step3 = document.getElementById("step3");
       
@@ -371,37 +480,37 @@
       nextStep2Btn.addEventListener("click", function () {
         step2.style.display = "none";
         step3.style.display = "block";
+        document.querySelector('.progress .step[data-step="2"]').classList.remove('active');
+        document.querySelector('.progress .step[data-step="3"]').classList.add('active');
       });
       
       backStep2Btn.addEventListener("click", function () {
         step3.style.display = "none";
         step2.style.display = "block";
+        document.querySelector('.progress .step[data-step="3"]').classList.remove('active');
+        document.querySelector('.progress .step[data-step="2"]').classList.add('active');
       });
       
       // Submit Quiz event listener
       submitQuizBtn.addEventListener("click", async () => {
-        // Get the user's email option selection for receiving the quiz
         const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-        // Get selected difficulty from toggle buttons
         const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
         const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
-        // Get selected question type text
         const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
         let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
         
-        // Convert question type to desired backend value
         if (questionType === "Multiple Choice") {
           questionType = "MCQs";
         } else if (questionType === "True False") {
           questionType = "truefalse";
         } else if (questionType === "Fill in the blank") {
           questionType = "blanks";
+        } else if (questionType === "General Question Answers") {
+          questionType = "qa";
         }
         
-        // Retrieve extracted PDF text
         const extractedText = localStorage.getItem("pdfText") || "";
         
-        // Build the payload including the is_email property as a boolean
         const payload = {
           difficulty: difficulty,
           type: questionType,
@@ -411,7 +520,6 @@
         };
         
         try {
-          // Send the POST request to your backend endpoint
           const response = await fetch("/generateOnTopic", {
             method: "POST",
             headers: {
@@ -443,7 +551,19 @@
           alert("An error occurred while generating the quiz.");
         }
       });
+      // For Step 3 email options
+const emailOptionLabels = document.querySelectorAll('.email-options .toggle-btn');
+emailOptionLabels.forEach(label => {
+  label.addEventListener('click', () => {
+    emailOptionLabels.forEach(l => l.classList.remove('active'));
+    label.classList.add('active');
+    // Also mark the radio input as checked
+    label.querySelector('input').checked = true;
+  });
+});
+
     });
   </script>
+
 </body>
 </html>

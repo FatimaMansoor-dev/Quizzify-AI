@@ -9,9 +9,8 @@ import re
 from youtube_transcript_api import YouTubeTranscriptApi
 import speech_recognition as sr
 from pydub import AudioSegment
-import requests
-from bs4 import BeautifulSoup
 import io
+from bs4 import BeautifulSoup
 
 # New imports for Google token verification
 import google.oauth2.id_token
@@ -20,20 +19,28 @@ import google.auth.transport.requests
 # Import for our custom decorator
 from functools import wraps
 
-# ===== New Imports for TTS =====
-import pyttsx3
+# ===== New Imports for TTS (using gTTS and playsound) =====
+from gtts import gTTS
+import tempfile
+import os
+import playsound
 
 app = Flask(__name__)
 app.secret_key = 'your-unique-secret-key'
 
 # ---------------------
-# Initialize TTS Engine
+# Alternative TTS Function using gTTS and playsound
 # ---------------------
-engine = pyttsx3.init()
-
 def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+    try:
+        tts = gTTS(text=text, lang='en')
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+            temp_filename = fp.name
+            tts.write_to_fp(fp)
+        playsound.playsound(temp_filename)
+        os.remove(temp_filename)
+    except Exception as e:
+        print("TTS error:", e)
 
 # ---------------------
 # CORS, Mail, Groq Setup
@@ -86,7 +93,7 @@ def get_user_data(email):
     """Fetch user data from Firebase by email."""
     try:
         response = requests.get(FIREBASE_URL)
-        print(response.json())  # Debugging: prints all users
+        print(response.json())  # Debug: print all users
 
         if response.status_code != 200:
             raise Exception("Failed to fetch user data from Firebase")
@@ -218,7 +225,6 @@ def login():
         if user_data:
             decrypted_password = decrypt_password(user_data["password"])
             if password == decrypted_password:
-                # Store the email in the session so protected routes can verify login
                 session['email'] = email
                 profile_data = prepare_user_profile(user_data)
                 print(profile_data)
@@ -250,7 +256,6 @@ def signup():
 
         otp = random.randint(100000, 999999)
         session['otp'] = otp
-        # Temporarily store user info until OTP is verified
         session['pending_email'] = email
         session['pending_password'] = encrypt_password(password)
         session['pending_first_name'] = first_name
@@ -287,9 +292,7 @@ def verify_otp():
             }
             response = requests.post(FIREBASE_URL, json=data)
             if response.status_code == 200:
-                # Once the account is created, set the session email
                 session['email'] = email
-                # Optionally, remove pending data from session
                 session.pop('pending_email', None)
                 session.pop('pending_password', None)
                 session.pop('pending_first_name', None)
@@ -408,27 +411,31 @@ def generate_on_topic():
 
     if qtype == 'MCQs':
         prompt = f"""
-        Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic} in this format:
+        Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic}. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Return in this format:
         **Question 1:** [question]?
         A) [option 1]
         B) [option 2]
         C) [option 3]
         D) [option 4]
         **Answer:** B)
+        soure: [should be the exact line that contains the answer]
         """
     elif qtype in ['blanks', 'fillintheblank']:
         prompt = f"""
-        Generate 10 meaningful {difficulty} fill-in-the-blank questions on {topic} with single blanks + their answers.
+        Generate 10 meaningful {difficulty} fill-in-the-blank questions on {topic} with single blanks + their answers. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Reply in the format:
         **Question 1:** [question]
         **Answer:** [answer]
+        soure: [should be the exact line that contains the answer]
         """
     elif qtype in ['truefalse', 'true/false']:
         prompt = f"""
-        Generate 10 meaningful {difficulty} True/False questions on {topic} + their answers. Some will be true, some will be false.
+        Generate 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Format:
         **Question 1:** [statement]
         **Answer:** [True/False]
+        soure: [should be the exact line that contains the answer]
         """
     else:
         prompt = f"""
@@ -455,6 +462,7 @@ def generate_on_topic():
         extended_answer = ""
         for response_chunk in completion:
             extended_answer += response_chunk.choices[0].delta.content or ""
+        print(extended_answer)
     
         store_quiz_in_firebase(email, extended_answer, difficulty, qtype, score=None)
 
@@ -489,7 +497,6 @@ def insert_results():
             return jsonify({"error": "Email is required"}), 400
 
         try:
-            # 1. Fetch user data from Firebase
             response = requests.get(FIREBASE_URL)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch user data from Firebase"}), 500
@@ -498,7 +505,6 @@ def insert_results():
             user_id = None
             user_data = None
 
-            # 2. Identify the user by email
             for uid, user in users.items():
                 if user.get("email") == email:
                     user_id = uid
@@ -508,22 +514,19 @@ def insert_results():
             if not user_data:
                 return jsonify({"error": "User not found"}), 404
 
-            # 3. Prepare the updated quiz_attempts list
             current_date = datetime.now() + timedelta(hours=2)
             formatted_date = current_date.strftime("%Y-%m-%d %H:%M:%S")
             quiz_attempts = user_data.get("quiz_attempts", [])
 
-            # 4. Look for the most recent quiz attempt with no score and update it
             updated = False
             for attempt in reversed(quiz_attempts):
                 if attempt.get("score") is None:
                     attempt["score"] = score
-                    attempt["date"] = formatted_date  # update the date if needed
+                    attempt["date"] = formatted_date
                     attempt["difficulty"] = difficulty
                     updated = True
                     break
 
-            # 5. If no existing attempt is found without a score, append a new one
             if not updated:
                 quiz_attempts.append({
                     "score": score,
@@ -531,7 +534,6 @@ def insert_results():
                     "difficulty": difficulty
                 })
 
-            # 6. Update the user record in Firebase with the modified quiz_attempts list
             update_url = FIREBASE_URL.replace('.json', '') + f'/{user_id}.json'
             update_data = {"quiz_attempts": quiz_attempts}
             update_response = requests.patch(update_url, json=update_data)
@@ -546,7 +548,6 @@ def insert_results():
 
 # ---------------------
 # Updated /transcribe Endpoint
-# (Now uses custom thresholds and speaks out the transcription)
 # ---------------------
 @app.route("/transcribe", methods=["POST"])
 @login_required
@@ -572,7 +573,6 @@ def transcribe():
         wav_io.seek(0)
 
         recognizer = sr.Recognizer()
-        # Update recognizer settings as in your standalone script
         recognizer.pause_threshold = 1
         recognizer.energy_threshold = 150
 
@@ -594,7 +594,6 @@ def transcribe():
 
 # ---------------------
 # New /listen Endpoint for Microphone Input
-# (Uses the microphone to capture live speech and provides TTS feedback)
 # ---------------------
 @app.route("/listen", methods=["GET"])
 @login_required
@@ -635,19 +634,16 @@ def auth_google():
         request_adapter = google.auth.transport.requests.Request()
         id_info = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, CLIENT_ID)
         
-        # Extract user details from the token payload
         email = id_info.get('email')
         first_name = id_info.get('given_name', '')
         last_name = id_info.get('family_name', '')
         
-        # Check if user exists in Firebase
         user_data = get_user_data(email)
         
         if not user_data:
-            # User doesn't exist; create a new user record.
             new_user = {
                 "email": email,
-                "password": "",  # No password required for Google-authenticated users
+                "password": "",
                 "first_name": first_name,
                 "last_name": last_name,
                 "google": True,
@@ -659,10 +655,8 @@ def auth_google():
             else:
                 return render_template('index.html', message="Failed to create user account"), 500
 
-        # Set the session email for protected routes
         session['email'] = email
 
-        # Prepare profile data and render the user profile page
         profile_data = prepare_user_profile(user_data)
         return render_template(
             'userProfile.html',
@@ -671,7 +665,6 @@ def auth_google():
             **profile_data
         )
     except ValueError as e:
-        # Token is invalid or expired.
         return render_template('index.html', message="Invalid or expired token"), 401
 
 @app.route('/generate_transcript', methods=['POST'])
@@ -701,9 +694,8 @@ def scrape():
         return jsonify({'error': 'Missing URL'}), 400
     try:
         response = requests.get(url)
-        response.raise_for_status()  # raise an exception for HTTP errors
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
-        # Extract text content from the page; customize as needed
         content = soup.get_text(separator=" ", strip=True)
         return jsonify({'success': True, 'content': content})
     except Exception as e:
