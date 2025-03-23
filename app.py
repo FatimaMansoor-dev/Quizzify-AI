@@ -25,8 +25,14 @@ import tempfile
 import os
 import playsound
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = 'your-unique-secret-key'
+
+# Set the secret key from the environment variable
+app.secret_key = os.environ.get('SECRET_KEY', 'default-secret-key')
 
 # ---------------------
 # Alternative TTS Function using gTTS and playsound
@@ -48,20 +54,23 @@ def speak(text):
 from flask_cors import CORS
 CORS(app)
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'benzenering032@gmail.com'
-app.config['MAIL_PASSWORD'] = 'kpfa yprh zdev kafn'
-app.config['MAIL_DEFAULT_SENDER'] = 'benzenering032@gmail.com'
+# Mail configuration using environment variables
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ['true', '1']
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
 
-client = Groq(api_key="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")
+# Groq client using API key from environment variables
+groq_api_key = os.environ.get('GROQ_API_KEY')
+client = Groq(api_key=groq_api_key)
 
 # ---------------------
 # Firebase / JSON config
 # ---------------------
-FIREBASE_URL = "https://quizifyai-7d979-default-rtdb.firebaseio.com/users.json"
+FIREBASE_URL = os.environ.get('FIREBASE_URL')
 
 # Load character mapping from JSON
 with open("char_key_mapping.json", "r") as f:
@@ -629,7 +638,8 @@ def auth_google():
     if not token:
         return render_template('index.html', message="Token not provided"), 400
 
-    CLIENT_ID = '419341207216-n9a6ckit9g43339vbm3do7ucv9pu17io.apps.googleusercontent.com'
+    # CLIENT_ID now from env file
+    CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     try:
         request_adapter = google.auth.transport.requests.Request()
         id_info = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, CLIENT_ID)
