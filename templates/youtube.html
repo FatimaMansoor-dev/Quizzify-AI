@@ -6,7 +6,6 @@
   <title>QuizRise - Create Quiz</title>
   <!-- Import Roboto font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- (Optional) PDF.js script is not needed here since we work with YouTube -->
   <style>
     /* Global Reset */
     * {
@@ -39,8 +38,11 @@
       top: 0;
       left: 0;
       color: #7a4dc1;
-      font-family: cursive;
       z-index: 2;
+    }
+    /* Brand with cursive font */
+    .navbar .brand {
+      font-family: cursive;
     }
     .email-initial {
       background: #7a4dc1;
@@ -57,7 +59,7 @@
     .progress-container {
       width: 100%;
       max-width: 1000px;
-      margin-top: 80px; /* to account for navbar */
+      margin-top: 80px;
       padding: 20px 0;
     }
     .progress {
@@ -226,6 +228,11 @@
       display: none;
     }
   </style>
+  <!-- Include jQuery (for legacy support if needed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <!-- Include Apify Client from CDN -->
+  <script src="https://unpkg.com/apify-client/dist/apify-client.umd.js"></script>
+
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
@@ -315,7 +322,7 @@
       
       // Step 1 elements
       const step1 = document.getElementById("step1");
-      const youtubeUrl = document.getElementById("youtube_url");
+      const youtubeUrlInput = document.getElementById("youtube_url");
       const statusMessage = document.getElementById("statusMessage");
       const nextStepBtn = document.getElementById("nextStepBtn");
       
@@ -329,10 +336,50 @@
       // Loading overlay
       const loadingOverlay = document.getElementById("loadingOverlay");
       
-      // Step 1: Handle YouTube URL submission
+      // --- Transcript Extraction using Apify's YouTube Transcript Scraper ---
+      async function fetchTranscript(youtubeUrl) {
+        try {
+          // Prepare input for the Apify actor
+          const input = {
+            videoUrl: youtubeUrl, // Pass the full YouTube URL
+            language: 'en' // You can adjust language as needed
+          };
+          // Initialize the ApifyClient using the global variable.
+          // Check both possible global names.
+          const ApifyClientLib = window.ApifyClient || window.apifyClient;
+          if (!ApifyClientLib) {
+            throw new Error("ApifyClient library is not loaded");
+          }
+          const client = new ApifyClientLib({ token: 'apify_api_DeJ0aPN8hMTTlaNnwK95dbC8CyHFNf246IcF' });
+          
+          // Call the actor
+          const run = await client.actor("easyapi/youtube-transcript-scraper").call(input);
+          console.log("Actor run completed. Dataset ID:", run.defaultDatasetId);
+          
+          // Fetch results from the run's dataset
+          const datasetResponse = await client.dataset(run.defaultDatasetId).listItems();
+          const items = datasetResponse.items;
+          
+          // Combine transcript parts (adjust based on the actor's output schema)
+          let transcript = "";
+          items.forEach(item => {
+            // Assuming each item has a 'text' field containing a portion of the transcript.
+            transcript += item.text + " ";
+          });
+          transcript = transcript.trim();
+          if (!transcript) {
+            throw new Error("Transcript extraction failed: no text found.");
+          }
+          return transcript;
+        } catch (err) {
+          throw new Error("Transcript extraction failed: " + err.message);
+        }
+      }
+      
+      // --- Step 1: Handle YouTube URL submission ---
       nextStepBtn.addEventListener("click", async function (event) {
         event.preventDefault();
-        let url = youtubeUrl.value.trim();
+        let url = youtubeUrlInput.value.trim();
         statusMessage.classList.add("hidden");
         statusMessage.textContent = "";
         
@@ -343,40 +390,32 @@
         }
         
         loadingOverlay.style.display = "flex";
-        statusMessage.textContent = "🔄 Scraping in progress...";
+        statusMessage.textContent = "🔄 Fetching transcript via Apify...";
         statusMessage.classList.remove("hidden");
         
         try {
-          let response = await fetch("/generate_transcript", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ youtube_url: url })
-          });
-          let data = await response.json();
+          const transcript = await fetchTranscript(url);
           loadingOverlay.style.display = "none";
-          if (response.ok) {
-            transcriptText = data.transcript;
-            statusMessage.textContent = "✅ Scraping successful!";
-            // Update progress: mark step 1 complete and step 2 active
-            progressSteps.forEach(step => {
-              if (step.getAttribute("data-step") === "1") {
-                step.classList.add("active");
-              }
-              if (step.getAttribute("data-step") === "2") {
-                step.classList.add("active");
-              }
-            });
-            // Transition to Step 2 after a brief delay
-            setTimeout(() => {
-              step1.style.display = "none";
-              step2.style.display = "block";
-            }, 1000);
-          } else {
-            statusMessage.textContent = data.error || "Error fetching transcript.";
-          }
+          transcriptText = transcript;
+          console.log("Extracted Transcript:", transcriptText); // Log the transcript to the console
+          statusMessage.textContent = "✅ Transcript fetched successfully!";
+          // Update progress: mark step 1 complete and step 2 active
+          progressSteps.forEach(step => {
+            if (step.getAttribute("data-step") === "1") {
+              step.classList.add("active");
+            }
+            if (step.getAttribute("data-step") === "2") {
+              step.classList.add("active");
+            }
+          });
+          // Transition to Step 2 after a brief delay
+          setTimeout(() => {
+            step1.style.display = "none";
+            step2.style.display = "block";
+          }, 1000);
         } catch (error) {
           loadingOverlay.style.display = "none";
-          statusMessage.textContent = "❌ Something went wrong. Please try again.";
+          statusMessage.textContent = "❌ " + error.message;
         }
       });
       
@@ -390,7 +429,7 @@
         }
       }
       
-      // Step 2: Transition to Step 3 when Next Step button is clicked
+      // --- Step 2: Transition to Step 3 ---
       document.getElementById("nextToStep3").addEventListener("click", function () {
         questionType = document.querySelector(".step-section:nth-of-type(1) .option-btn.selected")?.textContent || "MCQs";
         difficulty = document.querySelector(".step-section:nth-of-type(2) .option-btn.selected")?.textContent || "Easy";
@@ -403,7 +442,7 @@
         step3.style.display = "block";
       });
       
-      // Option Selection Logic for all option buttons
+      // --- Option Selection Logic for all option buttons ---
       document.querySelectorAll(".option-btn").forEach(button => {
         button.addEventListener("click", function () {
           let parent = this.closest(".option-group");
@@ -412,7 +451,7 @@
         });
       });
       
-      // Step 3: Generate Quiz event listener
+      // --- Step 3: Generate Quiz event listener ---
       document.getElementById("generateQuiz").addEventListener("click", async function () {
         let userEmail = document.getElementById("userEmail").value;
         let emailOptionElement = document.querySelector("#step3 .step-section .option-btn.selected");

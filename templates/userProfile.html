@@ -120,6 +120,27 @@
     .quizzes-header .create-quiz-btn:hover {
       background-color: #7a4dc1;
     }
+    /* New glowing button for AI Suggestions */
+    .quizzes-header .ai-suggestions-btn {
+      background-color: #7a4dc1;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-left: 0.5rem;
+      box-shadow: 0 0 10px rgba(122,77,193,0.7);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px rgba(122,77,193,0.7);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(122,77,193,1);
+      }
+    }
     .quizzes-subtext {
       color: #6c757d;
       margin-bottom: 1.5rem;
@@ -209,106 +230,103 @@
       outline: 2px solid #ffc107;
     }
 
-   /* SIDEBAR - new styles */
-/* SIDEBAR - default closed state */
-#sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 0;                /* Set width to 0 when closed */
-  height: 60%;
-  background-color: #fff;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
-  overflow: hidden;        /* Hide content when closed */
-  transition: width 0.5s, padding 0.5s;
-  padding: 0;              /* Remove padding when closed */
-}
+    /* SIDEBAR - new styles */
+    /* SIDEBAR - default closed state */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 0;                /* Set width to 0 when closed */
+      height: 60%;
+      background-color: #fff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+      overflow: hidden;        /* Hide content when closed */
+      transition: width 0.5s, padding 0.5s;
+      padding: 0;              /* Remove padding when closed */
+    }
 
-/* SIDEBAR - open state */
-#sidebar.open {
-  width: 250px;            /* Desired width when open */
-  padding: 0 1rem;         /* Add padding when open */
-}
+    /* SIDEBAR - open state */
+    #sidebar.open {
+      width: 250px;            /* Desired width when open */
+      padding: 0 1rem;         /* Add padding when open */
+    }
 
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid #eee;
+    }
 
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 1px solid #eee;
-}
+    .sidebar-brand {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #7a4dc1;
+      /* If you want cursive, add: font-family: cursive; */
+    }
 
-.sidebar-brand {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #7a4dc1;
-  /* If you want cursive, add: font-family: cursive; */
-}
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #333;
+      margin-right: 0;
+    }
 
-.close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #333;
-  margin-right: 0;
-}
+    .sidebar-section {
+      margin: 1rem 0;
+    }
 
-.sidebar-section {
-  margin: 1rem 0;
-}
+    .sidebar-section h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
 
-.sidebar-section h3 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-.sidebar-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+    .sidebar-menu li {
+      margin-bottom: 0.75rem;
+    }
 
-.sidebar-menu li {
-  margin-bottom: 0.75rem;
-}
+    .sidebar-menu li a {
+      color: #333;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
 
-.sidebar-menu li a {
-  color: #333;
-  text-decoration: none;
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
-}
+    .sidebar-menu li a:hover {
+      color: #7a4dc1;  /* Hover color to match your brand */
+    }
 
-.sidebar-menu li a:hover {
-  color: #7a4dc1;  /* Hover color to match your brand */
-}
+    .logout-btn {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
 
-.logout-btn {
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
 
-.logout-btn:hover {
-  background-color: #c82333;
-}
-
-/* Optional: Full width on smaller screens */
-@media (max-width: 768px) {
-  #sidebar.open {
-    width: 100%;
-  }
-}
-
-
+    /* Optional: Full width on smaller screens */
+    @media (max-width: 768px) {
+      #sidebar.open {
+        width: 100%;
+      }
+    }
 
     /* MEDIA QUERIES */
     @media (max-width: 768px) {
@@ -355,7 +373,6 @@
 
     <!-- STREAK TRACKER -->
     <div class="streak-tracker">
-      <h2>Your Streak Tracker</h2>
       <div id="calendar"></div>
     </div>
 
@@ -368,9 +385,14 @@
     <!-- QUIZZES HEADER -->
     <div class="quizzes-header">
       <h1>Quizzes</h1>
-      <button class="create-quiz-btn" onclick="window.location.href='/options?email={{ email }}'">
-        Create new quiz
-      </button>
+      <div>
+        <button class="create-quiz-btn" onclick="window.location.href='/options?email={{ email }}'">
+          Create new quiz
+        </button>
+        <button class="ai-suggestions-btn" onclick="getAISuggestions()">
+          Get AI Suggestions
+        </button>
+      </div>
     </div>
     <div class="quizzes-subtext">
       You can effortlessly list, delete, edit, and create new exams.
@@ -382,72 +404,67 @@
   </div> <!-- END main-wrapper -->
 
   <!-- SIDEBAR -->
-<div id="sidebar">
-  <!-- Sidebar Header / Brand -->
-  <div class="sidebar-header">
-    <div class="sidebar-brand">{{ first_name }}'s Classroom</div>
-    <button class="close-btn" onclick="closeSidebar()">×</button>
-  </div>
+  <div id="sidebar">
+    <!-- Sidebar Header / Brand -->
+    <div class="sidebar-header">
+      <div class="sidebar-brand">{{ first_name }}'s Classroom</div>
+      <button class="close-btn" onclick="closeSidebar()">×</button>
+    </div>
 
-  <!-- User Info Section -->
-  <div class="sidebar-section">
-    <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
-   
-  </div>
+    <!-- User Info Section -->
+    <div class="sidebar-section">
+      <h3>Welcome, {{ first_name }} {{ last_name }}!</h3>
+    </div>
 
-  <!-- Example Nav Links (adjust or remove as needed) -->
-  <div class="sidebar-section">
-    <ul class="sidebar-menu">
-      <li id="streakTrackerSidebar" style="margin-bottom: 0.5rem; font-weight: 600;"></li>
-      <li>Last Score: <span id="lastScore">N/A</span></li>
-      <li>Maximum Score: <span id="maxScore">N/A</span></li>
-    </ul>
-  </div>
+    <!-- Example Nav Links (adjust or remove as needed) -->
+    <div class="sidebar-section">
+      <ul class="sidebar-menu">
+        <li id="streakTrackerSidebar" style="margin-bottom: 0.5rem; font-weight: 600;"></li>
+        <li>Last Score: <span id="lastScore">N/A</span></li>
+        <li>Maximum Score: <span id="maxScore">N/A</span></li>
+      </ul>
+    </div>
 
-  <!-- Logout Button -->
-  <div class="sidebar-section">
-    <button class="logout-btn" onclick="window.location.href='/'">
-      Logout
-    </button>
+    <!-- Logout Button -->
+    <div class="sidebar-section">
+      <button class="logout-btn" onclick="window.location.href='/'">
+        Logout
+      </button>
+    </div>
   </div>
-</div>
-<!-- End SIDEBAR -->
+  <!-- End SIDEBAR -->
 
   <!-- Hidden fields passed from Flask -->
-<input type="hidden" id="userData" value='{{ user_data|tojson|safe }}'>
-<input type="hidden" id="badges" value='{{ message|default([])|tojson|safe }}'>
+  <input type="hidden" id="userData" value='{{ user_data|tojson|safe }}'>
+  <input type="hidden" id="badges" value='{{ message|default([])|tojson|safe }}'>
 
-<!-- Hidden data for quiz dates, etc. -->
-<div id="quizDatesData" data-quiz-dates='{{ quiz_dates | tojson }}'></div>
+  <!-- Hidden data for quiz dates, etc. -->
+  <div id="quizDatesData" data-quiz-dates='{{ quiz_dates | tojson }}'></div>
 
-<!-- Container elements for dynamically rendered content -->
-<div id="quizContainer"></div>
-<div id="badgeContainer"></div>
+  <!-- Container elements for dynamically rendered content -->
+  <div id="quizContainer"></div>
+  <div id="badgeContainer"></div>
 
-<!-- JavaScript to render quizzes and badges -->
-<script>
-  // Get and parse the JSON data from hidden inputs
-  let rawUserData = document.getElementById("userData").value;
-  let rawBadges = document.getElementById("badges").value;
-  var userData = JSON.parse(rawUserData);
-  var badgeData = JSON.parse(rawBadges);
-  console.log("User data:", userData);
-  console.log("Badge data:", badgeData);
+  <!-- JavaScript to render quizzes and badges -->
+  <script>
+    // Get and parse the JSON data from hidden inputs
+    let rawUserData = document.getElementById("userData").value;
+    let rawBadges = document.getElementById("badges").value;
+    var userData = JSON.parse(rawUserData);
+    var badgeData = JSON.parse(rawBadges);
+    console.log("User data:", userData);
+    console.log("Badge data:", badgeData);
 
-  // Render quiz attempts
-  const quizContainer = document.getElementById("quizContainer");
-  console.log(typeof userData); // Outputs: "object" if it's an array or null
-  let UserData = JSON.parse(userData);
-  console.log('ohhhhhhh')
-  
-  
-
-  // Optional: store badge messages in a constant if needed later
-  const badgeMessages = badgeData;
-  console.log("Badge messages:", badgeMessages);
-</script>
-
-  
+    // Render quiz attempts
+    const quizzesContainer = document.getElementById("quizzesContainer");
+    console.log(typeof userData); // Outputs: "object" if it's an array or null
+    let UserData = JSON.parse(userData);
+    console.log('ohhhhhhh')
+    
+    // Optional: store badge messages in a constant if needed later
+    const badgeMessages = badgeData;
+    console.log("Badge messages:", badgeMessages);
+  </script>
 
   <script>
     /****************************************************
@@ -456,18 +473,22 @@
     function openSidebar() {
       const sidebar = document.getElementById("sidebar");
       if (sidebar) {
-        sidebar.style.width = "300px";
-      }
-      const streakTrackerSidebar = document.getElementById("streakTrackerSidebar");
-      if (streakTrackerSidebar) {
-        const quizDatesElement = document.getElementById("quizDatesData");
-        const quizDates = JSON.parse(quizDatesElement.getAttribute("data-quiz-dates")) || [];
-        const streakCount = calculateCurrentStreak(quizDates);
-        streakTrackerSidebar.innerText = `Current Streak: ${streakCount} days`;
+        sidebar.classList.add("open");
+        // Update the streak tracker if needed
+        const streakTrackerSidebar = document.getElementById("streakTrackerSidebar");
+        if (streakTrackerSidebar) {
+          const quizDatesElement = document.getElementById("quizDatesData");
+          const quizDates = JSON.parse(quizDatesElement.getAttribute("data-quiz-dates")) || [];
+          const streakCount = calculateCurrentStreak(quizDates);
+          streakTrackerSidebar.innerText = `Current Streak: ${streakCount} days`;
+        }
       }
     }
     function closeSidebar() {
-      document.getElementById("sidebar").style.width = "0";
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar) {
+        sidebar.classList.remove("open");
+      }
     }
 
     /****************************************************
@@ -499,8 +520,6 @@
     /****************************************************
      * RENDER QUIZ CARDS FROM rawUserData.quiz_attempts
      ****************************************************/
-   
-    // const quizzesContainer = document.getElementById("quizzesContainer");
     if (UserData.quiz_attempts && Array.isArray(UserData.quiz_attempts) && UserData.quiz_attempts.length > 0) {
       UserData.quiz_attempts.forEach((attempt, idx) => {
         const quizCard = document.createElement("div");
@@ -618,28 +637,11 @@
       }
       return streak;
     }
-    function openSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  if (sidebar) {
-    sidebar.classList.add("open");
-    // Update the streak tracker if needed
-    const streakTrackerSidebar = document.getElementById("streakTrackerSidebar");
-    if (streakTrackerSidebar) {
-      const quizDatesElement = document.getElementById("quizDatesData");
-      const quizDates = JSON.parse(quizDatesElement.getAttribute("data-quiz-dates")) || [];
-      const streakCount = calculateCurrentStreak(quizDates);
-      streakTrackerSidebar.innerText = `Current Streak: ${streakCount} days`;
+
+    // New function for AI Suggestions button
+    function getAISuggestions() {
+      alert("AI Suggestions feature coming soon!");
     }
-  }
-}
-
-function closeSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  if (sidebar) {
-    sidebar.classList.remove("open");
-  }
-}
-
   </script>
 </body>
 </html>

@@ -110,11 +110,18 @@
       font-size: 1.2rem;
       margin-bottom: 10px;
       font-weight: 700;
+      color: #192742; /* A darker shade for headings */
     }
     .review-card p {
       font-size: 1rem;
       line-height: 1.5;
       margin-bottom: 10px;
+      color: #333;
+    }
+    .review-card a {
+      color: #6c63ff;
+      text-decoration: none;
+      font-weight: 600;
     }
     
     /* Right Side (Form) */
@@ -216,30 +223,63 @@
   </div>
   
   <div class="container">
-    <!-- Left Side (Reviews/Branding) -->
+    <!-- Left Side (Features in place of Reviews) -->
     <div class="left-side">
       <h1>QuizXpert</h1>
       <div class="review-cards">
         <!-- Card 1 -->
         <div class="review-card">
-          <h3>Capterra</h3>
-          <p><strong>Aug 29, 2024</strong></p>
-          <p>"It is amazing their AI gives you answers to the quizzes and flashcards. In other sites you have to choose the answers yourself."</p>
-          <p><em>- Ardh R. (2)</em></p>
+          <span style="font-size: 1.5rem;">📄</span>
+          <h3>Multiple question types</h3>
+          <p>
+            Generate multiple-choice, true-false, and fill-in-the-blank questions with ease.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
         </div>
         <!-- Card 2 -->
         <div class="review-card">
-          <h3>Capterra</h3>
-          <p><strong>Aug 29, 2024</strong></p>
-          <p>"One improvement I'd like to see is the ability to track progress better. But overall it's great."</p>
-          <p><em>- Sarah B.</em></p>
+          <span style="font-size: 1.5rem;">📜</span>
+          <h3>From the text, YouTube, URL, or PDF</h3>
+          <p>
+            Effortlessly generate questions from any content, including text, PDFs, and YouTube videos.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
         </div>
         <!-- Card 3 -->
         <div class="review-card">
-          <h3>Capterra</h3>
-          <p><strong>Aug 29, 2024</strong></p>
-          <p>"Learn new things quickly. It's so easy to remember the answers."</p>
-          <p><em>- Mark T.</em></p>
+          <span style="font-size: 1.5rem;">🏆</span>
+          <h3>Streaks & Badges</h3>
+          <p>
+            Keep learning fun and engaging by earning streaks and badges as you progress.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
+        </div>
+        <!-- Card 4 -->
+        <div class="review-card">
+          <span style="font-size: 1.5rem;">🔗</span>
+          <h3>Share as a Link</h3>
+          <p>
+            Effortlessly share your exams with our 'Share as a Link' feature.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
+        </div>
+        <!-- Card 5 -->
+        <div class="review-card">
+          <span style="font-size: 1.5rem;">📥</span>
+          <h3>Export to PDF or TXT</h3>
+          <p>
+            Save and export your quizzes as PDF or TXT files for easy sharing.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
+        </div>
+        <!-- Card 6 -->
+        <div class="review-card">
+          <span style="font-size: 1.5rem;">📊</span>
+          <h3>Analyze the Results</h3>
+          <p>
+            Analyze student results and identify learning trends.
+          </p>
+          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
         </div>
       </div>
     </div>
@@ -282,24 +322,23 @@
       console.log("Encoded JWT ID token: " + response.credential);
       // Send the token to your backend for verification and registration/login
       fetch('/auth/google', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ token: response.credential })
-})
-.then(res => res.text())  // Use text() if you expect HTML
-.then(html => {
-  // Option 1: Replace the current document with the received HTML
-  document.open();
-  document.write(html);
-  document.close();
-
-  // Option 2: Alternatively, extract a URL from the HTML and redirect:
-  // window.location.href = '/userProfile?email=' + encodeURIComponent(email);
-})
-.catch(err => {
-  console.error('Error:', err);
-});
-
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: response.credential })
+      })
+      .then(res => res.text())  // Use text() if you expect HTML
+      .then(html => {
+        // Option 1: Replace the current document with the received HTML
+        document.open();
+        document.write(html);
+        document.close();
+        
+        // Option 2: Alternatively, extract a URL from the HTML and redirect:
+        // window.location.href = '/userProfile?email=' + encodeURIComponent(email);
+      })
+      .catch(err => {
+        console.error('Error:', err);
+      });
     }
 
     // Initialize Google Identity Services and render the button
@@ -322,7 +361,7 @@
       );
     }
 
-    // Center the second review card on load
+    // Center the second card on load
     window.addEventListener("DOMContentLoaded", () => {
       const reviewCardsContainer = document.querySelector('.review-cards');
       const secondCard = reviewCardsContainer.children[1];
