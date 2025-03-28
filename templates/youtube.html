@@ -230,9 +230,6 @@
   </style>
   <!-- Include jQuery (for legacy support if needed) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-  <!-- Include Apify Client from CDN -->
-  <script src="https://unpkg.com/apify-client/dist/apify-client.umd.js"></script>
-
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
@@ -336,46 +333,6 @@
       // Loading overlay
       const loadingOverlay = document.getElementById("loadingOverlay");
       
-      // --- Transcript Extraction using Apify's YouTube Transcript Scraper ---
-      async function fetchTranscript(youtubeUrl) {
-        try {
-          // Prepare input for the Apify actor
-          const input = {
-            videoUrl: youtubeUrl, // Pass the full YouTube URL
-            language: 'en' // You can adjust language as needed
-          };
-          // Initialize the ApifyClient using the global variable.
-          // Check both possible global names.
-          const ApifyClientLib = window.ApifyClient || window.apifyClient;
-          if (!ApifyClientLib) {
-            throw new Error("ApifyClient library is not loaded");
-          }
-          const client = new ApifyClientLib({ token: 'apify_api_DeJ0aPN8hMTTlaNnwK95dbC8CyHFNf246IcF' });
-          
-          // Call the actor
-          const run = await client.actor("easyapi/youtube-transcript-scraper").call(input);
-          console.log("Actor run completed. Dataset ID:", run.defaultDatasetId);
-          
-          // Fetch results from the run's dataset
-          const datasetResponse = await client.dataset(run.defaultDatasetId).listItems();
-          const items = datasetResponse.items;
-          
-          // Combine transcript parts (adjust based on the actor's output schema)
-          let transcript = "";
-          items.forEach(item => {
-            // Assuming each item has a 'text' field containing a portion of the transcript.
-            transcript += item.text + " ";
-          });
-          transcript = transcript.trim();
-          if (!transcript) {
-            throw new Error("Transcript extraction failed: no text found.");
-          }
-          return transcript;
-        } catch (err) {
-          throw new Error("Transcript extraction failed: " + err.message);
-        }
-      }
-      
       // --- Step 1: Handle YouTube URL submission ---
       nextStepBtn.addEventListener("click", async function (event) {
         event.preventDefault();
@@ -390,15 +347,31 @@
         }
         
         loadingOverlay.style.display = "flex";
-        statusMessage.textContent = "🔄 Fetching transcript via Apify...";
+        statusMessage.textContent = "🔄 Fetching transcript...";
         statusMessage.classList.remove("hidden");
         
         try {
-          const transcript = await fetchTranscript(url);
+          // POST the YouTube URL to the /get_transcripts route in your Flask app
+          const response = await fetch("/get_transcripts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ youtube_url: url })
+          });
+          
+          if (!response.ok) {
+            throw new Error("Transcript extraction failed.");
+          }
+          
+          const data = await response.json();
+          transcriptText = data.transcript;
+          
+          if (!transcriptText) {
+            throw new Error("Transcript extraction failed: no text found.");
+          }
+          
           loadingOverlay.style.display = "none";
-          transcriptText = transcript;
-          console.log("Extracted Transcript:", transcriptText); // Log the transcript to the console
           statusMessage.textContent = "✅ Transcript fetched successfully!";
+          
           // Update progress: mark step 1 complete and step 2 active
           progressSteps.forEach(step => {
             if (step.getAttribute("data-step") === "1") {

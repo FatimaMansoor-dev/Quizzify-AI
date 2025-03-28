@@ -5,12 +5,16 @@ from datetime import datetime, timedelta
 import random
 from flask_mail import Mail, Message
 from groq import Groq
+from flask import Flask, request, jsonify
+import time
+import logging
 import re
-from youtube_transcript_api import YouTubeTranscriptApi
+# from youtube_transcript_api import YouTubeTranscriptApi
 import speech_recognition as sr
 from pydub import AudioSegment
 import io
 from bs4 import BeautifulSoup
+import time
 
 # New imports for Google token verification
 import google.oauth2.id_token
@@ -168,9 +172,12 @@ def prepare_user_profile(user_data):
         "difficulty_counts": difficulty_counts  
     }
 
-def store_quiz_in_firebase(email, quiz_content, difficulty, qtype, score=None):
+import re
+
+def store_quiz_in_firebase(email, quiz_content, difficulty, qtype, score=None, extracted_topic=None):
     """
     Stores the entire quiz attempt in Firebase for the given email.
+    Now also stores the extracted topic.
     """
     # 1) Fetch all users from Firebase
     resp = requests.get(FIREBASE_URL)
@@ -197,8 +204,10 @@ def store_quiz_in_firebase(email, quiz_content, difficulty, qtype, score=None):
         "difficulty": difficulty,
         "score": score,       # Will be None for a newly generated quiz
         "type": qtype,
-        "quiz_content": quiz_content
+        "quiz_content": quiz_content,
+        "topic": extracted_topic  # storing the topic along with quiz attempt
     }
+    print(extracted_topic)
     quiz_attempts.append(new_attempt)
     
     # 4) Update the user's quiz_attempts in Firebase
@@ -207,6 +216,7 @@ def store_quiz_in_firebase(email, quiz_content, difficulty, qtype, score=None):
     patch_resp = requests.patch(update_url, json=update_data)
     if patch_resp.status_code != 200:
         raise Exception("Failed to update user data in Firebase")
+
 
 # ---------------------
 # Existing Routes
@@ -420,8 +430,9 @@ def generate_on_topic():
 
     if qtype == 'MCQs':
         prompt = f"""
-        Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic}. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic}. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Return in this format:
+        Topic : [topic]
         **Question 1:** [question]?
         A) [option 1]
         B) [option 2]
@@ -432,24 +443,27 @@ def generate_on_topic():
         """
     elif qtype in ['blanks', 'fillintheblank']:
         prompt = f"""
-        Generate 10 meaningful {difficulty} fill-in-the-blank questions on {topic} with single blanks + their answers. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Generate 10 meaningful {difficulty} fill-in-the-blank questions on {topic} with single blanks + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Reply in the format:
+        Topic : [topic]
         **Question 1:** [question]
         **Answer:** [answer]
         soure: [should be the exact line that contains the answer]
         """
     elif qtype in ['truefalse', 'true/false']:
         prompt = f"""
-        Generate 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Generate 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Format:
+        Topic : [topic]
         **Question 1:** [statement]
         **Answer:** [True/False]
         soure: [should be the exact line that contains the answer]
         """
     else:
         prompt = f"""
-        Generate 10 {difficulty} descriptive Q&A on {topic}.
+        Generate 10 {difficulty} descriptive Q&A on {topic}. Also create a one liner topic for the quiz.
         Format:
+        Topic: [topic]
         **Question 1:** [question]
         **Answer:** [answer]
         """
@@ -473,7 +487,17 @@ def generate_on_topic():
             extended_answer += response_chunk.choices[0].delta.content or ""
         print(extended_answer)
     
-        store_quiz_in_firebase(email, extended_answer, difficulty, qtype, score=None)
+        # Extract the topic from the LM response using a regex search.
+        match = re.search(r"Topic\s*:\s*(.*)", extended_answer)
+        if match:
+            extracted_topic = match.group(1).strip()
+        else:
+            extracted_topic = topic  # fallback to the original topic if not found
+
+        print(extracted_topic)
+
+        store_quiz_in_firebase(email, extended_answer, difficulty, qtype, score=None, extracted_topic=extracted_topic)
+
 
         # If is_mail is True, send the quiz to the user's email
         if is_mail:
@@ -677,24 +701,34 @@ def auth_google():
     except ValueError as e:
         return render_template('index.html', message="Invalid or expired token"), 401
 
-@app.route('/generate_transcript', methods=['POST'])
-def generate_transcript():
-    youtube_url = request.form.get("youtube_url")
+
+from langchain_community.document_loaders import YoutubeLoader
+@app.route('/get_transcripts', methods=['POST'])
+def get_transcripts():
+    data = request.get_json()
+    youtube_url = data.get('youtube_url', '').strip()
+    
     if not youtube_url:
-        return jsonify({'error': 'Missing YouTube URL'}), 400
+        return jsonify({"error": "No YouTube URL provided"}), 400
 
-    pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+|(?:v|embed|shorts|watch)\/?|watch\?v=)|youtu\.be\/)([^\"&?\/\s]{11})"
-    match = re.search(pattern, youtube_url)
-    if not match:
-        return jsonify({'error': 'Invalid YouTube URL'}), 400
-
-    video_id = match.group(1)
     try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
-        text_paragraph = " ".join([entry['text'] for entry in transcript])
-        return jsonify({'transcript': text_paragraph})
+        # Initialize the loader from the YouTube URL
+        loader = YoutubeLoader.from_youtube_url(youtube_url, add_video_info=False)
+        # Load transcript documents; each Document object contains a chunk of transcript text.
+        transcript_docs = loader.load()
+        
+        # Combine the content from each Document into a single transcript string.
+        transcript_text = " ".join([doc.page_content for doc in transcript_docs]).strip()
+
+        if not transcript_text:
+            logging.error("Transcript not found.")
+            return jsonify({"error": "Transcript not found"}), 404
+
+        return jsonify({"transcript": transcript_text})
+    
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logging.exception("Transcript extraction failed:")
+        return jsonify({"error": f"Transcript extraction failed: {str(e)}"}), 500
     
 @app.route('/scrape', methods=['POST'])
 def scrape():
@@ -710,6 +744,83 @@ def scrape():
         return jsonify({'success': True, 'content': content})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/ai_suggs', methods=['GET', 'POST'])
+def chat_with_ai():
+    email = session.get('email')
+    user_data = get_user_data(email)
+    if not user_data:
+        return jsonify({"error": "User not found"}), 404
+    print("yes")
+
+    # Build the user's quiz history from their quiz_attempts
+    quiz_attempts = user_data.get("quiz_attempts", [])
+    quizzes_scores = []
+    for attempt in quiz_attempts:
+        topic = attempt.get("topic", "Unknown Topic")
+        score = attempt.get("score", "Not Attempted")
+        quizzes_scores.append({"topic": topic, "score": score})
+
+    history = {
+        "message": "here are your quizes and score:",
+        "quizzes": quizzes_scores
+    }
+    # Print the result to the terminal for debugging
+    print(json.dumps(history, indent=2))
+    
+    # Depending on the method, obtain the user question
+    if request.method == "GET":
+        user_question = request.args.get('question', 'What can you tell me about my quiz history?')
+    else:  # POST
+        data = request.get_json()
+        user_question = data.get('message', 'What can you tell me about my quiz history?')
+    
+    # Build a prompt including the history and the user's question
+    prompt = f"""
+You are an advanced student assistant with access to the following user quiz history. All scores are out of 10:
+{json.dumps(history, indent=2)}
+
+The user has asked the following question:
+{user_question}
+
+When answering, please:
+1. Maintain a professional, precise, and helpful tone.
+2. Refer to the user's quiz history where relevant.
+3. Suggest to use features on this website such as uploading PDFs, dropping a website URL, embedding YouTube links, specifying custom topics, or using note descriptions from which quizzes can be generated to perpare for anything.
+4. Be concise but thorough, focusing on actionable insights and recommendations.
+
+Now, provide a short, professional response of not more than 100 words addressing the user’s question and any relevant app feature recommendations:
+"""
+
+    
+    try:
+        completion = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "You are an expert who guides students about their career based on their quiz results."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.3,
+            max_tokens=1024,
+            top_p=1,
+            stream=False,
+        )
+        ai_answer = completion.choices[0].message.content.strip()
+    except Exception as e:
+        return jsonify({"error": f"An error occurred while processing AI suggestion: {e}"}), 500
+
+    # For POST requests, return a simple JSON response for the chatbot
+    if request.method == "POST":
+        return jsonify({"response": ai_answer})
+    
+    # For GET requests, return the full details
+    return jsonify({
+        "quiz_history": history,
+        "user_question": user_question,
+        "ai_answer": ai_answer
+    })
+
+
 
 if __name__ == '__main__':
     app.run()
