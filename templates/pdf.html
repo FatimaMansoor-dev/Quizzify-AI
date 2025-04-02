@@ -3,61 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz Upload</title>
+  <title>QuizXpert – Upload Your PDF</title>
   <!-- Import Roboto font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
+    :root {
+      --primary-color: #5a3e85;
+      --secondary-color: #f8f8f8;
+      --accent-color: #ffffff;
+      --text-color: #333333;
+      --light-text: #666666;
+      --border-color: #e0e0e0;
+      --transition-speed: 0.3s;
+    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
     }
     body {
-      background-color: #f9f9f9;
+      background: var(--secondary-color);
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       width: 100vw;
-      margin: 0 auto;
     }
     /* Navbar */
     .navbar {
       width: 100%;
-      background: #fff;
-      padding: 15px 20px;
+      background: var(--accent-color);
+      padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      font-size: 28px;
-      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       position: fixed;
       top: 0;
       left: 0;
-      color: #7a4dc1;
-      font-family: cursive;
-      z-index: 2;
+      z-index: 10;
+    }
+    .navbar .brand {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
     }
     .email-initial {
-      background: #7a4dc1;
-      color: white;
-      width: 40px;
-      height: 40px;
+      background: var(--primary-color);
+      color: var(--accent-color);
+      width: 45px;
+      height: 45px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       font-size: 20px;
+      font-weight: 500;
     }
     /* Progress Container */
     .progress-container {
       width: 100%;
       max-width: 1000px;
-      margin-top: 80px; /* to account for navbar */
-      padding: 20px 0;
+      margin-top: 90px;
+      padding: 20px;
     }
     .progress {
       display: flex;
@@ -66,13 +76,12 @@
     }
     .step {
       position: relative;
-      background: #ccc;
-      /* Make the text purple for non-active steps */
-      color: #7a4dc1;
-      padding: 30px 40px;
+      background: var(--border-color);
+      color: var(--primary-color);
+      padding: 20px 30px;
       text-align: center;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 18px;
+      font-weight: 500;
       border-radius: 5px 0 0 5px;
       flex: 1;
       clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
@@ -81,76 +90,84 @@
       justify-content: center;
       min-width: 120px;
       height: 60px;
+      transition: background var(--transition-speed);
     }
     .step span {
       position: absolute;
       top: 50%;
       left: 15px;
       transform: translateY(-50%);
-      background: white;
-      color: #7a4dc1;
+      background: var(--accent-color);
+      color: var(--primary-color);
       border-radius: 50%;
       width: 40px;
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 18px;
-      border: 2px dotted purple;
+      border: 2px solid var(--primary-color);
     }
     .step.active {
-      background: #7a4dc1;
-      /* Keep text white on the active step */
-      color: #fff;
+      background: var(--primary-color);
+      color: var(--accent-color);
     }
-    /* Main container */
+    .step.active span {
+      background: var(--accent-color);
+      color: var(--primary-color);
+      border-color: var(--accent-color);
+    }
+    /* Main Container */
     .container {
-      padding: 40px;
+      padding: 40px 20px;
       width: 100%;
-      max-width: 1500px;
+      max-width: 1200px;
       text-align: center;
+      background: var(--accent-color);
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-      background-color: #fff;
-      min-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin: 20px;
+      min-height: 70vh;
+      transition: all var(--transition-speed);
     }
-    /* Hide steps by default except the first */
-    #step2, #step3 {
-      display: none;
-    }
-    /* Thin-bordered containers for each step */
+    /* Step Containers */
     .step-container,
     .upload-container {
-      border: 1px solid #d3d3d3;
+      border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 20px;
-      display: inline-block;
+      padding: 30px;
       width: 100%;
       max-width: 900px;
       margin: 20px auto;
+      background: linear-gradient(135deg, var(--accent-color), #f7f7f7);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     /* Upload Section (Step 1) */
     .upload-section {
-      margin: 10px 0;
+      margin: 20px 0;
     }
     .upload-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      border: 3px dashed #6e6d6e;
+      justify-content: center;
+      border: 3px dashed var(--border-color);
       padding: 50px;
       border-radius: 10px;
       cursor: pointer;
-      color: #6e6d6e;
-      font-family: 'Roboto', sans-serif;
+      color: var(--light-text);
       font-size: 17px;
       width: 100%;
-      margin: auto;
-      height: 350px;
+      height: 50px;
+      transition: border-color var(--transition-speed);
+    }
+    .upload-box:hover {
+      border-color: var(--primary-color);
     }
     .upload-box p {
       margin-bottom: 10px;
@@ -160,160 +177,112 @@
     }
     #pdf-preview {
       font-size: 16px;
-      color: #333;
-      font-weight: bold;
+      color: var(--text-color);
+      font-weight: 500;
       margin-top: 10px;
     }
-    /* Configure Quiz (Step 2) */
+    /* Quiz Config (Step 2) */
     .quiz-config {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 20px;
+      gap: 25px;
       max-width: 600px;
       margin: 0 auto;
       text-align: left;
     }
+    .quiz-config p {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
     .quiz-config label {
-      font-weight: bold;
+      font-weight: 600;
       margin-bottom: 5px;
+      color: var(--text-color);
     }
     .quiz-config select {
-      padding: 8px;
+      padding: 10px;
       font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      width: 100%;
     }
     .question-types,
     .question-count {
       display: flex;
-      gap: 10px;
+      gap: 15px;
+      flex-wrap: wrap;
     }
     .toggle-btn {
-      background-color: #f1f1f1;
-      border: 1px solid #ccc;
-      padding: 10px 15px;
+      background-color: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      padding: 12px 20px;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;
+      transition: background var(--transition-speed), color var(--transition-speed);
+      position: relative;
+      min-width: 130px;
+      text-align: center;
     }
     .toggle-btn.active {
-      background-color: #7a4dc1;
-      color: white;
-      border-color: #7a4dc1;
+      background-color: var(--primary-color);
+      color: var(--accent-color);
+      border-color: var(--primary-color);
     }
-    .info {
-      font-size: 14px;
-      color: #666;
-      margin-top: -10px;
+    .toggle-btn::after {
+      content: "";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      background: var(--secondary-color);
+      transition: all var(--transition-speed);
     }
-    /* Next button */
+    .toggle-btn.active::after {
+      content: "\2713";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-color);
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    /* Next & Back buttons */
     .next-btn {
-      background: #7a4dc1;
-      color: white;
+      background: var(--primary-color);
+      color: var(--accent-color);
       border: none;
-      padding: 15px 25px;
+      padding: 15px 30px;
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
-      align-self: flex-end;
+      transition: background var(--transition-speed);
+      margin-top: 20px;
     }
-    .step-container {
-  width: 90%;               /* Allow it to take most of the container’s width */
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 30px;
-  min-height: 60vh;         /* Ensure it covers a significant vertical space */
-  background: linear-gradient(135deg, #ffffff, #f0f0f0); /* Subtle gradient */
-  border: 1px solid #d3d3d3;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;  /* Center the content vertically */
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Optional: Fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-    .container {
-  padding: 40px;
-  width: 100%;
-  max-width: 1500px;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-  background-color: #fff;
-  min-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  /* Remove or replace justify-content: center; */
-  justify-content: flex-start; 
-}
-
-.toggle-btn {
-  position: relative; /* make space for the pseudo-element */
-  background-color: #f1f1f1;
-  border: 1px solid #ccc;
-  padding: 10px 15px;
-  padding-right: 40px;  /* extra right padding to accommodate the circle */
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  display: inline-block;
-}
-
-/* Add a circle on the right */
-.toggle-btn::after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ccc;
-  border-radius: 50%;
-  background: #fff;
-}
-
-/* When active, change background, border and add a tick mark */
-.toggle-btn.active {
-  background-color: #7a4dc1;
-  color: white;
-  border-color: #7a4dc1;
-}
-
-.toggle-btn.active::after {
-  content: "\2713";  /* Unicode checkmark */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background-color: #7a4dc1;
-  border-color: #7a4dc1;
-}
-
+    .next-btn:hover {
+      background: #4a316a;
+    }
+    /* Hide non-active steps */
+    #step2, #step3 {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
   <!-- Navbar -->
   <div class="navbar">
-    <span>QuizXpert</span>
-    <span class="email-initial" id="emailInitial"></span>
+    <div class="brand">QuizXpert</div>
+    <div class="email-initial" id="emailInitial"></div>
   </div>
-
+  
   <!-- Progress Container -->
   <div class="progress-container">
     <div class="progress">
@@ -328,15 +297,14 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Main Container -->
   <div class="container">
     <!-- Step 1: Upload PDF -->
     <div id="step1">
       <div class="upload-section">
         <div class="upload-container">
-          <!-- Add heading here -->
-          <h2 style="margin-bottom: 20px;">Upload PDF</h2>
+          <h2 style="margin-bottom: 20px; color: var(--primary-color);">Upload PDF</h2>
           <label for="pdf-upload" class="upload-box">
             <img src="static/upload.svg" alt="Upload Icon" style="width:100px; margin-bottom:20px;">
             <p>Click to upload PDF files</p>
@@ -347,59 +315,56 @@
       </div>
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
-
+    
     <!-- Step 2: Configure Quiz -->
-<div id="step2">
-  <div class="step-container">
-    <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
-    <div class="quiz-config">
-      <div>
-        <p style="margin-bottom: 5px;">What type of questions?</p>
-        <div class="question-types">
-          <button class="toggle-btn active">Multiple Choice</button>
-          <button class="toggle-btn">True False</button>
-          <button class="toggle-btn">Fill in the blank</button>
-          <button class="toggle-btn">General Question Answers</button>
+    <div id="step2">
+      <div class="step-container">
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Configure Quiz</h2>
+        <div class="quiz-config">
+          <div>
+            <p>What type of questions?</p>
+            <div class="question-types">
+              <button class="toggle-btn active">Multiple Choice</button>
+              <button class="toggle-btn">True False</button>
+              <button class="toggle-btn">Fill in the blank</button>
+              <button class="toggle-btn">General Q&A</button>
+            </div>
+          </div>
+          <div>
+            <p>Difficulty Level?</p>
+            <div class="question-count">
+              <button class="toggle-btn">Easy</button>
+              <button class="toggle-btn active">Medium</button>
+              <button class="toggle-btn">Hard</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <button id="next-step2" class="next-btn">Next Step →</button>
         </div>
       </div>
-      <div>
-        <p style="margin-bottom: 5px;">Difficulty Level?</p>
-        <div class="question-count">
-          <button class="toggle-btn">Easy</button>
-          <button class="toggle-btn active">Medium</button>
-          <button class="toggle-btn">Hard</button>
+    </div>
+    
+    <!-- Step 3: Output Options -->
+    <div id="step3">
+      <div class="step-container">
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive Quiz via Email?</h2>
+        <div class="quiz-config email-options">
+          <label class="toggle-btn">
+            <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
+          </label>
+          <label class="toggle-btn">
+            <input type="radio" name="emailOption" value="no" checked /> No, Thanks
+          </label>
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+          <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+          <button id="submit-quiz" class="next-btn">Submit Quiz</button>
         </div>
       </div>
     </div>
-
-    <!-- Put the button inside the .step-container and align it to the right -->
-    <div style="text-align: right; margin-top: 20px;">
-      <button id="next-step2" class="next-btn">Next Step →</button>
-    </div>
   </div>
-</div>
-
-   <!-- Step 3: Output Options -->
-<div id="step3">
-  <div class="step-container">
-    <h2 style="margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
-    <div class="quiz-config email-options">
-      <label class="toggle-btn">
-        <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
-      </label>
-      <label class="toggle-btn">
-        <input type="radio" name="emailOption" value="no" checked /> No, Thanks
-      </label>
-    </div>
-    <div style="text-align: right; margin-top: 20px;">
-      <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
-      <button id="submit-quiz" class="next-btn">Submit Quiz</button>
-    </div>
-  </div>
-</div>
-
-  </div>
-
+  
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // Set email initial in navbar
@@ -461,15 +426,15 @@
       });
       
       // Toggle buttons for difficulty levels
-      const questionCountButtons = document.querySelectorAll('.question-count .toggle-btn');
-      questionCountButtons.forEach(button => {
+      const difficultyButtons = document.querySelectorAll('.question-count .toggle-btn');
+      difficultyButtons.forEach(button => {
         button.addEventListener('click', () => {
-          questionCountButtons.forEach(btn => btn.classList.remove('active'));
+          difficultyButtons.forEach(btn => btn.classList.remove('active'));
           button.classList.add('active');
         });
       });
       
-      // Handle step transitions
+      // Step transitions
       const step2 = document.getElementById("step2");
       const step3 = document.getElementById("step3");
       
@@ -505,7 +470,7 @@
           questionType = "truefalse";
         } else if (questionType === "Fill in the blank") {
           questionType = "blanks";
-        } else if (questionType === "General Question Answers") {
+        } else if (questionType === "General Q&A") {
           questionType = "qa";
         }
         
@@ -522,9 +487,7 @@
         try {
           const response = await fetch("/generateOnTopic", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
           const data = await response.json();
@@ -551,19 +514,17 @@
           alert("An error occurred while generating the quiz.");
         }
       });
-      // For Step 3 email options
-const emailOptionLabels = document.querySelectorAll('.email-options .toggle-btn');
-emailOptionLabels.forEach(label => {
-  label.addEventListener('click', () => {
-    emailOptionLabels.forEach(l => l.classList.remove('active'));
-    label.classList.add('active');
-    // Also mark the radio input as checked
-    label.querySelector('input').checked = true;
-  });
-});
-
+      
+      // Email option toggle
+      const emailOptionLabels = document.querySelectorAll('.email-options .toggle-btn');
+      emailOptionLabels.forEach(label => {
+        label.addEventListener('click', () => {
+          emailOptionLabels.forEach(l => l.classList.remove('active'));
+          label.classList.add('active');
+          label.querySelector('input').checked = true;
+        });
+      });
     });
   </script>
-
 </body>
 </html>

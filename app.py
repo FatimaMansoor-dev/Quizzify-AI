@@ -355,7 +355,7 @@ def user_profile():
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
 @app.route('/options')
-# @login_required
+@login_required
 def options():
     email = session.get('email')
     return render_template('options.html', email=email)
@@ -367,7 +367,7 @@ def youtube():
     return render_template('youtube.html', email=email)
 
 @app.route('/pdf')
-# @login_required
+@login_required
 def pdf():
     email = session.get('email')
     return render_template('pdf.html', email=email)
@@ -663,7 +663,7 @@ def auth_google():
         return render_template('index.html', message="Token not provided"), 400
 
     # CLIENT_ID now from env file
-    CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    CLIENT_ID = os.environ.get('340201962397-iqttskc43i5ipnvn6b80qtou1ofq9ns9.apps.googleusercontent.com')
     try:
         request_adapter = google.auth.transport.requests.Request()
         id_info = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, CLIENT_ID)
