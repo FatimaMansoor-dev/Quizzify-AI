@@ -777,7 +777,7 @@ def chat_with_ai():
     
     # Build a prompt including the history and the user's question
     prompt = f"""
-You are an advanced student assistant with access to the following user quiz history. All scores are out of 10:
+You are an advanced student assistant with access to the following user attempted quiz history. All scores are out of 10:
 {json.dumps(history, indent=2)}
 
 The user has asked the following question:
