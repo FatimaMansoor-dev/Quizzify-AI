@@ -355,7 +355,7 @@ def user_profile():
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
 @app.route('/options')
-@login_required
+# @login_required
 def options():
     email = session.get('email')
     return render_template('options.html', email=email)
@@ -367,7 +367,7 @@ def youtube():
     return render_template('youtube.html', email=email)
 
 @app.route('/pdf')
-@login_required
+# @login_required
 def pdf():
     email = session.get('email')
     return render_template('pdf.html', email=email)
