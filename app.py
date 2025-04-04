@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, send_file, render_template, request, jsonify, session, redirect, url_for
 import requests
 import json
 from datetime import datetime, timedelta
@@ -148,6 +148,7 @@ def prepare_user_profile(user_data):
     first_name = user_data.get("first_name", "User")
     last_name = user_data.get("last_name", "")
     quiz_attempts = user_data.get("quiz_attempts", [])
+    print('quiz attempts:', quiz_attempts)
     # For calendar display, we only need the date strings.
     quiz_dates = [attempt.get("date").split(" ")[0] for attempt in quiz_attempts if "date" in attempt]
     last_score = quiz_attempts[-1].get("score") if quiz_attempts else None
@@ -246,7 +247,7 @@ def login():
             if password == decrypted_password:
                 session['email'] = email
                 profile_data = prepare_user_profile(user_data)
-                print(profile_data)
+                # print(profile_data)
                 return render_template(
                     'userProfile.html',
                     email=email,
@@ -358,7 +359,12 @@ def user_profile():
 @login_required
 def options():
     email = session.get('email')
-    return render_template('options.html', email=email)
+    pres = request.args.get('pres')
+    print(pres) 
+    if pres == 'true':
+        return render_template('presentation.html', email=email)
+    else:
+        return render_template('options.html', email=email)
 
 @app.route('/youtube')
 @login_required
@@ -820,7 +826,137 @@ Now, provide a short, professional response of not more than 100 words addressin
         "ai_answer": ai_answer
     })
 
+import google.generativeai as genai
 
+genai.configure(api_key='AIzaSyCV_vO9wTMD-OYRJsz7yFrx5l9tFvKlU-4')
+model = genai.GenerativeModel('gemini-2.0-flash')  # Specify the desired model
+
+def generate_presentation_content(n, topic, description):
+    # Construct the prompt for Gemini API
+    prompt = f"""
+    You are an AI assistant that helps users create presentations.
+    Generate a well-detailed and informative presentation with {n} text slides on the topic "{topic}".
+    The topic title will be used on the first slide separately.
+    For each text slide, use the following format:
+
+    **Slide X:**
+    **Title:** [Insert Title]
+    **Key Points:**
+    - Bullet point 1
+    - Bullet point 2
+    - Bullet point 3
+    """
+    # Making a request to the Gemini API
+    response = model.generate_content(prompt)
+    return response.text
+
+@app.route('/generate_ppt', methods=['POST'])
+def generate_ppt():
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
+        n = int(data.get('slides'))  # number of text slides desired
+        topic = data.get('topic')
+        description = data.get('description')
+        email = data.get('email')  # may be used later for email options
+
+        # Validate required fields
+        if not n or not topic or not description:
+            return jsonify({"error": "Required fields missing."}), 400
+
+        # Generate presentation content using your Gemini API function
+        content = generate_presentation_content(n, topic, description)
+        if not content:
+            return jsonify({"error": "Content generation failed."}), 400
+
+        # Select a random template from the 'temps' folder
+        template_folder = 'static/temps'
+        template_files = [f for f in os.listdir(template_folder) if f.endswith('.pptx')]
+        if not template_files:
+            return jsonify({"error": "No template files found."}), 500
+
+        # Randomly select a template file
+        selected_template = random.choice(template_files)
+        template_ppt_path = os.path.join(template_folder, selected_template)
+
+        # Load the template presentation
+        presentation = Presentation(template_ppt_path)
+
+        # Assume the first slide is the title-only slide.
+        # Set the topic name in the title slide.
+        title_slide = presentation.slides[0]
+        if title_slide.shapes.title:
+            title_slide.shapes.title.text = topic
+
+        # Prepare a list of text slides from the template.
+        # These are assumed to be slides 2 to 4 (i.e. indices 1, 2, and 3).
+        text_slides = presentation.slides[1:4]
+
+        # Split the generated content into separate slide contents.
+        # Each slide's content is separated by one or more blank lines.
+        slides_content = re.split(r'\n\s*\n+', content.strip())
+
+        # Loop over the desired number of text slides.
+        for i in range(n):
+            # Get content for the current slide (if available)
+            slide_text = slides_content[i] if i < len(slides_content) else ""
+            title = ""
+            key_points = []
+
+            # Extract the title and key points using regex.
+            title_match = re.search(r'\*\*Title:\*\*\s*(.+)', slide_text)
+            key_points_match = re.findall(r'-\s*(.+)', slide_text)
+
+            if title_match:
+                title = title_match.group(1).strip()
+            if key_points_match:
+                key_points = [kp.strip() for kp in key_points_match]
+
+            # Determine which slide to use:
+            # - If i is less than available text slides in template, use that slide.
+            # - Otherwise, replicate the last text slide's layout.
+            if i < len(text_slides):
+                slide = text_slides[i]
+            else:
+                # Replicate the layout of the last text slide.
+                last_text_slide = text_slides[-1]
+                layout = last_text_slide.slide_layout
+                slide = presentation.slides.add_slide(layout)
+
+            # Update the slide title if a title shape exists.
+            if slide.shapes.title:
+                slide.shapes.title.text = title
+
+            # Remove existing textbox shapes if needed before adding new key points.
+            # (Optional: add code here if you need to clear previous content.)
+
+            # Add key points as bullet points.
+            if key_points:
+                left = Inches(1)
+                top = Inches(3)
+                width = Inches(8)
+                height = Inches(3)
+                textbox = slide.shapes.add_textbox(left, top, width, height)
+                text_frame = textbox.text_frame
+                text_frame.word_wrap = True
+                # Clear any existing paragraphs
+                text_frame.clear()
+                for kp in key_points:
+                    p = text_frame.add_paragraph()
+                    p.text = f"• {kp}"
+                    p.space_after = Inches(0.1)
+                    # Note: Font size is set in points; adjust as needed.
+                    p.font.size = Inches(0.25)
+                    p.level = 0  # First-level bullet point
+
+        # Save the generated presentation
+        ppt_file_path = 'presentation.pptx'
+        presentation.save(ppt_file_path)
+
+        # Return the file for download
+        return send_file(ppt_file_path, as_attachment=True, download_name='presentation.pptx')
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run()

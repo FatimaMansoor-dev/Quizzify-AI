@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuizXpert – Create Your PPT</title>
   <!-- Import Roboto font -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #5a3e85;
@@ -21,6 +21,7 @@
       padding: 0;
       box-sizing: border-box;
       font-family: 'Roboto', sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
     body {
       background: var(--secondary-color);
@@ -29,6 +30,8 @@
       align-items: center;
       min-height: 100vh;
       width: 100vw;
+      line-height: 1.6;
+      color: var(--text-color);
     }
     /* Navbar */
     .navbar {
@@ -151,7 +154,7 @@
       margin-bottom: 20px;
     }
     .form-group label {
-      font-weight: 600;
+      font-weight: 500;
       margin-bottom: 5px;
       display: block;
       color: var(--text-color);
@@ -160,14 +163,31 @@
     .form-group input[type="text"],
     .form-group textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       font-size: 16px;
       border: 1px solid var(--border-color);
       border-radius: 5px;
+      outline: none;
+      transition: border-color var(--transition-speed);
+    }
+    .form-group input[type="number"]:focus,
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary-color);
     }
     textarea {
       resize: vertical;
       min-height: 100px;
+    }
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 10px;
     }
     /* Next & Back buttons */
     .next-btn {
@@ -178,6 +198,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
+      font-weight: 500;
       transition: background var(--transition-speed);
       margin-top: 20px;
     }
@@ -188,6 +209,62 @@
     #step2, #step3 {
       display: none;
     }
+
+    /* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --primary-color: #5a3e85;
+  --secondary-color: #f8f8f8;
+  --accent-color: #ffffff;
+  --text-color: #333333;
+  --light-text: #666666;
+  --border-color: #e0e0e0;
+  --transition-speed: 0.3s;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+h2 {
+  font-size: 26px;
+}
+
+p {
+  font-size: 16px;
+  color: var(--light-text);
+}
+
+/* Buttons */
+.next-btn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Labels & Inputs */
+.form-group label {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.form-group input,
+.form-group textarea {
+  font-size: 17px;
+  font-family: 'Inter', sans-serif;
+}
+
   </style>
 </head>
 <body>
@@ -218,7 +295,7 @@
     <!-- Step 1: Enter PPT Details -->
     <div id="step1">
       <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Enter PPT Details</h2>
+        <h2>Enter PPT Details</h2>
         <div class="form-group">
           <label for="numSlides">Number of Slides</label>
           <input type="number" id="numSlides" placeholder="e.g., 10" min="1" required />
@@ -238,7 +315,7 @@
     <!-- Step 2: Review PPT Details -->
     <div id="step2">
       <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Review Your Details</h2>
+        <h2>Review Your Details</h2>
         <p><strong>Number of Slides:</strong> <span id="reviewSlides"></span></p>
         <p><strong>Topic:</strong> <span id="reviewTopic"></span></p>
         <p><strong>Description:</strong></p>
@@ -253,7 +330,7 @@
     <!-- Step 3: Output Options -->
     <div id="step3">
       <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive PPT via Email?</h2>
+        <h2>Receive PPT via Email?</h2>
         <div class="form-group" style="text-align: center;">
           <label style="display: inline-block; margin-right: 20px;">
             <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
@@ -341,38 +418,53 @@
       });
 
       // Submit PPT event listener
-      submitPptBtn.addEventListener("click", async () => {
-        const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-        
-        // Prepare payload
-        const payload = {
-          slides: numSlidesInput.value,
-          topic: topicInput.value,
-          description: descriptionInput.value,
-          email: email,
-          is_email: selectedOption === "yes"
-        };
-        
-        try {
-          const response = await fetch("/generatePPT", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          const data = await response.json();
-          if (response.ok) {
-            // Redirect or display a success message as needed
-            alert("PPT generation successful!");
-            // For example, redirect:
-            // window.location.href = `/ppt?message=${encodeURIComponent(data.message)}&email=${encodeURIComponent(email)}`;
-          } else {
-            alert("PPT generation failed: " + data.error);
-          }
-        } catch (error) {
-          console.error("Error generating PPT:", error);
-          alert("An error occurred while generating the PPT.");
-        }
-      });
+      // Submit PPT event listener
+submitPptBtn.addEventListener("click", async () => {
+  const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
+
+  // Prepare payload
+  const payload = {
+    slides: numSlidesInput.value,
+    topic: topicInput.value,
+    description: descriptionInput.value,
+    email: email,
+    is_email: selectedOption === "yes"
+  };
+
+  try {
+    const response = await fetch("/generate_ppt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      // Get the file blob from the response
+      const blob = await response.blob();
+      // Create a URL for the blob
+      const downloadUrl = window.URL.createObjectURL(blob);
+      // Create a temporary link element
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      // Set the desired file name
+      link.download = "presentation.pptx";
+      // Append to the document, trigger click, and remove it
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      alert("PPT generation successful!");
+    } else {
+      // If response is not OK, try to extract error info as JSON
+      const errorData = await response.json();
+      alert("PPT generation failed: " + errorData.error);
+    }
+  } catch (error) {
+    console.error("Error generating PPT:", error);
+    alert("An error occurred while generating the PPT.");
+  }
+});
+
     });
   </script>
 </body>

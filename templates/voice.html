@@ -170,6 +170,98 @@
     label {
       cursor: pointer;
     }
+    /* Quiz Config (Step 2) */
+    .quiz-config {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 25px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .quiz-config p {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+    .quiz-config label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text-color);
+    }
+    .quiz-config select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+    }
+    .question-types,
+    .question-count {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .toggle-btn {
+      background-color: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background var(--transition-speed), color var(--transition-speed);
+      position: relative;
+      min-width: 130px;
+      text-align: center;
+    }
+    .toggle-btn.active {
+      background-color: var(--primary-color);
+      color: var(--accent-color);
+      border-color: var(--primary-color);
+    }
+    .toggle-btn::after {
+      content: "";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      background: var(--secondary-color);
+      transition: all var(--transition-speed);
+    }
+    .toggle-btn.active::after {
+      content: "\2713";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-color);
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    /* Next & Back buttons */
+    .next-btn {
+      background: var(--primary-color);
+      color: var(--accent-color);
+      border: none;
+      padding: 15px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background var(--transition-speed);
+      margin-top: 20px;
+    }
+    .next-btn:hover {
+      background: #4a316a;
+    }
+    /* Hide non-active steps */
+    #step2, #step3 {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -208,46 +300,50 @@
       <button class="next-btn" id="next-step1">Next Step →</button>
     </div>
     <!-- Step 2: Configure Quiz -->
-    <div class="step-container" id="step2">
-      <h2>Configure Quiz</h2>
-      <!-- <p>Select your question type and difficulty level.</p> -->
-      <div>
-        <p style="font-weight: bold; margin-bottom: 10px;">Question Type:</p>
-        <div class="toggle-group question-types">
-          <button class="toggle-btn active">Multiple Choice</button>
-          <button class="toggle-btn">True False</button>
-          <button class="toggle-btn">Fill in the blank</button>
-          <button class="toggle-btn">General Q&amp;A</button>
+    <div id="step2">
+      <div class="step-container">
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Configure Quiz</h2>
+        <div class="quiz-config">
+          <div>
+            <p>What type of questions?</p>
+            <div class="question-types">
+              <button class="toggle-btn active">Multiple Choice</button>
+              <button class="toggle-btn">True False</button>
+              <button class="toggle-btn">Fill in the blank</button>
+              <button class="toggle-btn">General Q&A</button>
+            </div>
+          </div>
+          <div>
+            <p>Difficulty Level?</p>
+            <div class="question-count">
+              <button class="toggle-btn">Easy</button>
+              <button class="toggle-btn active">Medium</button>
+              <button class="toggle-btn">Hard</button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div>
-        <p style="font-weight: bold; margin-bottom: 10px;">Difficulty Level:</p>
-        <div class="toggle-group difficulty">
-          <button class="toggle-btn">Easy</button>
-          <button class="toggle-btn active">Medium</button>
-          <button class="toggle-btn">Hard</button>
+        <div style="text-align: right;">
+          <button id="next-step2" class="next-btn">Next Step →</button>
         </div>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="next-btn" id="prev-step2">← Back</button>
-        <button class="next-btn" id="next-step2">Next Step →</button>
       </div>
     </div>
+    
     <!-- Step 3: Output Options -->
-    <div class="step-container" id="step3">
-      <h2>Output Options</h2>
-      <p>Would you like the quiz emailed to you?</p>
-      <div class="radio-group">
-        <label>
-          <input type="radio" name="sendEmail" value="yes" checked> Yes
-        </label>
-        <label>
-          <input type="radio" name="sendEmail" value="no"> No
-        </label>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="next-btn" id="prev-step3" style="background: gray;">← Back</button>
-        <button class="next-btn" id="submit-quiz">Submit Quiz</button>
+    <div id="step3">
+      <div class="step-container">
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive Quiz via Email?</h2>
+        <div class="quiz-config email-options">
+          <label class="toggle-btn">
+            <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
+          </label>
+          <label class="toggle-btn">
+            <input type="radio" name="emailOption" value="no" checked /> No, Thanks
+          </label>
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+          <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+          <button id="submit-quiz" class="next-btn">Submit Quiz</button>
+        </div>
       </div>
     </div>
   </div>

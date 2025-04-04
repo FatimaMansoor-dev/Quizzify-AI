@@ -121,7 +121,7 @@
       background-color: #7a4dc1;
     }
     /* New glowing button for AI Suggestions */
-    .quizzes-header .ai-suggestions-btn {
+    .ai-suggestions-btn {
       background-color: #7a4dc1;
       color: #ffffff;
       border: none;
@@ -237,7 +237,7 @@
       top: 0;
       right: 0;
       width: 0;
-      height: 60%;
+      height: 40%;
       background-color: #fff;
       box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
       overflow: hidden;
@@ -420,6 +420,12 @@
       <div class="navbar-brand">QuizXpert</div>
     </div>
     <div class="navbar-right">
+      <button class="ai-suggestions-btn" onclick="getAISuggestions()">
+        Get AI Suggestions
+      </button>
+      <button class="ai-suggestions-btn" onclick="window.location.href='/options?pres=true'">
+        Generate Presentation with AI
+      </button>
       <button class="user-button" onclick="openSidebar()">
         <img src="../static/user.png" alt="User">
       </button>
@@ -434,22 +440,20 @@
     </div>
 
     <!-- BADGES BLOCK -->
-    <div class="badges-block">
-      <h2>Your Badges</h2>
-      <div id="badgeList"></div>
-    </div>
+<div class="badges-block">
+  <h2>Your Badges</h2>
+  <div id="badgeList"></div>
+</div>
 
     <!-- QUIZZES HEADER -->
     <div class="quizzes-header">
       <h1>Quizzes</h1>
       <div>
-        <button class="create-quiz-btn" onclick="window.location.href='/options?email={{ email }}'">
+        
+        <button class="create-quiz-btn" onclick="window.location.href='/options?pres=false'">
           Create new quiz
         </button>
-        <!-- When clicked, the chatbot box will be shown -->
-        <button class="ai-suggestions-btn" onclick="getAISuggestions()">
-          Get AI Suggestions
-        </button>
+        
       </div>
     </div>
     <div class="quizzes-subtext">
@@ -513,6 +517,14 @@
     console.log("User data:", userData);
     console.log("Badge data:", badgeData);
 
+    if (badgeData.includes("First Step Badge")) {
+  const img = document.createElement("img");
+  img.src = "../static/firststep.png"; 
+  img.alt = "First Step Badge";
+  document.getElementById("badgeList").appendChild(img);
+}
+
+
     // Render quiz attempts
     const quizzesContainer = document.getElementById("quizzesContainer");
     let UserData = JSON.parse(userData);
@@ -535,7 +547,7 @@
           const quizDatesElement = document.getElementById("quizDatesData");
           const quizDates = JSON.parse(quizDatesElement.getAttribute("data-quiz-dates")) || [];
           const streakCount = calculateCurrentStreak(quizDates);
-          streakTrackerSidebar.innerText = `Current Streak: ${streakCount} days`;
+          streakTrackerSidebar.innerText = `Streak: ${streakCount} days`;
         }
       }
     }
