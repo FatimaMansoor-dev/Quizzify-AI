@@ -669,7 +669,7 @@ def auth_google():
         return render_template('index.html', message="Token not provided"), 400
 
     # CLIENT_ID now from env file
-    CLIENT_ID = os.environ.get('340201962397-iqttskc43i5ipnvn6b80qtou1ofq9ns9.apps.googleusercontent.com')
+    CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     try:
         request_adapter = google.auth.transport.requests.Request()
         id_info = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, CLIENT_ID)
