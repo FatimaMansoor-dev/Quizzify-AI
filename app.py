@@ -7,6 +7,8 @@ from flask_mail import Mail, Message
 from groq import Groq
 from flask import Flask, request, jsonify
 import time
+from pptx import Presentation
+from pptx.util import Inches, Pt
 import logging
 import re
 # from youtube_transcript_api import YouTubeTranscriptApi
@@ -445,7 +447,7 @@ def generate_on_topic():
         C) [option 3]
         D) [option 4]
         **Answer:** B)
-        soure: [should be the exact line that contains the answer]
+        soure: [should be the exact line that contains the answer and the place or website that you got this answer from.]
         """
     elif qtype in ['blanks', 'fillintheblank']:
         prompt = f"""
@@ -931,6 +933,7 @@ def generate_ppt():
             # (Optional: add code here if you need to clear previous content.)
 
             # Add key points as bullet points.
+            # Add key points as bullet points.
             if key_points:
                 left = Inches(1)
                 top = Inches(3)
@@ -939,15 +942,15 @@ def generate_ppt():
                 textbox = slide.shapes.add_textbox(left, top, width, height)
                 text_frame = textbox.text_frame
                 text_frame.word_wrap = True
-                # Clear any existing paragraphs
-                text_frame.clear()
+                # Clear the text by setting it to an empty string.
+                text_frame.text = ""
                 for kp in key_points:
                     p = text_frame.add_paragraph()
                     p.text = f"• {kp}"
-                    p.space_after = Inches(0.1)
-                    # Note: Font size is set in points; adjust as needed.
-                    p.font.size = Inches(0.25)
+                    p.space_after = 0  # You can adjust spacing as needed.
+                    p.font.size = Pt(10)  # Set font size in points.
                     p.level = 0  # First-level bullet point
+
 
         # Save the generated presentation
         ppt_file_path = 'presentation.pptx'

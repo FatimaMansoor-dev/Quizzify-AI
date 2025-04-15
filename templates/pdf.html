@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuizXpert – Create Your PPT</title>
+  <title>QuizXpert – Upload Your PDF</title>
   <!-- Import Roboto font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
     :root {
       --primary-color: #5a3e85;
@@ -127,11 +128,12 @@
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       margin: 20px;
-      min-height: 60vh;
+      min-height: 70vh;
       transition: all var(--transition-speed);
     }
     /* Step Containers */
-    .step-container {
+    .step-container,
+    .upload-container {
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 30px;
@@ -140,34 +142,117 @@
       margin: 20px auto;
       background: linear-gradient(135deg, var(--accent-color), #f7f7f7);
       animation: fadeIn 0.5s ease-in-out;
-      text-align: left;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 20px;
+    /* Upload Section (Step 1) */
+    .upload-section {
+      margin: 20px 0;
     }
-    .form-group label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      display: block;
+    .upload-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 3px dashed var(--border-color);
+      padding: 50px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--light-text);
+      font-size: 17px;
+      width: 100%;
+      height: 50px;
+      transition: border-color var(--transition-speed);
+    }
+    .upload-box:hover {
+      border-color: var(--primary-color);
+    }
+    .upload-box p {
+      margin-bottom: 10px;
+    }
+    .upload-box input {
+      display: none;
+    }
+    #pdf-preview {
+      font-size: 16px;
+      color: var(--text-color);
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    /* Quiz Config (Step 2) */
+    .quiz-config {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 25px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .quiz-config p {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
       color: var(--text-color);
     }
-    .form-group input[type="number"],
-    .form-group input[type="text"],
-    .form-group textarea {
-      width: 100%;
+    .quiz-config label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text-color);
+    }
+    .quiz-config select {
       padding: 10px;
       font-size: 16px;
-      border: 1px solid var(--border-color);
       border-radius: 5px;
+      border: 1px solid var(--border-color);
+      width: 100%;
     }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
+    .question-types,
+    .question-count {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .toggle-btn {
+      background-color: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background var(--transition-speed), color var(--transition-speed);
+      position: relative;
+      min-width: 130px;
+      text-align: center;
+    }
+    .toggle-btn.active {
+      background-color: var(--primary-color);
+      color: var(--accent-color);
+      border-color: var(--primary-color);
+    }
+    .toggle-btn::after {
+      content: "";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      background: var(--secondary-color);
+      transition: all var(--transition-speed);
+    }
+    .toggle-btn.active::after {
+      content: "\2713";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-color);
+      background: var(--primary-color);
+      border-color: var(--primary-color);
     }
     /* Next & Back buttons */
     .next-btn {
@@ -202,10 +287,10 @@
   <div class="progress-container">
     <div class="progress">
       <div class="step active" data-step="1">
-        <span>1</span> PPT Details
+        <span>1</span> Upload PDF
       </div>
       <div class="step" data-step="2">
-        <span>2</span> Review Details
+        <span>2</span> Configure Quiz
       </div>
       <div class="step" data-step="3">
         <span>3</span> Output Options
@@ -215,56 +300,66 @@
   
   <!-- Main Container -->
   <div class="container">
-    <!-- Step 1: Enter PPT Details -->
+    <!-- Step 1: Upload PDF -->
     <div id="step1">
-      <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Enter PPT Details</h2>
-        <div class="form-group">
-          <label for="numSlides">Number of Slides</label>
-          <input type="number" id="numSlides" placeholder="e.g., 10" min="1" required />
-        </div>
-        <div class="form-group">
-          <label for="pptTopic">Topic</label>
-          <input type="text" id="pptTopic" placeholder="Enter the topic" required />
-        </div>
-        <div class="form-group">
-          <label for="pptDescription">Description</label>
-          <textarea id="pptDescription" placeholder="Enter a description for your PPT" required></textarea>
+      <div class="upload-section">
+        <div class="upload-container">
+          <h2 style="margin-bottom: 20px; color: var(--primary-color);">Upload PDF</h2>
+          <label for="pdf-upload" class="upload-box">
+            <img src="static/upload.svg" alt="Upload Icon" style="width:100px; margin-bottom:20px;">
+            <p>Click to upload PDF files</p>
+            <input type="file" id="pdf-upload" accept="application/pdf" />
+            <div id="pdf-preview"></div>
+          </label>
         </div>
       </div>
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
     
-    <!-- Step 2: Review PPT Details -->
+    <!-- Step 2: Configure Quiz -->
     <div id="step2">
       <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Review Your Details</h2>
-        <p><strong>Number of Slides:</strong> <span id="reviewSlides"></span></p>
-        <p><strong>Topic:</strong> <span id="reviewTopic"></span></p>
-        <p><strong>Description:</strong></p>
-        <p id="reviewDescription" style="white-space: pre-wrap;"></p>
-      </div>
-      <div style="text-align: right;">
-        <button id="back-step1" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
-        <button id="next-step2" class="next-btn">Next Step →</button>
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Configure Quiz</h2>
+        <div class="quiz-config">
+          <div>
+            <p>What type of questions?</p>
+            <div class="question-types">
+              <button class="toggle-btn active">Multiple Choice</button>
+              <button class="toggle-btn">True False</button>
+              <button class="toggle-btn">Fill in the blank</button>
+              <button class="toggle-btn">General Q&A</button>
+            </div>
+          </div>
+          <div>
+            <p>Difficulty Level?</p>
+            <div class="question-count">
+              <button class="toggle-btn">Easy</button>
+              <button class="toggle-btn active">Medium</button>
+              <button class="toggle-btn">Hard</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <button id="next-step2" class="next-btn">Next Step →</button>
+        </div>
       </div>
     </div>
     
     <!-- Step 3: Output Options -->
     <div id="step3">
       <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive PPT via Email?</h2>
-        <div class="form-group" style="text-align: center;">
-          <label style="display: inline-block; margin-right: 20px;">
+        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive Quiz via Email?</h2>
+        <div class="quiz-config email-options">
+          <label class="toggle-btn">
             <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
           </label>
-          <label style="display: inline-block;">
+          <label class="toggle-btn">
             <input type="radio" name="emailOption" value="no" checked /> No, Thanks
           </label>
         </div>
         <div style="text-align: right; margin-top: 20px;">
           <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
-          <button id="submit-ppt" class="next-btn">Submit PPT</button>
+          <button id="submit-quiz" class="next-btn">Submit Quiz</button>
         </div>
       </div>
     </div>
@@ -275,103 +370,159 @@
       // Set email initial in navbar
       let email = document.getElementById("userEmail").value;
       document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
-
-      // Step elements
-      const step1 = document.getElementById("step1");
-      const step2 = document.getElementById("step2");
-      const step3 = document.getElementById("step3");
-
-      // Buttons for transitions
+      
+      // PDF upload elements
+      const fileInput = document.getElementById("pdf-upload");
+      const pdfPreview = document.getElementById("pdf-preview");
       const nextStep1Btn = document.getElementById("next-step1");
-      const backStep1Btn = document.getElementById("back-step1");
-      const nextStep2Btn = document.getElementById("next-step2");
-      const backStep2Btn = document.getElementById("back-step2");
-      const submitPptBtn = document.getElementById("submit-ppt");
-
-      // Fields for PPT Details (Step 1)
-      const numSlidesInput = document.getElementById("numSlides");
-      const topicInput = document.getElementById("pptTopic");
-      const descriptionInput = document.getElementById("pptDescription");
-
-      // Review elements (Step 2)
-      const reviewSlides = document.getElementById("reviewSlides");
-      const reviewTopic = document.getElementById("reviewTopic");
-      const reviewDescription = document.getElementById("reviewDescription");
-
-      // Transition from Step 1 to Step 2
+      let extractedText = "";
+      
+      fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          pdfPreview.textContent = `Selected: ${file.name}`;
+        }
+      });
+      
+      // Transition from Step 1 to Step 2 after reading PDF
       nextStep1Btn.addEventListener("click", function () {
-        // Validate required fields
-        if (!numSlidesInput.value || !topicInput.value || !descriptionInput.value) {
-          alert("Please fill out all fields.");
+        if (!fileInput.files.length) {
+          alert("Please upload a PDF first!");
           return;
         }
-        // Populate review section
-        reviewSlides.textContent = numSlidesInput.value;
-        reviewTopic.textContent = topicInput.value;
-        reviewDescription.textContent = descriptionInput.value;
-        // Move to Step 2
-        step1.style.display = "none";
-        step2.style.display = "block";
-        document.querySelector('.progress .step[data-step="1"]').classList.remove('active');
-        document.querySelector('.progress .step[data-step="2"]').classList.add('active');
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function () {
+          try {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            extractedText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const content = await page.getTextContent();
+              extractedText += content.items.map(item => item.str).join(" ") + "\n";
+            }
+            localStorage.setItem("pdfText", extractedText);
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+            // Update progress bar
+            document.querySelector('.progress .step[data-step="1"]').classList.remove('active');
+            document.querySelector('.progress .step[data-step="2"]').classList.add('active');
+          } catch (error) {
+            console.error("Error reading PDF:", error);
+            alert("Failed to read PDF. Please try again.");
+          }
+        };
+        reader.readAsArrayBuffer(file);
       });
-
-      // Back button from Step 2 to Step 1
-      backStep1Btn.addEventListener("click", function () {
-        step2.style.display = "none";
-        step1.style.display = "block";
-        document.querySelector('.progress .step[data-step="2"]').classList.remove('active');
-        document.querySelector('.progress .step[data-step="1"]').classList.add('active');
+      
+      // Toggle buttons for question types
+      const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
+      questionTypeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          questionTypeButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
       });
-
-      // Transition from Step 2 to Step 3
+      
+      // Toggle buttons for difficulty levels
+      const difficultyButtons = document.querySelectorAll('.question-count .toggle-btn');
+      difficultyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          difficultyButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        });
+      });
+      
+      // Step transitions
+      const step2 = document.getElementById("step2");
+      const step3 = document.getElementById("step3");
+      
+      const nextStep2Btn = document.getElementById("next-step2");
+      const backStep2Btn = document.getElementById("back-step2");
+      const submitQuizBtn = document.getElementById("submit-quiz");
+      
       nextStep2Btn.addEventListener("click", function () {
         step2.style.display = "none";
         step3.style.display = "block";
         document.querySelector('.progress .step[data-step="2"]').classList.remove('active');
         document.querySelector('.progress .step[data-step="3"]').classList.add('active');
       });
-
-      // Back button from Step 3 to Step 2
+      
       backStep2Btn.addEventListener("click", function () {
         step3.style.display = "none";
         step2.style.display = "block";
         document.querySelector('.progress .step[data-step="3"]').classList.remove('active');
         document.querySelector('.progress .step[data-step="2"]').classList.add('active');
       });
-
-      // Submit PPT event listener
-      submitPptBtn.addEventListener("click", async () => {
+      
+      // Submit Quiz event listener
+      submitQuizBtn.addEventListener("click", async () => {
         const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
+        const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
+        const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
+        const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
+        let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
         
-        // Prepare payload
+        if (questionType === "Multiple Choice") {
+          questionType = "MCQs";
+        } else if (questionType === "True False") {
+          questionType = "truefalse";
+        } else if (questionType === "Fill in the blank") {
+          questionType = "blanks";
+        } else if (questionType === "General Q&A") {
+          questionType = "qa";
+        }
+        
+        const extractedText = localStorage.getItem("pdfText") || "";
+        
         const payload = {
-          slides: numSlidesInput.value,
-          topic: topicInput.value,
-          description: descriptionInput.value,
+          difficulty: difficulty,
+          type: questionType,
+          topic: extractedText,
           email: email,
           is_email: selectedOption === "yes"
         };
         
         try {
-          const response = await fetch("/generatePPT", {
+          const response = await fetch("/generateOnTopic", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
           const data = await response.json();
           if (response.ok) {
-            // Redirect or display a success message as needed
-            alert("PPT generation successful!");
-            // For example, redirect:
-            // window.location.href = `/ppt?message=${encodeURIComponent(data.message)}&email=${encodeURIComponent(email)}`;
+            const params = new URLSearchParams({
+              message: data.message,
+              email: email,
+              difficulty: difficulty
+            });
+            if (questionType === "MCQs") {
+              window.location.href = `/quiz?${params.toString()}`;
+            } else if (questionType === "truefalse") {
+              window.location.href = `/truefalse?${params.toString()}`;
+            } else if (questionType === "qa") {
+              window.location.href = `/qa?${params.toString()}`;
+            } else {
+              window.location.href = `/blank?${params.toString()}`;
+            }
           } else {
-            alert("PPT generation failed: " + data.error);
+            alert("Quiz generation failed: " + data.error);
           }
         } catch (error) {
-          console.error("Error generating PPT:", error);
-          alert("An error occurred while generating the PPT.");
+          console.error("Error generating quiz:", error);
+          alert("An error occurred while generating the quiz.");
         }
+      });
+      
+      // Email option toggle
+      const emailOptionLabels = document.querySelectorAll('.email-options .toggle-btn');
+      emailOptionLabels.forEach(label => {
+        label.addEventListener('click', () => {
+          emailOptionLabels.forEach(l => l.classList.remove('active'));
+          label.classList.add('active');
+          label.querySelector('input').checked = true;
+        });
       });
     });
   </script>

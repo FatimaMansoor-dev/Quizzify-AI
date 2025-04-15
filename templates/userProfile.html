@@ -12,17 +12,14 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-
     body {
       background-color: #f8f9fa;
       color: #212529;
     }
-
     a {
       text-decoration: none;
       color: inherit;
     }
-
     /* NAVBAR */
     .navbar {
       display: flex;
@@ -55,14 +52,12 @@
       height: 40px;
       border-radius: 50%;
     }
-
     /* MAIN WRAPPER */
     .main-wrapper {
       max-width: 1200px;
       margin: 1.5rem auto;
       padding: 0 1rem;
     }
-
     /* STREAK TRACKER */
     .streak-tracker {
       background-color: #ffffff;
@@ -76,7 +71,6 @@
       margin-bottom: 0.5rem;
       color: #343a40;
     }
-
     /* BADGES BLOCK */
     .badges-block {
       background-color: #ffffff;
@@ -94,7 +88,6 @@
       margin-bottom: 0.3rem;
       color: #495057;
     }
-
     /* QUIZZES HEADER SECTION */
     .quizzes-header {
       display: flex;
@@ -146,7 +139,6 @@
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
     }
-
     /* QUIZ CARD */
     .quiz-card {
       background-color: #ffffff;
@@ -176,7 +168,18 @@
       max-height: 300px;
       overflow-y: auto;
     }
-
+    .quiz-card button {
+      background-color: #7a4dc1;
+      color: #fff;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .quiz-card button:hover {
+      background-color: #6939a8;
+    }
     /* CALENDAR Layout */
     #calendar {
       display: flex;
@@ -229,8 +232,6 @@
     .active {
       outline: 2px solid #ffc107;
     }
-
-    /* SIDEBAR - new styles */
     /* SIDEBAR - default closed state */
     #sidebar {
       position: fixed;
@@ -337,19 +338,6 @@
         max-height: 200px;
       }
     }
-    .quiz-card button {
-      background-color: #7a4dc1;
-      color: #fff;
-      border: none;
-      padding: 0.3rem 0.6rem;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-    .quiz-card button:hover {
-      background-color: #6939a8;
-    }
-
     /* Chatbot Styles (hidden by default) */
     #chatbot-box {
       position: fixed;
@@ -365,6 +353,18 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       overflow: hidden;
       font-size: 14px;
+      padding-top: 30px; /* Space for the close button */
+    }
+    /* Chatbot close button */
+    #chatbot-close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
     }
     #chat-messages {
       flex: 1;
@@ -423,9 +423,6 @@
       <button class="ai-suggestions-btn" onclick="getAISuggestions()">
         Get AI Suggestions
       </button>
-      <button class="ai-suggestions-btn" onclick="window.location.href='/options?pres=true'">
-        Generate Presentation with AI
-      </button>
       <button class="user-button" onclick="openSidebar()">
         <img src="../static/user.png" alt="User">
       </button>
@@ -438,28 +435,23 @@
     <div class="streak-tracker">
       <div id="calendar"></div>
     </div>
-
     <!-- BADGES BLOCK -->
-<div class="badges-block">
-  <h2>Your Badges</h2>
-  <div id="badgeList"></div>
-</div>
-
+    <div class="badges-block">
+      <h2>Your Badges</h2>
+      <div id="badgeList"></div>
+    </div>
     <!-- QUIZZES HEADER -->
     <div class="quizzes-header">
       <h1>Quizzes</h1>
       <div>
-        
         <button class="create-quiz-btn" onclick="window.location.href='/options?pres=false'">
           Create new quiz
         </button>
-        
       </div>
     </div>
     <div class="quizzes-subtext">
       You can effortlessly list, delete, edit, and create new exams.
     </div>
-
     <!-- DYNAMIC QUIZ CARDS -->
     <div id="quizzesContainer"></div>
   </div> <!-- END main-wrapper -->
@@ -499,7 +491,9 @@
   <div id="quizContainer"></div>
   <div id="badgeContainer"></div>
 
+  <!-- Chatbot box with close button -->
   <div id="chatbot-box">
+    <button id="chatbot-close-btn" onclick="closeChatbot()">×</button>
     <div id="chat-messages"></div>
     <div id="chat-input-container">
       <input type="text" id="chat-input" placeholder="Type your message..." />
@@ -507,7 +501,7 @@
     </div>
   </div>
 
-  <!-- JavaScript to render quizzes, badges, and chatbot -->
+  <!-- JavaScript to render quizzes, badges, sidebar and chatbot -->
   <script>
     // Get and parse the JSON data from hidden inputs
     let rawUserData = document.getElementById("userData").value;
@@ -518,25 +512,23 @@
     console.log("Badge data:", badgeData);
 
     if (badgeData.includes("First Step Badge")) {
-  const img = document.createElement("img");
-  img.src = "../static/firststep.png"; 
-  img.alt = "First Step Badge";
-  document.getElementById("badgeList").appendChild(img);
-}
-
+      const img = document.createElement("img");
+      img.src = "../static/firststep.png"; 
+      img.alt = "First Step Badge";
+      document.getElementById("badgeList").appendChild(img);
+    }
 
     // Render quiz attempts
     const quizzesContainer = document.getElementById("quizzesContainer");
     let UserData = JSON.parse(userData);
-    
-    // Optional: store badge messages in a constant if needed later
+
     const badgeMessages = badgeData;
     console.log("Badge messages:", badgeMessages);
   </script>
 
   <script>
     /****************************************************
-     * SIDEBAR TOGGLE
+     * SIDEBAR TOGGLE FUNCTIONS
      ****************************************************/
     function openSidebar() {
       const sidebar = document.getElementById("sidebar");
@@ -557,7 +549,59 @@
         sidebar.classList.remove("open");
       }
     }
-
+    /****************************************************
+     * Chatbot Functions
+     ****************************************************/
+    function closeChatbot() {
+      const chatbotBox = document.getElementById("chatbot-box");
+      if (chatbotBox) {
+        chatbotBox.style.display = "none";
+      }
+    }
+    // Update the AI Suggestions button to show the chatbot box.
+    function getAISuggestions() {
+      const chatbotBox = document.getElementById("chatbot-box");
+      if (chatbotBox) {
+        chatbotBox.style.display = "flex";
+        // Optionally add an initial message
+        addChatMessage("Hello! How can I help you with your quiz history today?", "ai");
+      }
+    }
+    /****************************************************
+     * Chatbot Message Handling
+     ****************************************************/
+    // Helper function to append messages to the chat
+    function addChatMessage(message, sender) {
+      const chatMessages = document.getElementById("chat-messages");
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("chat-message", sender);
+      msgDiv.innerText = message;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    // Function to send the user message
+    function sendChatMessage() {
+      const chatInput = document.getElementById("chat-input");
+      const message = chatInput.value.trim();
+      if (!message) return;
+      addChatMessage(message, "user");
+      fetch("/ai_suggs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        addChatMessage(data.response || "No response", "ai");
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        addChatMessage("Error: " + error, "ai");
+      });
+      chatInput.value = "";
+    }
     /****************************************************
      * LOAD LAST & MAX SCORE
      ****************************************************/
@@ -567,9 +611,8 @@
       document.getElementById("lastScore").textContent = lastScore || "N/A";
       document.getElementById("maxScore").textContent  = maxScore || "N/A";
     });
-
     /****************************************************
-     * DISPLAY BADGES
+     * RENDER BADGES
      ****************************************************/
     const badgeList = document.getElementById("badgeList");
     if (badgeMessages && badgeMessages.length > 0) {
@@ -583,19 +626,16 @@
       p.textContent = "No badges yet. Keep going!";
       badgeList.appendChild(p);
     }
-
     /****************************************************
-     * RENDER QUIZ CARDS FROM rawUserData.quiz_attempts
+     * RENDER QUIZ CARDS
      ****************************************************/
     if (UserData.quiz_attempts && Array.isArray(UserData.quiz_attempts) && UserData.quiz_attempts.length > 0) {
       UserData.quiz_attempts.forEach((attempt, idx) => {
         const quizCard = document.createElement("div");
         quizCard.classList.add("quiz-card");
-
         const title = document.createElement("h2");
         title.textContent = attempt.topic ? attempt.topic : `Quiz Attempt #${idx + 1}`;
         quizCard.appendChild(title);
-
         const meta = document.createElement("div");
         meta.classList.add("quiz-meta");
         const scoreText = attempt.score ? `Score: ${attempt.score}` : "Score: N/A";
@@ -604,12 +644,10 @@
         const dateText  = attempt.date ? `Date: ${attempt.date}` : "";
         meta.textContent = [dateText, diffText, typeText, scoreText].join(" | ");
         quizCard.appendChild(meta);
-
         const quizPre = document.createElement("pre");
         quizPre.textContent = attempt.quiz_content || "No quiz content";
         quizPre.style.display = "none";
         quizCard.appendChild(quizPre);
-
         const expandBtn = document.createElement("button");
         expandBtn.textContent = "+";
         expandBtn.style.marginTop = "0.5rem";
@@ -623,7 +661,6 @@
           }
         });
         quizCard.appendChild(expandBtn);
-
         quizzesContainer.appendChild(quizCard);
       });
     } else {
@@ -631,7 +668,6 @@
       noQuizMsg.textContent = "No quizzes generated yet. Click 'Create new quiz' to get started!";
       quizzesContainer.appendChild(noQuizMsg);
     }
-
     /****************************************************
      * RENDER CALENDAR / STREAK TRACKER
      ****************************************************/
@@ -649,22 +685,18 @@
     daysInMonth.forEach((days, monthIndex) => {
       const monthContainer = document.createElement("div");
       monthContainer.className = "month-container";
-
       const monthLabel = document.createElement("div");
       monthLabel.className = "month-label";
       monthLabel.innerText = monthNames[monthIndex];
       monthContainer.appendChild(monthLabel);
-
       let dayOfWeek = (monthIndex === 0) ? startingDayOfWeek : (startingDayOfWeek % 7);
       let week = document.createElement("div");
       week.className = "week-row";
-
       for (let i = 0; i < dayOfWeek; i++) {
         const emptyBox = document.createElement("div");
         emptyBox.className = "day empty";
         week.appendChild(emptyBox);
       }
-
       for (let day = 1; day <= days; day++) {
         if (dayOfWeek === 7) {
           dayOfWeek = 0;
@@ -675,7 +707,6 @@
         const dayBox = document.createElement("div");
         dayBox.className = "day";
         dayBox.title = `${monthNames[monthIndex]} ${day}`;
-
         const currentDay = new Date(2025, monthIndex, day);
         if (highlightDates.some(date => date.getTime() === currentDay.getTime())) {
           dayBox.classList.add("highlight");
@@ -695,7 +726,6 @@
       calendar.appendChild(monthContainer);
       startingDayOfWeek = (startingDayOfWeek + days) % 7;
     });
-
     function calculateCurrentStreak(datesArray) {
       if (!datesArray || datesArray.length === 0) return 0;
       const uniqueDates = [...new Set(datesArray.map(d => {
@@ -716,69 +746,6 @@
       }
       return streak;
     }
-
-    // Update the AI Suggestions button to simply show the chatbot box.
-    function getAISuggestions() {
-      const chatbotBox = document.getElementById("chatbot-box");
-      if (chatbotBox) {
-        chatbotBox.style.display = "flex"; // Show the chatbot
-      }
-    }
-  </script>
-
-  <!-- Chatbot functionality -->
-  <script>
-    const chatbotBox = document.getElementById("chatbot-box");
-
-// Helper function to append messages to the chat
-function addChatMessage(message, sender) {
-  const chatMessages = document.getElementById("chat-messages");
-  const msgDiv = document.createElement("div");
-  msgDiv.classList.add("chat-message", sender);
-  msgDiv.innerText = message;
-  chatMessages.appendChild(msgDiv);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-// Function to display the chatbot box when the button is clicked
-function getAISuggestions() {
-  // Show the chatbot box
-  chatbotBox.style.display = "flex";
-  // Optionally, add an initial prompt or message (e.g., a welcome message)
-  addChatMessage("Hello! How can I help you with your quiz history today?", "ai");
-}
-
-// Function to send the user message to /ai_suggs via POST
-function sendChatMessage() {
-  const chatInput = document.getElementById("chat-input");
-  const message = chatInput.value.trim();
-  if (!message) return;
-
-  // Append the user message to the chat
-  addChatMessage(message, "user");
-
-  // Send the user message to /ai_suggs as a POST request with JSON body
-  fetch("/ai_suggs", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message: message })
-  })
-    .then(response => response.json())
-    .then(data => {
-      // Append the AI's response to the chat (expects "response" property)
-      addChatMessage(data.response || "No response", "ai");
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      addChatMessage("Error: " + error, "ai");
-    });
-
-  // Clear the input field after sending
-  chatInput.value = "";
-}
-    
   </script>
 </body>
 </html>
