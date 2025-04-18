@@ -66,7 +66,7 @@ app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ['true', '1']
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER','benzenering032@gmail.com')
 mail = Mail(app)
 
 # Groq client using API key from environment variables
@@ -108,19 +108,22 @@ def get_user_data(email):
     """Fetch user data from Firebase by email."""
     try:
         response = requests.get(FIREBASE_URL)
-        print(response.json())  # Debug: print all users
+        # print(response.json())  # Debug: print all users
 
         if response.status_code != 200:
             raise Exception("Failed to fetch user data from Firebase")
 
         users = response.json()
         if not users:
+            print('im here')
             return None  # No users found
 
         if isinstance(users, dict):
+            print('ahha')
             for user_id, user_info in users.items():
                 if user_info.get("email") == email:
                     return user_info
+        print('not here')
         return None
     except Exception as e:
         print(f"Error fetching user data: {e}")
@@ -244,12 +247,15 @@ def login():
 
     try:
         user_data = get_user_data(email)
+        print("got it",user_data)
         if user_data:
             decrypted_password = decrypt_password(user_data["password"])
+            print(decrypted_password)
             if password == decrypted_password:
+                print('yes')
                 session['email'] = email
                 profile_data = prepare_user_profile(user_data)
-                # print(profile_data)
+                print('yoo')
                 return render_template(
                     'userProfile.html',
                     email=email,
@@ -266,30 +272,22 @@ def signup():
     password = request.form.get('password')
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
-
     if not email or not password or not first_name or not last_name:
         return render_template('index.html', message="Please fill in all fields.")
     if len(password) < 9:
         return render_template('index.html', message="Password must be at least 9 characters long.")
+    if get_user_data(email):
+        return render_template('index.html', message="Email already exists. Please use a different email.")
+    encrypted = encrypt_password(password)
+    data = {"email": email, "password": encrypted,
+            "first_name": first_name, "last_name": last_name, "quiz_attempts": []}
+    resp = requests.post(FIREBASE_URL, json=data)
+    if resp.status_code == 200:
+        session['email'] = email
+        profile_data = prepare_user_profile(data)
+        return render_template('userProfile.html', email=email, user_data=json.dumps(data), **profile_data)
+    return render_template('index.html', message="Failed to create an account.")
 
-    try:
-        if get_user_data(email):
-            return render_template('index.html', message="Email already exists. Please use a different email.")
-
-        otp = random.randint(100000, 999999)
-        session['otp'] = otp
-        session['pending_email'] = email
-        session['pending_password'] = encrypt_password(password)
-        session['pending_first_name'] = first_name
-        session['pending_last_name'] = last_name
-
-        message = Message("Verify Your Email - QuizifyAI", recipients=[email])
-        message.body = f"Your OTP for email verification is: {otp}"
-        mail.send(message)
-
-        return render_template('verify_otp.html', email=email)
-    except Exception as e:
-        return render_template('index.html', message=f"An error occurred: {e}")
 
 @app.route('/verify-otp', methods=['POST'])
 def verify_otp():
@@ -827,139 +825,6 @@ Now, provide a short, professional response of not more than 100 words addressin
         "user_question": user_question,
         "ai_answer": ai_answer
     })
-
-import google.generativeai as genai
-
-genai.configure(api_key='AIzaSyCV_vO9wTMD-OYRJsz7yFrx5l9tFvKlU-4')
-model = genai.GenerativeModel('gemini-2.0-flash')  # Specify the desired model
-
-def generate_presentation_content(n, topic, description):
-    # Construct the prompt for Gemini API
-    prompt = f"""
-    You are an AI assistant that helps users create presentations.
-    Generate a well-detailed and informative presentation with {n} text slides on the topic "{topic}".
-    The topic title will be used on the first slide separately.
-    For each text slide, use the following format:
-
-    **Slide X:**
-    **Title:** [Insert Title]
-    **Key Points:**
-    - Bullet point 1
-    - Bullet point 2
-    - Bullet point 3
-    """
-    # Making a request to the Gemini API
-    response = model.generate_content(prompt)
-    return response.text
-
-@app.route('/generate_ppt', methods=['POST'])
-def generate_ppt():
-    try:
-        # Get the JSON data from the request
-        data = request.get_json()
-        n = int(data.get('slides'))  # number of text slides desired
-        topic = data.get('topic')
-        description = data.get('description')
-        email = data.get('email')  # may be used later for email options
-
-        # Validate required fields
-        if not n or not topic or not description:
-            return jsonify({"error": "Required fields missing."}), 400
-
-        # Generate presentation content using your Gemini API function
-        content = generate_presentation_content(n, topic, description)
-        if not content:
-            return jsonify({"error": "Content generation failed."}), 400
-
-        # Select a random template from the 'temps' folder
-        template_folder = 'static/temps'
-        template_files = [f for f in os.listdir(template_folder) if f.endswith('.pptx')]
-        if not template_files:
-            return jsonify({"error": "No template files found."}), 500
-
-        # Randomly select a template file
-        selected_template = random.choice(template_files)
-        template_ppt_path = os.path.join(template_folder, selected_template)
-
-        # Load the template presentation
-        presentation = Presentation(template_ppt_path)
-
-        # Assume the first slide is the title-only slide.
-        # Set the topic name in the title slide.
-        title_slide = presentation.slides[0]
-        if title_slide.shapes.title:
-            title_slide.shapes.title.text = topic
-
-        # Prepare a list of text slides from the template.
-        # These are assumed to be slides 2 to 4 (i.e. indices 1, 2, and 3).
-        text_slides = presentation.slides[1:4]
-
-        # Split the generated content into separate slide contents.
-        # Each slide's content is separated by one or more blank lines.
-        slides_content = re.split(r'\n\s*\n+', content.strip())
-
-        # Loop over the desired number of text slides.
-        for i in range(n):
-            # Get content for the current slide (if available)
-            slide_text = slides_content[i] if i < len(slides_content) else ""
-            title = ""
-            key_points = []
-
-            # Extract the title and key points using regex.
-            title_match = re.search(r'\*\*Title:\*\*\s*(.+)', slide_text)
-            key_points_match = re.findall(r'-\s*(.+)', slide_text)
-
-            if title_match:
-                title = title_match.group(1).strip()
-            if key_points_match:
-                key_points = [kp.strip() for kp in key_points_match]
-
-            # Determine which slide to use:
-            # - If i is less than available text slides in template, use that slide.
-            # - Otherwise, replicate the last text slide's layout.
-            if i < len(text_slides):
-                slide = text_slides[i]
-            else:
-                # Replicate the layout of the last text slide.
-                last_text_slide = text_slides[-1]
-                layout = last_text_slide.slide_layout
-                slide = presentation.slides.add_slide(layout)
-
-            # Update the slide title if a title shape exists.
-            if slide.shapes.title:
-                slide.shapes.title.text = title
-
-            # Remove existing textbox shapes if needed before adding new key points.
-            # (Optional: add code here if you need to clear previous content.)
-
-            # Add key points as bullet points.
-            # Add key points as bullet points.
-            if key_points:
-                left = Inches(1)
-                top = Inches(3)
-                width = Inches(8)
-                height = Inches(3)
-                textbox = slide.shapes.add_textbox(left, top, width, height)
-                text_frame = textbox.text_frame
-                text_frame.word_wrap = True
-                # Clear the text by setting it to an empty string.
-                text_frame.text = ""
-                for kp in key_points:
-                    p = text_frame.add_paragraph()
-                    p.text = f"• {kp}"
-                    p.space_after = 0  # You can adjust spacing as needed.
-                    p.font.size = Pt(10)  # Set font size in points.
-                    p.level = 0  # First-level bullet point
-
-
-        # Save the generated presentation
-        ppt_file_path = 'presentation.pptx'
-        presentation.save(ppt_file_path)
-
-        # Return the file for download
-        return send_file(ppt_file_path, as_attachment=True, download_name='presentation.pptx')
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run()
