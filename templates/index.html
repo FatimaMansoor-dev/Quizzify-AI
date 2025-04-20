@@ -52,7 +52,7 @@
       overflow: hidden;
     }
     
-    /* Right-side styling with fixed height */
+    /* Right-side styling */
     .right-side {
       margin-left: 10rem;
       min-height: 500px;
@@ -62,7 +62,7 @@
       justify-content: center;
     }
     
-    /* Left side (Reviews/Branding) */
+    /* Left side (Features/Branding) */
     .left-side {
       width: 500px;
       flex-shrink: 0;
@@ -110,7 +110,7 @@
       font-size: 1.2rem;
       margin-bottom: 10px;
       font-weight: 700;
-      color: #192742; /* A darker shade for headings */
+      color: #192742;
     }
     .review-card p {
       font-size: 1rem;
@@ -166,38 +166,6 @@
       background: #5a52d2;
     }
     
-    .or-divider {
-      text-align: center;
-      margin: 20px 0;
-      font-size: 0.85rem;
-      color: #999;
-      position: relative;
-    }
-    .or-divider::before,
-    .or-divider::after {
-      content: "";
-      display: inline-block;
-      width: 10%;
-      height: 1px;
-      background: #ccc;
-      vertical-align: middle;
-      margin: 0 5px;
-    }
-    
-    /* Google button container */
-    .google-btn {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-    
-    #inner {
-      margin-top: -1.4rem;
-      margin-bottom: 2rem;
-      color: #555;
-      font-size: 0.7rem;
-    }
-    
     /* Mobile View */
     @media (max-width: 768px) {
       .left-side {
@@ -213,8 +181,6 @@
       }
     }
   </style>
-  <!-- Load Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <!-- Top-right Toggle Button -->
@@ -223,64 +189,18 @@
   </div>
   
   <div class="container">
-    <!-- Left Side (Features in place of Reviews) -->
+    <!-- Left Side (Features) -->
     <div class="left-side">
       <h1>QuizXpert</h1>
       <div class="review-cards">
-        <!-- Card 1 -->
+        <!-- Feature Cards... -->
         <div class="review-card">
           <span style="font-size: 1.5rem;">📄</span>
           <h3>Multiple question types</h3>
-          <p>
-            Generate multiple-choice, true-false, and fill-in-the-blank questions with ease.
-          </p>
+          <p>Generate multiple-choice, true-false, and fill-in-the-blank questions with ease.</p>
           <a href="{{ url_for('sign') }}">Let’s Get Started</a>
         </div>
-        <!-- Card 2 -->
-        <div class="review-card">
-          <span style="font-size: 1.5rem;">📜</span>
-          <h3>From the text, YouTube, URL, or PDF</h3>
-          <p>
-            Effortlessly generate questions from any content, including text, PDFs, and YouTube videos.
-          </p>
-          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
-        </div>
-        <!-- Card 3 -->
-        <div class="review-card">
-          <span style="font-size: 1.5rem;">🏆</span>
-          <h3>Streaks & Badges</h3>
-          <p>
-            Keep learning fun and engaging by earning streaks and badges as you progress.
-          </p>
-          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
-        </div>
-        <!-- Card 4 -->
-        <div class="review-card">
-          <span style="font-size: 1.5rem;">🔗</span>
-          <h3>Share as a Link</h3>
-          <p>
-            Effortlessly share your exams with our 'Share as a Link' feature.
-          </p>
-          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
-        </div>
-        <!-- Card 5 -->
-        <div class="review-card">
-          <span style="font-size: 1.5rem;">📥</span>
-          <h3>Export to PDF or TXT</h3>
-          <p>
-            Save and export your quizzes as PDF or TXT files for easy sharing.
-          </p>
-          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
-        </div>
-        <!-- Card 6 -->
-        <div class="review-card">
-          <span style="font-size: 1.5rem;">📊</span>
-          <h3>Analyze the Results</h3>
-          <p>
-            Analyze student results and identify learning trends.
-          </p>
-          <a href="{{ url_for('sign') }}">Let’s Get Started</a>
-        </div>
+        <!-- ...other cards... -->
       </div>
     </div>
     
@@ -289,12 +209,10 @@
       <h2 id="form-heading">Create an account</h2>
       <p id="inner">Enter your email below to create your account</p>
       <form id="auth-form" action="/signup" method="POST">
-        <!-- First Name field: visible only in register mode -->
         <div class="form-group" id="first-name-group">
           <label for="first-name">First Name</label>
           <input type="text" id="first-name" name="first_name" placeholder="John" required>
         </div>
-        <!-- Last Name field: visible only in register mode -->
         <div class="form-group" id="last-name-group">
           <label for="last-name">Last Name</label>
           <input type="text" id="last-name" name="last_name" placeholder="Doe" required>
@@ -308,113 +226,34 @@
           <input type="password" id="password" name="password" placeholder="********" required>
         </div>
         <button type="submit" class="action-btn" id="form-button">Register</button>
-        <div class="or-divider" id="or-divider">OR CONTINUE WITH</div>
-        <!-- Google button will be rendered here -->
-        <div id="google-btn" class="google-btn"></div>
       </form>
     </div>
   </div>
   
-  <!-- Scripts -->
+  <!-- Toggle Script -->
   <script>
-    // Callback to handle the response from Google
-    function handleCredentialResponse(response) {
-      console.log("Encoded JWT ID token: " + response.credential);
-      // Send the token to your backend for verification and registration/login
-      fetch('/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: response.credential })
-      })
-      .then(res => res.text())  // Use text() if you expect HTML
-      .then(html => {
-        // Option 1: Replace the current document with the received HTML
-        document.open();
-        document.write(html);
-        document.close();
-        
-        // Option 2: Alternatively, extract a URL from the HTML and redirect:
-        // window.location.href = '/userProfile?email=' + encodeURIComponent(email);
-      })
-      .catch(err => {
-        console.error('Error:', err);
-      });
-    }
-
-    // Initialize Google Identity Services and render the button
-    window.onload = function() {
-      google.accounts.id.initialize({
-        client_id: '340201962397-iqttskc43i5ipnvn6b80qtou1ofq9ns9.apps.googleusercontent.com',
-        callback: handleCredentialResponse
-      });
-      // Render the initial Google button in "register" (signup) mode
-      renderGoogleButton('signup');
-    };
-
-    // Function to render the Google button with appropriate text
-    function renderGoogleButton(mode) {
-      // Clear any previous button content
-      document.getElementById('google-btn').innerHTML = "";
-      google.accounts.id.renderButton(
-        document.getElementById('google-btn'),
-        { theme: "outline", size: "large", text: mode === 'login' ? "signin_with" : "signup_with" }
-      );
-    }
-
-    // Center the second card on load
-    window.addEventListener("DOMContentLoaded", () => {
-      const reviewCardsContainer = document.querySelector('.review-cards');
-      const secondCard = reviewCardsContainer.children[1];
-      reviewCardsContainer.scrollLeft =
-        secondCard.offsetLeft +
-        secondCard.offsetWidth / 2 -
-        reviewCardsContainer.offsetWidth / 2;
-    });
-
-    let isLoginMode = false; // Default is register mode
+    let isLoginMode = false;
     document.getElementById('toggle-mode').addEventListener('click', function(e) {
       e.preventDefault();
-
       const firstNameGroup = document.getElementById('first-name-group');
       const lastNameGroup = document.getElementById('last-name-group');
-      const firstNameInput = document.getElementById('first-name');
-      const lastNameInput = document.getElementById('last-name');
-
       if (!isLoginMode) {
-        // Switch to Login mode
         document.getElementById('form-heading').textContent = "Login";
         document.getElementById('inner').textContent = "Enter your email and password to login";
-        // Hide first and last name fields and remove required attributes
         firstNameGroup.style.display = "none";
         lastNameGroup.style.display = "none";
-        firstNameInput.removeAttribute('required');
-        lastNameInput.removeAttribute('required');
-        // Change form action and button text
         document.getElementById('auth-form').action = "/login";
         document.getElementById('form-button').textContent = "Login";
-        // Re-render Google button for login mode
-        renderGoogleButton('login');
-        // Toggle top-right button text
         this.textContent = "Register";
       } else {
-        // Switch back to Register mode
         document.getElementById('form-heading').textContent = "Create an account";
         document.getElementById('inner').textContent = "Enter your email below to create your account";
-        // Show first and last name fields and add required attributes back
         firstNameGroup.style.display = "block";
         lastNameGroup.style.display = "block";
-        firstNameInput.setAttribute('required', 'required');
-        lastNameInput.setAttribute('required', 'required');
-        // Change form action and button text
         document.getElementById('auth-form').action = "/signup";
         document.getElementById('form-button').textContent = "Register";
-        // Re-render Google button for signup mode
-        renderGoogleButton('signup');
-        // Toggle top-right button text
         this.textContent = "Login";
       }
-      
-      // Toggle the mode flag
       isLoginMode = !isLoginMode;
     });
   </script>
