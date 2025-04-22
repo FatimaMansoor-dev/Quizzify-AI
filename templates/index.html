@@ -204,7 +204,6 @@
       </div>
     </div>
     
-    <!-- Right Side (Form) -->
     <div class="right-side">
       <h2 id="form-heading">Create an account</h2>
       <p id="inner">Enter your email below to create your account</p>
@@ -230,31 +229,53 @@
     </div>
   </div>
   
-  <!-- Toggle Script -->
   <script>
     let isLoginMode = false;
-    document.getElementById('toggle-mode').addEventListener('click', function(e) {
+    const toggleLink     = document.getElementById('toggle-mode');
+    const authForm       = document.getElementById('auth-form');
+    const formButton     = document.getElementById('form-button');
+    const firstNameGrp   = document.getElementById('first-name-group');
+    const lastNameGrp    = document.getElementById('last-name-group');
+    const firstNameInput = document.getElementById('first-name');
+    const lastNameInput  = document.getElementById('last-name');
+    const heading        = document.getElementById('form-heading');
+    const innerText      = document.getElementById('inner');
+
+    toggleLink.addEventListener('click', function(e) {
       e.preventDefault();
-      const firstNameGroup = document.getElementById('first-name-group');
-      const lastNameGroup = document.getElementById('last-name-group');
+
       if (!isLoginMode) {
-        document.getElementById('form-heading').textContent = "Login";
-        document.getElementById('inner').textContent = "Enter your email and password to login";
-        firstNameGroup.style.display = "none";
-        lastNameGroup.style.display = "none";
-        document.getElementById('auth-form').action = "/login";
-        document.getElementById('form-button').textContent = "Login";
-        this.textContent = "Register";
+        // Switch to LOGIN
+        heading.textContent       = "Login";
+        innerText.textContent     = "Enter your email and password to login";
+        firstNameGrp.style.display = "none";
+        lastNameGrp.style.display  = "none";
+        firstNameInput.disabled    = true;
+        lastNameInput.disabled     = true;
+        authForm.action            = "/login";
+        formButton.textContent     = "Login";
+        this.textContent           = "Register";
       } else {
-        document.getElementById('form-heading').textContent = "Create an account";
-        document.getElementById('inner').textContent = "Enter your email below to create your account";
-        firstNameGroup.style.display = "block";
-        lastNameGroup.style.display = "block";
-        document.getElementById('auth-form').action = "/signup";
-        document.getElementById('form-button').textContent = "Register";
-        this.textContent = "Login";
+        // Switch back to REGISTER
+        heading.textContent       = "Create an account";
+        innerText.textContent     = "Enter your email below to create your account";
+        firstNameGrp.style.display = "block";
+        lastNameGrp.style.display  = "block";
+        firstNameInput.disabled    = false;
+        lastNameInput.disabled     = false;
+        authForm.action            = "/signup";
+        formButton.textContent     = "Register";
+        this.textContent           = "Login";
       }
+
       isLoginMode = !isLoginMode;
+    });
+
+    authForm.addEventListener('submit', function(e) {
+      if (isLoginMode) {
+        console.log('login pressed.');
+      }
+      // form continues to submit…
     });
   </script>
 </body>

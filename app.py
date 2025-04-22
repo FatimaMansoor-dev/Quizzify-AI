@@ -448,14 +448,21 @@ def generate_on_topic():
         soure: [should be the exact line that contains the answer and the place or website that you got this answer from.]
         """
     elif qtype in ['blanks', 'fillintheblank']:
-        prompt = f"""
-        Generate 10 meaningful {difficulty} fill-in-the-blank questions on {topic} with single blanks + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
-        Reply in the format:
-        Topic : [topic]
-        **Question 1:** [question]
-        **Answer:** [answer]
-        soure: [should be the exact line that contains the answer]
-        """
+        prompt= '''Generate 10 meaningful fill‑in‑the‑blank questions on {topic} at {difficulty} level.  
+- Each question must be a single sentence with exactly one blank represented by “_____”.  
+- After each question, specify **Answer:** with only the phrase that fills the blank.  
+- If you were provided the exact sentence containing the answer, include a **Source:** field with that exact sentence; otherwise omit it.
+
+Always reply in this format:
+
+Topic: {topic}
+
+**Question 1:** The more you practice, the _____ you become at solving problems.  
+**Answer:** faster  
+Source: “The more you practice, the faster you become at solving problems.”
+
+… and so on through Question 10.'''
+
     elif qtype in ['truefalse', 'true/false']:
         prompt = f"""
         Generate 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.

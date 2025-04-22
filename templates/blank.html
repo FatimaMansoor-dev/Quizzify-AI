@@ -6,91 +6,52 @@
   <title>Fill-in-the-Blank Quiz</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Roboto',sans-serif;
       background: url('../static/quiz.jpg') no-repeat center center fixed;
       background-size: cover;
       color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
     }
     .quiz-container {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255,255,255,0.95);
       border-radius: 10px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      padding: 30px;
-      width: 100%;
-      max-width: 800px;
-      position: relative;
-      overflow: hidden;
+      padding: 30px; width: 100%; max-width: 800px;
+      position: relative; overflow: hidden;
     }
     h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #1C0E6D;
-      text-align: center;
-      margin-bottom: 20px;
+      font-size: 2.5rem; font-weight: 700; color: #1C0E6D;
+      text-align: center; margin-bottom: 20px;
       text-shadow: 0 0 5px rgba(255,255,255,0.8);
     }
     .question {
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 0;
+      background: #f8f9fa; padding: 10px;
+      border-radius: 5px; margin: 10px 0;
       text-align: left;
     }
     input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      width: 100%; padding: 8px; margin-top: 5px;
+      border: 1px solid #ccc; border-radius: 5px;
       font-size: 16px;
     }
-    .correct-answer {
-      font-size: 0.9rem;
-      color: #28a745;
-      margin-top: 5px;
-      display: none;
+    .correct-answer, .source {
+      font-size: 0.9rem; margin-top: 5px; display: none;
     }
-    .source {
-      font-size: 0.85rem;
-      color: #555;
-      margin-top: 5px;
-      display: none;
-    }
+    .correct-answer { color: #28a745; }
+    .source         { color: #555; }
     button {
-      padding: 12px 25px;
-      background: #1C0E6D;
-      color: #fff;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      margin-top: 15px;
-      display: block;
-      width: 100%;
+      padding: 12px 25px; background: #1C0E6D; color: #fff;
+      font-size: 1rem; border: none; border-radius: 5px;
+      cursor: pointer; transition: background 0.3s ease;
+      margin-top: 15px; display: block; width: 100%;
     }
-    button:hover {
-      background: #3732C1;
-    }
+    button:hover { background: #3732C1; }
     #score-container {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1C0E6D;
-      text-align: center;
-      margin-top: 25px;
-      display: none;
+      font-size: 1.5rem; font-weight: 700; color: #1C0E6D;
+      text-align: center; margin-top: 25px; display: none;
     }
   </style>
 </head>
@@ -100,100 +61,82 @@
     <form id="quiz-form">
       <div id="questions"></div>
       <button type="submit" id="submit-btn">Submit Answers</button>
-      <button type="button" id="return-btn" style="display: none;" onclick="returnHome()">Return Home</button>
+      <button type="button" id="return-btn" style="display:none;" onclick="returnHome()">Return Home</button>
     </form>
     <div id="score-container"></div>
   </div>
 
   <script>
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get("message") || 
-      `**Question 1:** The sky is blue.
-**Answer:** True
-Source: "Meteorological Data"
-
-**Question 2:** The Earth is flat.
-**Answer:** False
-Source: "Basic Science"`;
-      
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("message") || "";
     const correctAnswers = {};
 
-    // Parse quiz data: extracts question text, answer and source
-    function parseQuiz(message) {
-      let questionsContainer = document.getElementById("questions");
-      // Split by double newline to separate each question block
-      let questionBlocks = message.trim().split("\n\n");
-      let totalQuestions = 0;
+    function parseQuiz(text) {
+      const container = document.getElementById("questions");
+      // Regex to capture each question block
+      const questionRegex = /\*\*Question\s+(\d+):\*\*([\s\S]*?)(?=\*\*Question\s+\d+:\*\*|$)/g;
+      let match;
+      while ((match = questionRegex.exec(text)) !== null) {
+        const qNum = match[1].trim();
+        const block = match[2].trim();
+        // Extract question text (before Answer:)
+        const qText = (block.split(/\*\*Answer:\*\*|Answer:/)[0] || '').replace(/\r?\n/g, ' ').trim();
+        // Extract answer
+        const ansMatch = block.match(/\*\*Answer:\*\*\s*([^\r\n]+)/) || block.match(/Answer:\s*([^\r\n]+)/);
+        const answerText = ansMatch ? ansMatch[1].trim() : '';
+        // Extract source
+        const srcMatch = block.match(/\*\*Source:\*\*\s*([\s\S]*)$/) || block.match(/Source:\s*([\s\S]*)$/);
+        const sourceText = srcMatch ? srcMatch[1].trim() : null;
 
-      questionBlocks.forEach((block) => {
-        // Use regex to extract question, answer and source.
-        let questionMatch = block.match(/\*\*Question\s+\d+:\*\*\s*(.+)/i);
-        let answerMatch = block.match(/\*\*Answer:\*\*\s*(.+)/i);
-        let sourceMatch = block.match(/Source:\s*["']?([^"'\n]+)["']?/i);
+        correctAnswers[qNum] = { answer: answerText, source: sourceText };
 
-        if (questionMatch && answerMatch) {
-          totalQuestions++;
-          let questionText = questionMatch[1].trim();
-          let correctAnswer = answerMatch[1].trim();
-          let sourceText = sourceMatch ? sourceMatch[1].trim() : "";
-
-          // Save both answer and source for later use
-          correctAnswers[totalQuestions] = { answer: correctAnswer, source: sourceText };
-
-          let questionDiv = document.createElement("div");
-          questionDiv.classList.add("question");
-          questionDiv.innerHTML = `
-            <p>${questionText}</p>
-            <input type="text" name="q${totalQuestions}" data-question="${totalQuestions}" required>
-            <p class="correct-answer" id="answer${totalQuestions}">Correct Answer: <strong>${correctAnswer}</strong></p>
-            <p class="source" id="source${totalQuestions}">Source: <strong>${sourceText}</strong></p>
-          `;
-          questionsContainer.appendChild(questionDiv);
+        // Build question HTML
+        const div = document.createElement("div");
+        div.classList.add("question");
+        let html = `<p><strong>Question ${qNum}:</strong> ${qText}</p>`;
+        html += `<input type="text" name="q${qNum}" data-question="${qNum}" placeholder="Type your answer here" required>`;
+        html += `<p class="correct-answer" id="answer${qNum}">Correct Answer: <strong>${answerText}</strong></p>`;
+        if (sourceText) {
+          html += `<p class="source" id="source${qNum}">Source: <strong>${sourceText}</strong></p>`;
         }
-      });
+        div.innerHTML = html;
+        container.appendChild(div);
+      }
     }
 
-    // Return to home (adjust URL as needed)
     function returnHome() {
-      const email = new URLSearchParams(window.location.search).get("email") || "";
-      window.location.href = `/userProfile?email=${email}`;
+      const email = params.get("email") || "";
+      window.location.href = `/userProfile?email=${encodeURIComponent(email)}`;
     }
 
-    document.getElementById("quiz-form").addEventListener("submit", function(event) {
-      event.preventDefault();
+    document.getElementById("quiz-form").addEventListener("submit", function(evt) {
+      evt.preventDefault();
       let score = 0;
-      let totalQuestions = Object.keys(correctAnswers).length;
-
-      document.querySelectorAll("input[type='text']").forEach(input => {
-        let userAnswer = input.value.trim().toLowerCase();
-        let questionNum = input.dataset.question;
-        let correctAnswer = correctAnswers[questionNum].answer.toLowerCase();
-        let answerDisplay = document.getElementById(`answer${questionNum}`);
-        let sourceDisplay = document.getElementById(`source${questionNum}`);
-
-        if (userAnswer === correctAnswer) {
+      const total = Object.keys(correctAnswers).length;
+      document.querySelectorAll("input[type=text]").forEach(input => {
+        const userAns = input.value.trim().toLowerCase();
+        const q = input.dataset.question;
+        const correct = (correctAnswers[q]?.answer || '').toLowerCase();
+        const ansEl = document.getElementById(`answer${q}`);
+        const srcEl = document.getElementById(`source${q}`);
+        if (userAns === correct) {
           score++;
           input.style.border = "2px solid green";
         } else {
           input.style.border = "2px solid red";
         }
-
-        // Reveal the correct answer and its source
-        answerDisplay.style.display = "block";
-        sourceDisplay.style.display = "block";
+        ansEl.style.display = "block";
+        if (srcEl) srcEl.style.display = "block";
       });
-
-      let scoreContainer = document.getElementById("score-container");
-      scoreContainer.innerHTML = `You scored <strong>${score}/${totalQuestions}</strong>!`;
-      scoreContainer.style.display = "block";
-
-      // Hide the submit button and show the return home button
+      const scoreEl = document.getElementById("score-container");
+      scoreEl.innerHTML = `You scored <strong>${score}/${total}</strong>!`;
+      scoreEl.style.display = "block";
       document.getElementById("submit-btn").style.display = "none";
       document.getElementById("return-btn").style.display = "block";
     });
 
-    parseQuiz(message);
+    // Kick off parsing
+    parseQuiz(raw);
   </script>
 </body>
 </html>

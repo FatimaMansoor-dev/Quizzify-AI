@@ -106,13 +106,7 @@
     .step.active {
       background: #7a4dc1;
     }
-    /* Step Containers */
-    .step-container {
-      display: none;
-    }
-    .step-container.active {
-      display: block;
-    }
+    
     /* Button Styles */
     .next-btn, .record-btn {
       background: #7a4dc1;
@@ -348,6 +342,8 @@
     </div>
   </div>
   <script>
+    const nextStep1Btn = document.getElementById("next-step1");
+
     // Set email initial in navbar
     document.addEventListener("DOMContentLoaded", function () {
       let email = document.getElementById("userEmail").value;
@@ -407,19 +403,24 @@
     };
     
     // Navigation Buttons for Step 1
-    const nextStep1Btn = document.getElementById("next-step1");
     nextStep1Btn.addEventListener("click", () => {
-      if (!finalTranscript.trim()) {
-        alert("No transcript available. Please record your lecture.");
-        return;
-      }
-      step1.classList.remove("active");
-      step1.style.display = "none";
-      step2.classList.add("active");
-      step2.style.display = "block";
-      progressStep1.classList.remove("active");
-      progressStep2.classList.add("active");
-    });
+  if (!finalTranscript.trim()) {
+    alert("No transcript available. Please record your lecture.");
+    return;
+  }
+
+  // hide step1 container
+  document.querySelector("#step1.step-container").classList.remove("active");
+
+  // show step2 container
+  const innerStep2 = document.querySelector("#step2 .step-container");
+  innerStep2.classList.add("active");
+
+  // update progress bar
+  progressStep1.classList.remove("active");
+  progressStep2.classList.add("active");
+});
+
     
     // Navigation Buttons for Step 2
     const nextStep2Btn = document.getElementById("next-step2");
