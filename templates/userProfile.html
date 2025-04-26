@@ -52,6 +52,39 @@
       height: 40px;
       border-radius: 50%;
     }
+    /* AI SUGGESTIONS BUTTON */
+    .ai-suggestions-btn {
+      background-color: #7a4dc1;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      box-shadow: 0 0 10px rgba(122,77,193,0.7);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 10px rgba(122,77,193,0.7); }
+      to   { box-shadow: 0 0 20px rgba(122,77,193,1); }
+    }
+    /* GENERATE PPT BUTTON */
+    .generate-ppt-btn {
+      background-color: #28a745;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-left: 0.5rem;
+      box-shadow: 0 0 10px rgba(40,167,69,0.7);
+      animation: glow-green 1.5s infinite alternate;
+    }
+    @keyframes glow-green {
+      from { box-shadow: 0 0 10px rgba(40,167,69,0.7); }
+      to   { box-shadow: 0 0 20px rgba(40,167,69,1); }
+    }
     /* MAIN WRAPPER */
     .main-wrapper {
       max-width: 1200px;
@@ -111,28 +144,7 @@
       transition: background-color 0.3s ease;
     }
     .quizzes-header .create-quiz-btn:hover {
-      background-color: #7a4dc1;
-    }
-    /* New glowing button for AI Suggestions */
-    .ai-suggestions-btn {
-      background-color: #7a4dc1;
-      color: #ffffff;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      margin-left: 0.5rem;
-      box-shadow: 0 0 10px rgba(122,77,193,0.7);
-      animation: glow 1.5s infinite alternate;
-    }
-    @keyframes glow {
-      from {
-        box-shadow: 0 0 10px rgba(122,77,193,0.7);
-      }
-      to {
-        box-shadow: 0 0 20px rgba(122,77,193,1);
-      }
+      background-color: #6939a8;
     }
     .quizzes-subtext {
       color: #6c757d;
@@ -193,7 +205,6 @@
       text-align: center;
       padding: 5px;
       margin-right: 15px;
-      box-sizing: border-box;
     }
     .month-label {
       font-size: 0.95rem;
@@ -217,9 +228,7 @@
       border: 1px solid #ced4da;
       cursor: pointer;
     }
-    .day span {
-      display: none;
-    }
+    .day span { display: none; }
     .empty {
       background-color: transparent;
       border: none;
@@ -232,7 +241,7 @@
     .active {
       outline: 2px solid #ffc107;
     }
-    /* SIDEBAR - default closed state */
+    /* SIDEBAR */
     #sidebar {
       position: fixed;
       top: 0;
@@ -245,7 +254,6 @@
       transition: width 0.5s, padding 0.5s;
       padding: 0;
     }
-    /* SIDEBAR - open state */
     #sidebar.open {
       width: 250px;
       padding: 0 1rem;
@@ -268,33 +276,13 @@
       cursor: pointer;
       font-size: 1.5rem;
       color: #333;
-      margin-right: 0;
     }
-    .sidebar-section {
-      margin: 1rem 0;
-    }
-    .sidebar-section h3 {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .sidebar-menu li {
-      margin-bottom: 0.75rem;
-    }
-    .sidebar-menu li a {
-      color: #333;
-      text-decoration: none;
-      font-size: 0.95rem;
-      transition: color 0.2s ease;
-    }
-    .sidebar-menu li a:hover {
-      color: #7a4dc1;
-    }
+    .sidebar-section { margin: 1rem 0; }
+    .sidebar-section h3 { font-size: 1rem; margin-bottom: 0.5rem; color: #333; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+    .sidebar-menu li { margin-bottom: 0.75rem; }
+    .sidebar-menu li a { color: #333; text-decoration: none; font-size: 0.95rem; transition: color 0.2s ease; }
+    .sidebar-menu li a:hover { color: #7a4dc1; }
     .logout-btn {
       background-color: #dc3545;
       color: #fff;
@@ -305,40 +293,18 @@
       font-size: 0.9rem;
       transition: background-color 0.3s ease;
     }
-    .logout-btn:hover {
-      background-color: #c82333;
-    }
-    /* Optional: Full width on smaller screens */
+    .logout-btn:hover { background-color: #c82333; }
+    /* RESPONSIVE */
     @media (max-width: 768px) {
-      #sidebar.open {
-        width: 100%;
-      }
+      #sidebar.open { width: 100%; }
+      .navbar-left, .navbar-right { gap: 0.5rem; }
+      .navbar-brand { font-size: 1rem; }
+      .main-wrapper { padding: 0 0.5rem; }
+      .week-row { grid-template-columns: repeat(7, 10px); gap: 3px; }
+      .day { width: 10px; height: 10px; }
+      .quiz-card pre { max-height: 200px; }
     }
-    /* MEDIA QUERIES */
-    @media (max-width: 768px) {
-      .navbar-left,
-      .navbar-right {
-        gap: 0.5rem;
-      }
-      .navbar-brand {
-        font-size: 1rem;
-      }
-      .main-wrapper {
-        padding: 0 0.5rem;
-      }
-      .week-row {
-        grid-template-columns: repeat(7, 10px);
-        gap: 3px;
-      }
-      .day {
-        width: 10px;
-        height: 10px;
-      }
-      .quiz-card pre {
-        max-height: 200px;
-      }
-    }
-    /* Chatbot Styles (hidden by default) */
+    /* CHATBOT */
     #chatbot-box {
       position: fixed;
       bottom: 20px;
@@ -348,14 +314,13 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       background: #fff;
-      display: none; /* Initially hidden */
+      display: none;
       flex-direction: column;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       overflow: hidden;
       font-size: 14px;
-      padding-top: 30px; /* Space for the close button */
+      padding-top: 30px;
     }
-    /* Chatbot close button */
     #chatbot-close-btn {
       position: absolute;
       top: 5px;
@@ -371,34 +336,12 @@
       padding: 10px;
       overflow-y: auto;
     }
-    .chat-message {
-      margin-bottom: 10px;
-      padding: 5px 10px;
-      border-radius: 4px;
-      max-width: 80%;
-      word-wrap: break-word;
-    }
-    .chat-message.ai {
-      background-color: #F1F0F0;
-      align-self: flex-start;
-    }
-    .chat-message.user {
-      background-color: #DCF8C6;
-      align-self: flex-end;
-    }
-    #chat-input-container {
-      display: flex;
-      border-top: 1px solid #ccc;
-    }
-    #chat-input {
-      flex: 1;
-      border: none;
-      padding: 10px;
-      font-size: 14px;
-    }
-    #chat-input:focus {
-      outline: none;
-    }
+    .chat-message { margin-bottom: 10px; padding: 5px 10px; border-radius: 4px; max-width: 80%; }
+    .chat-message.ai { background-color: #F1F0F0; align-self: flex-start; }
+    .chat-message.user { background-color: #DCF8C6; align-self: flex-end; }
+    #chat-input-container { display: flex; border-top: 1px solid #ccc; }
+    #chat-input { flex: 1; border: none; padding: 10px; font-size: 14px; }
+    #chat-input:focus { outline: none; }
     #chat-send-btn {
       background-color: #7a4dc1;
       border: none;
@@ -407,9 +350,7 @@
       cursor: pointer;
       font-size: 14px;
     }
-    #chat-send-btn:hover {
-      background-color: #6939a8;
-    }
+    #chat-send-btn:hover { background-color: #6939a8; }
   </style>
 </head>
 <body>
@@ -422,6 +363,9 @@
     <div class="navbar-right">
       <button class="ai-suggestions-btn" onclick="getAISuggestions()">
         Get AI Suggestions
+      </button>
+      <button class="generate-ppt-btn" onclick="window.location.href='/options?pres=ppt'">
+        Generate PPT
       </button>
       <button class="user-button" onclick="openSidebar()">
         <img src="../static/user.png" alt="User">

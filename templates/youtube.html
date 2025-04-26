@@ -2,272 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QuizRise - Create Quiz</title>
-  <!-- Import Roboto font -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizXpert – YouTube to Quiz</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap" rel="stylesheet">
   <style>
-    /* Global Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-    body {
-      background-color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      width: 100vw;
-      margin: 0 auto;
-    }
-    /* Navbar */
-    .navbar {
-      width: 100%;
-      background: #fff;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      font-size: 28px;
-      font-weight: bold;
-      position: fixed;
-      top: 0;
-      left: 0;
-      color: #7a4dc1;
-      z-index: 2;
-    }
-    /* Brand with cursive font */
-    .navbar .brand {
-      font-family: cursive;
-    }
-    .email-initial {
-      background: #7a4dc1;
-      color: white;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-size: 20px;
-    }
-    /* Progress Container */
-    .progress-container {
-      width: 100%;
-      max-width: 1000px;
-      margin-top: 80px;
-      padding: 20px 0;
-    }
-    .progress {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .step {
-      position: relative;
-      background: #ccc;
-      color: #7a4dc1;
-      padding: 30px 40px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 5px 0 0 5px;
-      flex: 1;
-      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 120px;
-      height: 60px;
-    }
-    .step span {
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      background: white;
-      color: #7a4dc1;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-      border: 2px dotted purple;
-    }
-    .step.active {
-      background: #7a4dc1;
-      color: #fff;
-    }
-    /* Main Container */
-    .container {
-      padding: 40px;
-      width: 100%;
-      max-width: 1500px;
-      text-align: center;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-      background-color: #fff;
-      min-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    /* Step Container */
-    .step-container {
-      width: 90%;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 30px;
-      min-height: 60vh;
-      background: linear-gradient(135deg, #ffffff, #f0f0f0);
-      border: 1px solid #d3d3d3;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Form Elements */
-    .form-group {
-      margin-bottom: 1.5rem;
-      text-align: left;
-    }
-    .form-group label {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-    .form-group input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .help-text {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
-    }
-    .status {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #28a745;
-    }
-    /* Option groups in Steps 2 & 3 */
-    .step-section {
-      border-radius: 10px;
-      padding: 20px;
-      border: 1px solid #e0e0e0;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-    .step-section h3 {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .option-group {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    .option-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #a855f7;
-      border-radius: 10px;
-      padding: 10px 15px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #a855f7;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .option-btn.selected {
-      background: #a855f7;
-      color: white;
-    }
-    /* Next Button */
-    .next-btn {
-      background: #7a4dc1;
-      color: white;
-      border: none;
-      padding: 15px 25px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    /* Loading Overlay */
-    #loadingOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #7a4dc1;
-      z-index: 2000;
-      display: none;
-    }
+    :root { --primary-color: #8e44ad; --secondary-color: #f0eefb; --accent-color: #ffffff; --accent-light: #fce4ec; --text-color: #4a4a4a; --light-text: #777777; --border-color: #e0d4ed; --transition-speed: 0.3s; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+    body { background:var(--secondary-color); display:flex; flex-direction:column; align-items:center; min-height:100vh; width:100vw; color:var(--text-color); padding-top:80px; }
+    .navbar { width:100%; background:var(--accent-color); padding:15px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.1); position:fixed; top:0; z-index:10; border-bottom:2px solid var(--accent-light); }
+    .navbar .brand { font-family:'Cookie',cursive; font-size:32px; color:var(--primary-color); }
+    .email-initial { background:var(--primary-color); color:var(--accent-color); width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:20px; font-weight:600; }
+    .progress-container { width:100%; max-width:1000px; margin-bottom:20px; padding:0 20px; margin-top: 2rem; }
+    .progress { display:flex; justify-content:space-between; gap:12px; }
+    .step { position:relative; background:var(--accent-light); color:var(--primary-color); padding:18px 28px; text-align:center; font-size:17px; font-weight:500; border-radius:50px; flex:1; display:flex; align-items:center; justify-content:center; min-width:120px; height:54px; transition:background var(--transition-speed), transform var(--transition-speed); }
+    .step span { position:absolute; top:50%; left:16px; transform:translateY(-50%); background:var(--accent-color); color:var(--primary-color); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:600; }
+    .step.active { background:var(--primary-color); color:var(--accent-color); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .step.active span { background:var(--accent-color); color:var(--primary-color); }
+    .container { padding:40px 20px; width:100%; max-width:900px; background:var(--accent-color); border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,0.1); margin:20px; transition:all var(--transition-speed); }
+    .step-container { display:none; border:1px solid var(--border-color); border-radius:12px; padding:32px; background:linear-gradient(135deg,var(--accent-color),var(--secondary-color)); animation:fadeIn 0.5s ease-in-out; }
+    .step-container.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+    h2 { font-family:'Cookie',cursive; font-size:30px; color:var(--primary-color); margin-bottom:16px; }
+    .form-group { margin-bottom:20px; text-align:left; }
+    .form-group label { font-weight:600; display:block; margin-bottom:8px; color:var(--text-color); }
+    .form-group input[type="text"] { width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:8px; outline:none; transition:border-color var(--transition-speed); }
+    .form-group input[type="text"]:focus { border-color:var(--primary-color); }
+    .help-text, .status { font-size:14px; margin-top:8px; }
+    .help-text { color:var(--light-text); }
+    .status { color:#28a745; }
+    .step-section h3 { font-size:18px; font-weight:600; margin-bottom:12px; color:var(--primary-color); }
+    .option-group { display:flex; gap:12px; flex-wrap:wrap; }
+    .option-btn { padding:12px 20px; border:1px solid var(--primary-color); border-radius:8px; cursor:pointer; transition:background var(--transition-speed), color var(--transition-speed); }
+    .option-btn.selected { background:var(--primary-color); color:var(--accent-color); }
+    .next-btn { background:var(--primary-color); color:var(--accent-color); border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-size:16px; font-weight:500; transition:background var(--transition-speed); }
+    .next-btn:hover { background:#9b59b6; }
+    #loadingOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; color:#fff; font-size:24px; z-index:100; }
+    .spinner { border:8px solid rgba(255,255,255,0.3); border-top:8px solid #fff; border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; margin-bottom:16px; }
+    @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
   </style>
-  <!-- Include jQuery (for legacy support if needed) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
-  <!-- Navbar -->
-  <div class="navbar">
-    <span>QuizXpert</span>
-    <span class="email-initial" id="emailInitial"></span>
-  </div>
-  <!-- Progress Container -->
-  <div class="progress-container">
-    <div class="progress">
-      <div class="step active" data-step="1">
-        <span>1</span> YouTube URL
-      </div>
-      <div class="step" data-step="2">
-        <span>2</span> Configure Quiz
-      </div>
-      <div class="step" data-step="3">
-        <span>3</span> Output Options
-      </div>
-    </div>
-  </div>
-  <!-- Main Container -->
+  <div class="navbar"><div class="brand">QuizXpert</div><div class="email-initial" id="emailInitial"></div></div>
+  <div class="progress-container"><div class="progress">
+    <div class="step active" data-step="1"><span>1</span> YouTube URL</div>
+    <div class="step" data-step="2"><span>2</span> Configure Quiz</div>
+    <div class="step" data-step="3"><span>3</span> Output Options</div>
+  </div></div>
   <div class="container">
-    <!-- Step 1: YouTube URL Input -->
-    <div id="step1" class="step-container">
-      <h2 style="margin-bottom: 20px;">YouTube Video URL 🎥</h2>
+    <div id="step1" class="step-container active">
+      <h2>YouTube Video URL 🎥</h2>
       <div class="form-group">
         <label for="youtube_url">Enter YouTube URL</label>
-        <input type="text" id="youtube_url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=example">
+        <input type="text" id="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
         <p class="help-text">Please enter a valid YouTube URL.</p>
-        <p id="statusMessage" class="status hidden"></p>
+        <p id="statusMessage" class="status"></p>
       </div>
-      <button id="nextStepBtn" class="next-btn">Next Step</button>
+      <button id="nextStepBtn" class="next-btn">Next Step →</button>
     </div>
-    <!-- Step 2: Configure Quiz -->
-    <div id="step2" class="step-container" style="display: none;">
-      <h2 style="margin-bottom: 20px;">Configure Quiz</h2>
+    <div id="step2" class="step-container">
+      <h2>Configure Quiz</h2>
       <div class="step-section">
         <h3>What type of questions?</h3>
         <div class="option-group">
@@ -285,212 +80,88 @@
           <div class="option-btn">Hard</div>
         </div>
       </div>
-      <div style="text-align: right;">
-        <button id="nextToStep3" class="next-btn">Next Step →</button>
-      </div>
+      <div style="text-align:right;"><button id="nextToStep3" class="next-btn">Next Step →</button></div>
     </div>
-    <!-- Step 3: Output Options -->
-    <div id="step3" class="step-container" style="display: none;">
-      <h2 style="margin-bottom: 20px;">Output Options</h2>
+    <div id="step3" class="step-container">
+      <h2>Output Options</h2>
       <div class="step-section">
-        <h3>Do you want the quiz emailed to you?</h3>
+        <h3>Email the quiz?</h3>
         <div class="option-group">
           <div class="option-btn selected">Yes</div>
           <div class="option-btn">No</div>
         </div>
       </div>
-      <div style="text-align: right;">
-        <button id="generateQuiz" class="next-btn" style="background: #28a745;">Generate Quiz</button>
-      </div>
+      <div style="text-align:right;"><button id="generateQuiz" class="next-btn">Generate Quiz</button></div>
     </div>
   </div>
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay">Loading... Please wait</div>
+  <div id="loadingOverlay"><div class="spinner"></div>Please wait...</div>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Set email initial in navbar
-      let email = document.getElementById("userEmail").value;
-      document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
-      
-      // Global variables
-      let transcriptText = "";
-      let questionType = "";
-      let difficulty = "";
-      
-      // Step 1 elements
-      const step1 = document.getElementById("step1");
-      const youtubeUrlInput = document.getElementById("youtube_url");
-      const statusMessage = document.getElementById("statusMessage");
-      const nextStepBtn = document.getElementById("nextStepBtn");
-      
-      // Step containers
-      const step2 = document.getElementById("step2");
-      const step3 = document.getElementById("step3");
-      
-      // Progress indicators
-      const progressSteps = document.querySelectorAll(".progress .step");
-      
-      // Loading overlay
-      const loadingOverlay = document.getElementById("loadingOverlay");
-      
-      // --- Step 1: Handle YouTube URL submission ---
-      nextStepBtn.addEventListener("click", async function (event) {
-        event.preventDefault();
-        let url = youtubeUrlInput.value.trim();
-        statusMessage.classList.add("hidden");
-        statusMessage.textContent = "";
-        
-        if (!isValidURL(url)) {
-          statusMessage.textContent = "❌ Invalid URL format.";
-          statusMessage.classList.remove("hidden");
-          return;
-        }
-        
-        loadingOverlay.style.display = "flex";
-        statusMessage.textContent = "🔄 Fetching transcript...";
-        statusMessage.classList.remove("hidden");
-        
-        try {
-          // POST the YouTube URL to the /get_transcripts route in your Flask app
-          const response = await fetch("/get_transcripts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ youtube_url: url })
-          });
-          
-          if (!response.ok) {
-            throw new Error("Transcript extraction failed.");
-          }
-          
-          const data = await response.json();
+    document.addEventListener('DOMContentLoaded', function() {
+      // Email initial
+      const email = document.getElementById('userEmail').value;
+      document.getElementById('emailInitial').textContent = email.charAt(0).toUpperCase();
+      // Steps and indicators
+      const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+      const inds = document.querySelectorAll('.progress .step');
+      function showStep(i) {
+        steps.forEach((s,j)=> s.classList.toggle('active', j===i));
+        inds.forEach((ind,j)=> ind.classList.toggle('active', j<=i));
+      }
+      // URL validation
+      function isValidURL(str){ try{ new URL(str); return true;} catch{return false;} }
+      // Map type
+      function mapQ(t){t=t.toLowerCase(); if(t.includes('mcq')) return 'MCQs'; if(t.includes('true')) return 'truefalse'; if(t.includes('blank')) return 'blanks'; return 'qa'; }
+      // Store transcript
+      let transcriptText = '';
+      // Step1: transcript fetch
+      document.getElementById('nextStepBtn').onclick = async function(e){
+        e.preventDefault();
+        const url = document.getElementById('youtube_url').value.trim();
+        const status = document.getElementById('statusMessage');
+        status.textContent = '';
+        if(!isValidURL(url)){ status.textContent = '❌ Invalid URL'; return; }
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        status.textContent = '🔄 Fetching transcript...';
+        try{
+          const res = await fetch('/get_transcripts',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({youtube_url:url}) });
+          if(!res.ok) throw new Error('Transcript failed');
+          const data = await res.json();
+          if(!data.transcript) throw new Error('No transcript');
           transcriptText = data.transcript;
-          
-          if (!transcriptText) {
-            throw new Error("Transcript extraction failed: no text found.");
-          }
-          
-          loadingOverlay.style.display = "none";
-          statusMessage.textContent = "✅ Transcript fetched successfully!";
-          
-          // Update progress: mark step 1 complete and step 2 active
-          progressSteps.forEach(step => {
-            if (step.getAttribute("data-step") === "1") {
-              step.classList.add("active");
-            }
-            if (step.getAttribute("data-step") === "2") {
-              step.classList.add("active");
-            }
-          });
-          // Transition to Step 2 after a brief delay
-          setTimeout(() => {
-            step1.style.display = "none";
-            step2.style.display = "block";
-          }, 1000);
-        } catch (error) {
-          loadingOverlay.style.display = "none";
-          statusMessage.textContent = "❌ " + error.message;
+          document.getElementById('loadingOverlay').style.display = 'none';
+          status.textContent = '✅ Transcript ready';
+          setTimeout(()=> showStep(1), 500);
+        } catch(err){
+          document.getElementById('loadingOverlay').style.display = 'none';
+          status.textContent = '❌ ' + err.message;
         }
-      });
-      
-      // Utility: Basic URL validation
-      function isValidURL(str) {
-        try {
-          new URL(str);
-          return true;
-        } catch (e) {
-          return false;
+      };
+      // Step2 → Step3
+      document.getElementById('nextToStep3').onclick = () => showStep(2);
+      // Option selection
+      document.querySelectorAll('.option-btn').forEach(btn => btn.onclick = () =>{ const grp = btn.parentNode; grp.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); });
+      // Generate quiz with mapping logic
+      document.getElementById('generateQuiz').onclick = async function(){
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        const typeText = document.querySelector('#step2 .option-btn.selected').textContent;
+        const diffText = document.querySelector('#step2 .step-section:nth-of-type(2) .option-btn.selected').textContent;
+        const emailOpt = document.querySelector('#step3 .option-btn.selected').textContent === 'Yes';
+        const payload = { email, topic: transcriptText, type: mapQ(typeText), difficulty: diffText, is_email: emailOpt };
+        try{
+          const res = await fetch('/generateOnTopic',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          const data = await res.json();
+          document.getElementById('loadingOverlay').style.display = 'none';
+          const params = new URLSearchParams({ message: data.message, email, difficulty: diffText });
+          let redirectUrl = '/quiz?' + params.toString();
+          if(payload.type === 'truefalse') redirectUrl = '/truefalse?' + params.toString();
+          else if(payload.type === 'qa') redirectUrl = '/qa?' + params.toString();
+          else if(payload.type === 'blanks') redirectUrl = '/blank?' + params.toString();
+          window.location.href = redirectUrl;
+        } catch(e){
+          document.getElementById('loadingOverlay').style.display = 'none';
+          alert('Error generating quiz: ' + e.message);
         }
-      }
-      
-      // --- Step 2: Transition to Step 3 ---
-      document.getElementById("nextToStep3").addEventListener("click", function () {
-        questionType = document.querySelector(".step-section:nth-of-type(1) .option-btn.selected")?.textContent || "MCQs";
-        difficulty = document.querySelector(".step-section:nth-of-type(2) .option-btn.selected")?.textContent || "Easy";
-        progressSteps.forEach(step => {
-          if (step.getAttribute("data-step") === "3") {
-            step.classList.add("active");
-          }
-        });
-        step2.style.display = "none";
-        step3.style.display = "block";
-      });
-      
-      // --- Option Selection Logic for all option buttons ---
-      document.querySelectorAll(".option-btn").forEach(button => {
-        button.addEventListener("click", function () {
-          let parent = this.closest(".option-group");
-          parent.querySelectorAll(".option-btn").forEach(btn => btn.classList.remove("selected"));
-          this.classList.add("selected");
-        });
-      });
-      
-      // --- Step 3: Generate Quiz event listener ---
-      document.getElementById("generateQuiz").addEventListener("click", async function () {
-        let userEmail = document.getElementById("userEmail").value;
-        let emailOptionElement = document.querySelector("#step3 .step-section .option-btn.selected");
-        let isEmail = emailOptionElement.textContent.trim() === "Yes";
-        
-        if (!questionType || !difficulty) {
-          alert("Please make sure all selections are made before generating the quiz.");
-          return;
-        }
-        
-        const payload = {
-          email: userEmail,
-          topic: transcriptText,
-          type: mapQuestionType(questionType),
-          difficulty: difficulty,
-          is_email: isEmail
-        };
-        
-        loadingOverlay.style.display = "flex";
-        
-        try {
-          let response = await fetch("/generateOnTopic", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          let result = await response.json();
-          loadingOverlay.style.display = "none";
-          if (response.ok) {
-            const params = new URLSearchParams({
-              message: result.message,
-              email: userEmail,
-              difficulty: difficulty
-            });
-            if (payload.type === "MCQs") {
-              window.location.href = `/quiz?${params.toString()}`;
-            } else if (payload.type === "truefalse") {
-              window.location.href = `/truefalse?${params.toString()}`;
-            } else if (payload.type === "qa") {
-              window.location.href = `/qa?${params.toString()}`;
-            } else {
-              window.location.href = `/blank?${params.toString()}`;
-            }
-          } else {
-            alert("Quiz generation failed: " + result.error);
-          }
-        } catch (error) {
-          loadingOverlay.style.display = "none";
-          console.error("Error generating quiz:", error);
-          alert("An error occurred while generating the quiz.");
-        }
-      });
-      
-      // Utility: Map question type text to API value
-      function mapQuestionType(type) {
-        if (type.toLowerCase() === "mcqs") {
-          return "MCQs";
-        } else if (type.toLowerCase() === "true/false" || type.toLowerCase() === "true false") {
-          return "truefalse";
-        } else if (type.toLowerCase() === "blanks") {
-          return "blanks";
-        } else if (type.toLowerCase() === "short q&a") {
-          return "qa";
-        }
-        return "MCQs";
-      }
+      };
     });
   </script>
 </body>

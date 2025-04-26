@@ -2,539 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lecture Transcriber & Quiz Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizXpert – Lecture Transcriber & Quiz</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap" rel="stylesheet">
   <style>
-    /* Global Reset & Fonts */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    :root {
+      --primary-color: #8e44ad;
+      --secondary-color: #f0eefb;
+      --accent-color: #ffffff;
+      --accent-light: #fce4ec;
+      --text-color: #4a4a4a;
+      --light-text: #777777;
+      --border-color: #e0d4ed;
+      --transition-speed: 0.3s;
     }
-    body {
-      background-color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      width: 100vw;
-    }
-    /* Navbar */
-    .navbar {
-      width: 100%;
-      background: #fff;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      font-size: 28px;
-      font-weight: bold;
-      position: fixed;
-      top: 0;
-      left: 0;
-      color: #7a4dc1;
-      z-index: 1000;
-    }
-    .email-initial {
-      background: #7a4dc1;
-      color: white;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-size: 20px;
-    }
-    /* Main container */
-    .container {
-      padding: 40px;
-      width: 100%;
-      max-width: 1000px;
-      text-align: center;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(96, 1, 139, 0.1);
-      margin-top: 80px;
-      background-color: #fff;
-      min-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    /* Progress Bar */
-    .progress {
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0 40px 0;
-      gap: 10px;
-    }
-    .step {
-      position: relative;
-      background: #ccc;
-      color: white;
-      padding: 30px 40px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 5px 0 0 5px;
-      flex: 1;
-      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 120px;
-      height: 80px;
-    }
-    .step span {
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      background: white;
-      color: #7a4dc1;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .step.active {
-      background: #7a4dc1;
-    }
-    
-    /* Button Styles */
-    .next-btn, .record-btn {
-      background: #7a4dc1;
-      color: white;
-      border: none;
-      padding: 15px 25px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 10px;
-    }
-    .next-btn:disabled, .record-btn:disabled {
-      background-color: gray;
-      cursor: not-allowed;
-    }
-    /* Textarea */
-    textarea {
-      width: 100%;
-      height: 150px;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      resize: vertical;
-    }
-    /* Toggle Button Groups for Quiz Config */
-    .toggle-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .toggle-btn {
-      background-color: #f1f1f1;
-      border: 1px solid #ccc;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .toggle-btn.active {
-      background-color: #7a4dc1;
-      color: white;
-      border-color: #7a4dc1;
-    }
-    /* Radio Button Options */
-    .radio-group {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin: 20px 0;
-      font-size: 18px;
-    }
-    label {
-      cursor: pointer;
-    }
-    /* Quiz Config (Step 2) */
-    .quiz-config {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 25px;
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: left;
-    }
-    .quiz-config p {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--text-color);
-    }
-    .quiz-config label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--text-color);
-    }
-    .quiz-config select {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid var(--border-color);
-      width: 100%;
-    }
-    .question-types,
-    .question-count {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    .toggle-btn {
-      background-color: var(--secondary-color);
-      border: 1px solid var(--border-color);
-      padding: 12px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 15px;
-      transition: background var(--transition-speed), color var(--transition-speed);
-      position: relative;
-      min-width: 130px;
-      text-align: center;
-    }
-    .toggle-btn.active {
-      background-color: var(--primary-color);
-      color: var(--accent-color);
-      border-color: var(--primary-color);
-    }
-    .toggle-btn::after {
-      content: "";
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border-color);
-      border-radius: 50%;
-      background: var(--secondary-color);
-      transition: all var(--transition-speed);
-    }
-    .toggle-btn.active::after {
-      content: "\2713";
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-color);
-      background: var(--primary-color);
-      border-color: var(--primary-color);
-    }
-    /* Next & Back buttons */
-    .next-btn {
-      background: var(--primary-color);
-      color: var(--accent-color);
-      border: none;
-      padding: 15px 30px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background var(--transition-speed);
-      margin-top: 20px;
-    }
-    .next-btn:hover {
-      background: #4a316a;
-    }
-    /* Hide non-active steps */
-    #step2, #step3 {
-      display: none;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: var(--secondary-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; width: 100vw; color: var(--text-color); padding-top: 80px; }
+    .navbar { width:100%; background: var(--accent-color); padding: 15px 30px; display:flex; justify-content: space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.1); position:fixed; top:0; z-index:10; border-bottom:2px solid var(--accent-light); }
+    .navbar .brand { font-family:'Cookie', cursive; font-size:32px; color: var(--primary-color); }
+    .email-initial { background:var(--primary-color); color:var(--accent-color); width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:20px; font-weight:600; }
+    .container { width:100%; max-width:800px; background:var(--accent-color); border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,0.1); margin: 20px; padding:40px 20px; transition:all var(--transition-speed); }
+    .progress-container { width:100%; max-width:800px; margin-bottom:20px; padding:0 20px; }
+    .progress { display:flex; justify-content:space-between; gap:12px; }
+    .step { position:relative; background:var(--accent-light); color:var(--primary-color); padding:18px 28px; text-align:center; font-size:17px; font-weight:500; border-radius:50px; flex:1; display:flex; align-items:center; justify-content:center; min-width:120px; height:54px; transition:background var(--transition-speed), transform var(--transition-speed); }
+    .step span { position:absolute; top:50%; left:16px; transform:translateY(-50%); background:var(--accent-color); color:var(--primary-color); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:600; }
+    .step.active { background:var(--primary-color); color:var(--accent-color); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .step.active span { background:var(--accent-color); color:var(--primary-color); }
+    .step-container { display:none; border:1px solid var(--border-color); border-radius:12px; padding:32px; background:linear-gradient(135deg,var(--accent-color),var(--secondary-color)); animation:fadeIn 0.5s ease-in-out; }
+    .step-container.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+    h2 { font-family:'Cookie', cursive; font-size:30px; color:var(--primary-color); margin-bottom:16px; }
+    p { margin-bottom:12px; color:var(--light-text); }
+    textarea { width:100%; padding:14px; font-size:16px; border:1px solid var(--border-color); border-radius:8px; resize:vertical; min-height:120px; outline:none; transition:border-color var(--transition-speed); }
+    textarea:focus { border-color:var(--primary-color); }
+    .record-btn, .next-btn { background:var(--primary-color); color:var(--accent-color); border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-size:16px; font-weight:500; transition:background var(--transition-speed); margin-top:16px; }
+    .record-btn:disabled, .next-btn:disabled { background:#ccc; cursor:not-allowed; }
+    .toggle-btn { padding:12px 20px; border:1px solid var(--border-color); border-radius:8px; background:var(--accent-color); cursor:pointer; transition:background var(--transition-speed), border-color var(--transition-speed); }
+    .toggle-btn.active { background:var(--primary-color); color:var(--accent-color); border-color:var(--primary-color); }
   </style>
 </head>
 <body>
-  <!-- Hidden field for user email -->
   <input type="hidden" id="userEmail" value="{{ email }}">
-  <!-- Navbar -->
-  <div class="navbar">
-    <span>Lecture Transcriber &amp; Quiz Generator</span>
-    <span class="email-initial" id="emailInitial"></span>
-  </div>
-  <!-- Main Container -->
+  <div class="navbar"><div class="brand">QuizXpert</div><div class="email-initial" id="emailInitial"></div></div>
+  <div class="progress-container"><div class="progress"><div class="step active" data-step="1"><span>1</span> Record Lecture</div><div class="step" data-step="2"><span>2</span> Configure Quiz</div><div class="step" data-step="3"><span>3</span> Output Options</div></div></div>
   <div class="container">
-    <!-- Progress Bar -->
-    <div class="progress">
-      <div class="step active" id="progress-step1">
-        <span>1</span> Record Lecture
-      </div>
-      <div class="step" id="progress-step2">
-        <span>2</span> Configure Quiz
-      </div>
-      <div class="step" id="progress-step3">
-        <span>3</span> Output Options
-      </div>
-    </div>
-    <!-- Step 1: Lecture Transcriber -->
-    <div class="step-container active" id="step1">
+    <div id="step1" class="step-container active">
       <h2>Lecture Transcriber</h2>
       <p>Record your lecture and get it transcribed.</p>
-      <div class="transcriber-controls">
-        <button id="startRecording" class="record-btn">Start Recording</button>
-        <button id="stopRecording" class="record-btn" disabled>Stop Recording</button>
-      </div>
-      <audio id="audioPlayer" controls hidden></audio>
-      <h3>Transcription:</h3>
+      <button id="startRecording" class="record-btn">Start Recording</button>
+      <button id="stopRecording" class="record-btn" disabled>Stop Recording</button>
+      <h3 style="margin-top:20px;">Transcription:</h3>
       <textarea id="transcript" readonly>Waiting for input...</textarea>
-      <button class="next-btn" id="next-step1">Next Step →</button>
+      <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
-    <!-- Step 2: Configure Quiz -->
-    <div id="step2">
-      <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Configure Quiz</h2>
-        <div class="quiz-config">
-          <div>
-            <p>What type of questions?</p>
-            <div class="question-types">
-              <button class="toggle-btn active">Multiple Choice</button>
-              <button class="toggle-btn">True False</button>
-              <button class="toggle-btn">Fill in the blank</button>
-              <button class="toggle-btn">General Q&A</button>
-            </div>
-          </div>
-          <div>
-            <p>Difficulty Level?</p>
-            <div class="question-count">
-              <button class="toggle-btn">Easy</button>
-              <button class="toggle-btn active">Medium</button>
-              <button class="toggle-btn">Hard</button>
-            </div>
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <button id="next-step2" class="next-btn">Next Step →</button>
-        </div>
+    <div id="step2" class="step-container">
+      <h2>Configure Quiz</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <button class="toggle-btn active">Multiple Choice</button>
+        <button class="toggle-btn">True False</button>
+        <button class="toggle-btn">Fill in the blank</button>
+        <button class="toggle-btn">General Q&A</button>
       </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <button class="toggle-btn">Easy</button>
+        <button class="toggle-btn active">Medium</button>
+        <button class="toggle-btn">Hard</button>
+      </div>
+      <button id="next-step2" class="next-btn">Next Step →</button>
     </div>
-    
-    <!-- Step 3: Output Options -->
-    <div id="step3">
-      <div class="step-container">
-        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Receive Quiz via Email?</h2>
-        <div class="quiz-config email-options">
-          <label class="toggle-btn">
-            <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
-          </label>
-          <label class="toggle-btn">
-            <input type="radio" name="emailOption" value="no" checked /> No, Thanks
-          </label>
-        </div>
-        <div style="text-align: right; margin-top: 20px;">
-          <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
-          <button id="submit-quiz" class="next-btn">Submit Quiz</button>
-        </div>
+    <div id="step3" class="step-container">
+      <h2>Receive Quiz via Email?</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <label class="toggle-btn"><input type="radio" name="emailOption" value="yes" /> Yes</label>
+        <label class="toggle-btn"><input type="radio" name="emailOption" value="no" checked /> No</label>
       </div>
+      <button id="back-step2" class="next-btn" style="background:#bbb; margin-right:10px;">← Back</button>
+      <button id="submit-quiz" class="next-btn">Submit Quiz</button>
     </div>
   </div>
   <script>
-    const nextStep1Btn = document.getElementById("next-step1");
-
-    // Set email initial in navbar
-    document.addEventListener("DOMContentLoaded", function () {
-      let email = document.getElementById("userEmail").value;
-      document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
-    });
-    
-    // Step container elements
-    const step1 = document.getElementById("step1");
-    const step2 = document.getElementById("step2");
-    const step3 = document.getElementById("step3");
-    
-    // Progress bar steps
-    const progressStep1 = document.getElementById("progress-step1");
-    const progressStep2 = document.getElementById("progress-step2");
-    const progressStep3 = document.getElementById("progress-step3");
-    
-    // Lecture Transcriber Elements
-    const startRecordingBtn = document.getElementById("startRecording");
-    const stopRecordingBtn = document.getElementById("stopRecording");
-    const transcriptOutput = document.getElementById("transcript");
-    let finalTranscript = "";
-    
-    // Initialize Speech Recognition API
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    
-    startRecordingBtn.addEventListener("click", () => {
-      transcriptOutput.value = "Listening...";
-      finalTranscript = "";
-      recognition.start();
-      startRecordingBtn.disabled = true;
-      stopRecordingBtn.disabled = false;
-    });
-    
-    stopRecordingBtn.addEventListener("click", () => {
-      recognition.stop();
-      startRecordingBtn.disabled = false;
-      stopRecordingBtn.disabled = true;
-    });
-    
-    recognition.onresult = (event) => {
-      let interimTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript + " ";
-        } else {
-          interimTranscript += event.results[i][0].transcript + " ";
+    document.addEventListener('DOMContentLoaded',()=>{
+      // Email initial
+      const email=document.getElementById('userEmail').value;
+      document.getElementById('emailInitial').textContent=email.charAt(0).toUpperCase();
+      // Steps
+      const steps=[1,2,3].map(i=>document.getElementById('step'+i));
+      const indicators=document.querySelectorAll('.step');
+      function showStep(i){
+        steps.forEach((s,j)=>s.classList.toggle('active',j===i));
+        indicators.forEach((ind,j)=>ind.classList.toggle('active',j===i));
+      }
+      // Speech Recognition
+      const recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+      recognition.lang='en-US';recognition.continuous=true;recognition.interimResults=true;
+      let finalTranscript='';
+      const transcriptEl=document.getElementById('transcript');
+      document.getElementById('startRecording').onclick=()=>{
+        finalTranscript='';transcriptEl.value='Listening...';recognition.start();
+        document.getElementById('startRecording').disabled=true;
+        document.getElementById('stopRecording').disabled=false;
+      };
+      document.getElementById('stopRecording').onclick=()=>{
+        recognition.stop();
+        document.getElementById('startRecording').disabled=false;
+        document.getElementById('stopRecording').disabled=true;
+      };
+      recognition.onresult=e=>{
+        let interim='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          if(e.results[i].isFinal) finalTranscript+=e.results[i][0].transcript+' ';
+          else interim+=e.results[i][0].transcript+' ';
         }
-      }
-      transcriptOutput.value = (finalTranscript + interimTranscript).trim();
-    };
-    
-    recognition.onend = () => {
-      transcriptOutput.value = finalTranscript.trim() || "No speech detected.";
-    };
-    
-    // Navigation Buttons for Step 1
-    nextStep1Btn.addEventListener("click", () => {
-  if (!finalTranscript.trim()) {
-    alert("No transcript available. Please record your lecture.");
-    return;
-  }
-
-  // hide step1 container
-  document.querySelector("#step1.step-container").classList.remove("active");
-
-  // show step2 container
-  const innerStep2 = document.querySelector("#step2 .step-container");
-  innerStep2.classList.add("active");
-
-  // update progress bar
-  progressStep1.classList.remove("active");
-  progressStep2.classList.add("active");
-});
-
-    
-    // Navigation Buttons for Step 2
-    const nextStep2Btn = document.getElementById("next-step2");
-    const prevStep2Btn = document.getElementById("prev-step2");
-    
-    nextStep2Btn.addEventListener("click", () => {
-      step2.classList.remove("active");
-      step2.style.display = "none";
-      step3.classList.add("active");
-      step3.style.display = "block";
-      progressStep2.classList.remove("active");
-      progressStep3.classList.add("active");
-    });
-    
-    prevStep2Btn.addEventListener("click", () => {
-      step2.classList.remove("active");
-      step2.style.display = "none";
-      step1.classList.add("active");
-      step1.style.display = "block";
-      progressStep2.classList.remove("active");
-      progressStep1.classList.add("active");
-    });
-    
-    // Navigation Buttons for Step 3
-    const prevStep3Btn = document.getElementById("prev-step3");
-    prevStep3Btn.addEventListener("click", () => {
-      step3.classList.remove("active");
-      step3.style.display = "none";
-      step2.classList.add("active");
-      step2.style.display = "block";
-      progressStep3.classList.remove("active");
-      progressStep2.classList.add("active");
-    });
-    
-    // Toggle button functionality for Quiz Config (Question Type and Difficulty)
-    const questionTypeButtons = document.querySelectorAll(".question-types .toggle-btn");
-    questionTypeButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        questionTypeButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-      });
-    });
-    const difficultyButtons = document.querySelectorAll(".difficulty .toggle-btn");
-    difficultyButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        difficultyButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-      });
-    });
-    
-    // Submit Quiz: Send payload to backend
-    const submitQuizBtn = document.getElementById("submit-quiz");
-    submitQuizBtn.addEventListener("click", async () => {
-      if (!finalTranscript.trim()) {
-        alert("No transcript available.");
-        return;
-      }
-      let email = document.getElementById("userEmail").value;
-      
-      // Get selected difficulty
-      const difficultyBtn = document.querySelector(".difficulty .toggle-btn.active");
-      const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
-      
-      // Get selected question type and convert to backend values
-      const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
-      let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
-      if (questionType === "Multiple Choice") {
-        questionType = "MCQs";
-      } else if (questionType === "True False") {
-        questionType = "truefalse";
-      } else if (questionType === "Fill in the blank") {
-        questionType = "blanks";
-      } else if (questionType === "General Q&A") {
-        questionType = "qa";
-      }
-      
-      // Get email option
-      let sendEmailValue = document.querySelector("input[name='sendEmail']:checked").value;
-      
-      try {
-        let response = await fetch("/generateOnTopic", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email,
-            topic: finalTranscript,
-            difficulty: difficulty,
-            type: questionType,
-            is_email: sendEmailValue === "yes"
-          }),
-        });
-        let data = await response.json();
-        if (response.ok) {
-          const params = new URLSearchParams({
-            message: data.message,
-            email: email,
-            difficulty: difficulty,
-          });
-          if (questionType === "MCQs") {
-            window.location.href = `/quiz?${params.toString()}`;
-          } else if (questionType === "truefalse") {
-            window.location.href = `/truefalse?${params.toString()}`;
-          } else if (questionType === "qa") {
-            window.location.href = `/qa?${params.toString()}`;
-          } else {
-            window.location.href = `/blank?${params.toString()}`;
-          }
-        } else {
-          alert("Quiz generation failed: " + data.error);
-        }
-      } catch (error) {
-        console.error("Error generating quiz:", error);
-        alert("An error occurred while generating the quiz.");
-      }
+        transcriptEl.value=(finalTranscript+interim).trim();
+      };
+      recognition.onend=()=>{
+        transcriptEl.value=finalTranscript.trim()||'No speech detected.';
+      };
+      // Navigation
+      document.getElementById('next-step1').onclick=()=>{
+        if(!finalTranscript.trim()){alert('Please record first.');return;} showStep(1);
+      };
+      document.getElementById('next-step2').onclick=()=>showStep(2);
+      document.getElementById('back-step2').onclick=()=>showStep(1);
+      // Toggles
+      document.querySelectorAll('#step2 .toggle-btn').forEach(btn=>btn.addEventListener('click',()=>{
+        btn.parentNode.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      }));
+      // Submit
+      document.getElementById('submit-quiz').onclick=async()=>{
+        const typeBtn=document.querySelector('#step2 .toggle-btn.active');
+        let type=typeBtn?typeBtn.textContent.trim():'Multiple Choice';
+        const diffBtn=document.querySelector('#step2 .toggle-btn.active:nth-child(2)');
+        let difficulty=diffBtn?diffBtn.textContent.trim():'Medium';
+        const map={ 'Multiple Choice':'MCQs','True False':'truefalse','Fill in the blank':'blanks','General Q&A':'qa'};
+        type=map[type]||'MCQs';
+        const is_email=document.querySelector('input[name="emailOption"]:checked').value==='yes';
+        const email=document.getElementById('userEmail').value;
+        const payload={ email, topic:finalTranscript, difficulty, type, is_email };
+        try{
+          const res=await fetch('/generateOnTopic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+          const data=await res.json();
+          if(!res.ok) throw new Error(data.error||'Unknown error');
+          const params=new URLSearchParams({ message:data.message, email,difficulty });
+          let url='/quiz?'+params.toString();
+          if(type==='truefalse') url='/truefalse?'+params.toString();
+          else if(type==='qa') url='/qa?'+params.toString();
+          else if(type==='blanks') url='/blank?'+params.toString();
+          window.location.href=url;
+        }catch(e){alert('Error generating quiz: '+e.message);}
+      };
     });
   </script>
 </body>

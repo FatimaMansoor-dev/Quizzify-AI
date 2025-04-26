@@ -40,6 +40,11 @@ app = Flask(__name__)
 # Set the secret key from the environment variable
 app.secret_key = os.environ.get('SECRET_KEY', 'default-secret-key')
 
+app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
+@app.context_processor
+def inject_config():
+    return dict(config=app.config)
+
 # ---------------------
 # Alternative TTS Function using gTTS and playsound
 # ---------------------
@@ -361,7 +366,7 @@ def options():
     email = session.get('email')
     pres = request.args.get('pres')
     print(pres) 
-    if pres == 'true':
+    if pres == 'ppt':
         return render_template('presentation.html', email=email)
     else:
         return render_template('options.html', email=email)
@@ -436,7 +441,7 @@ def generate_on_topic():
 
     if qtype == 'MCQs':
         prompt = f"""
-        Generate 10 MCQs quiz with {difficulty} difficulty level quiz on {topic}. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Generate exact 10 MCQs quiz with {difficulty} difficulty level on {topic}. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Return in this format:
         Topic : [topic]
         **Question 1:** [question]?
@@ -448,24 +453,24 @@ def generate_on_topic():
         soure: [should be the exact line that contains the answer and the place or website that you got this answer from.]
         """
     elif qtype in ['blanks', 'fillintheblank']:
-        prompt= '''Generate 10 meaningful fill‑in‑the‑blank questions on {topic} at {difficulty} level.  
+        prompt= f'''Generate exact 10 meaningful and logical fill‑in‑the‑blank questions based on {topic} of {difficulty} difficulty level.  
 - Each question must be a single sentence with exactly one blank represented by “_____”.  
 - After each question, specify **Answer:** with only the phrase that fills the blank.  
 - If you were provided the exact sentence containing the answer, include a **Source:** field with that exact sentence; otherwise omit it.
 
-Always reply in this format:
+Always reply in this format, for example:
 
 Topic: {topic}
 
-**Question 1:** The more you practice, the _____ you become at solving problems.  
-**Answer:** faster  
-Source: “The more you practice, the faster you become at solving problems.”
+**Question 1:**  _____ is a part of the digestive system is responsible for absorbing most of the nutrients from the food we eat 
+**Answer:** small intestine  
+soure: [should be the exact line that contains the answer]
 
 … and so on through Question 10.'''
 
     elif qtype in ['truefalse', 'true/false']:
         prompt = f"""
-        Generate 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
+        Generate exact 10 meaningful {difficulty} True/False questions out of which some will be true and some will be false on {topic} + their answers. Also create a one liner topic for the quiz. If you are generating the quiz from within the data provided to you, then also provide that line as source of answer. If user did not provide you with complete data then do not include this source field.
         Format:
         Topic : [topic]
         **Question 1:** [statement]
@@ -474,11 +479,12 @@ Source: “The more you practice, the faster you become at solving problems.”
         """
     else:
         prompt = f"""
-        Generate 10 {difficulty} descriptive Q&A on {topic}. Also create a one liner topic for the quiz.
+        Generate exact 10 {difficulty} descriptive Q&A on {topic}. Also create a one liner topic for the quiz.
         Format:
         Topic: [topic]
         **Question 1:** [question]
         **Answer:** [answer]
+        soure: [should be the exact line that contains the answer]
         """
     
     try:
@@ -799,7 +805,7 @@ The user has asked the following question:
 When answering, please:
 1. Maintain a professional, precise, and helpful tone.
 2. Refer to the user's quiz history where relevant.
-3. Suggest to use features on this website such as uploading PDFs, dropping a website URL, embedding YouTube links, specifying custom topics, or using note descriptions from which quizzes can be generated to perpare for anything.
+3. After answering to the query, you may suggest to use features on this website such as uploading PDFs, dropping a website URL, embedding YouTube links, specifying custom topics, or using note descriptions from which quizzes can be generated to perpare for anything.
 4. Be concise but thorough, focusing on actionable insights and recommendations.
 
 Now, provide a short, professional response of not more than 100 words addressing the user’s question and any relevant app feature recommendations:
@@ -832,6 +838,90 @@ Now, provide a short, professional response of not more than 100 words addressin
         "user_question": user_question,
         "ai_answer": ai_answer
     })
+
+from pptx import Presentation
+from io import BytesIO
+
+@app.route('/generate_ppt', methods=['POST'])
+def generate_ppt():
+    # 1) Parse payload
+    data = request.get_json() or {}
+    slides_count = int(data.get('slides', 1))
+    topic        = data.get('topic', 'Presentation')
+    description  = data.get('description', '')
+
+    # 2) LLaMA prompt
+    llama_prompt = (
+        f"Produce a JSON array of {slides_count} slides for a PowerPoint presentation on:\n"
+        f"Topic: {topic}\nDescription: {description}\n\n"
+        "Each array element must be an object with exactly two keys:\n"
+        "  - title: the slide title\n"
+        "  - content: an array of bullet strings OR a paragraph string with knowledgable and complete content about topic.\n\n"
+        "Return ONLY valid JSON. Do NOT wrap it in markdown or any extra text."
+    )
+
+    try:
+        # 3) Call LLaMA
+        resp = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role":"system","content":"You draft PPT slide content as JSON."},
+                {"role":"user",  "content":llama_prompt},
+            ],
+            temperature=0.5,
+            max_tokens=2048,
+            top_p=1.0,
+            stream=False
+        )
+        raw = resp.choices[0].message.content.strip()
+        slides_data = json.loads(raw)
+
+        # 4) Build PPT
+        prs = Presentation()
+        # Title slide
+        t0 = prs.slide_layouts[0]
+        slide = prs.slides.add_slide(t0)
+        slide.shapes.title.text    = topic
+        slide.placeholders[1].text = description
+
+        # Content slides
+        for idx, info in enumerate(slides_data[:slides_count], start=1):
+            layout = prs.slide_layouts[1]
+            s = prs.slides.add_slide(layout)
+            s.shapes.title.text = info.get("title", f"Slide {idx+1}")
+            tf = s.placeholders[1].text_frame
+            # handle content as list or string
+            content = info.get("content", "")
+            if isinstance(content, list):
+                lines = content
+            else:
+                lines = str(content).split("\n")
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                p = tf.add_paragraph()
+                p.text  = line
+                p.level = 0
+
+        # 5) Return PPTX
+        buf = BytesIO()
+        prs.save(buf)
+        buf.seek(0)
+        return send_file(
+            buf,
+            as_attachment=True,
+            download_name='presentation.pptx',
+            mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        )
+
+    except json.JSONDecodeError:
+        logging.exception("LLaMA returned invalid JSON")
+        return jsonify({"error":"Invalid JSON", "raw": raw}), 500
+    except Exception as e:
+        logging.exception("Error generating PPT")
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run()

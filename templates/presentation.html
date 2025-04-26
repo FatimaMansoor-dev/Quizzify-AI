@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QuizXpert – Create Your PPT</title>
-  <!-- Import Roboto font -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Import Cute Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-color: #5a3e85;
-      --secondary-color: #f8f8f8;
+      --primary-color: #8e44ad;
+      --secondary-color: #f0eefb;
       --accent-color: #ffffff;
-      --text-color: #333333;
-      --light-text: #666666;
-      --border-color: #e0e0e0;
+      --accent-light: #fce4ec;
+      --text-color: #4a4a4a;
+      --light-text: #777777;
+      --border-color: #e0d4ed;
       --transition-speed: 0.3s;
     }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Poppins', sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     body {
@@ -32,6 +33,7 @@
       width: 100vw;
       line-height: 1.6;
       color: var(--text-color);
+      padding-top: 80px;
     }
     /* Navbar */
     .navbar {
@@ -46,74 +48,80 @@
       top: 0;
       left: 0;
       z-index: 10;
+      border-bottom: 2px solid var(--accent-light);
     }
     .navbar .brand {
-      font-size: 28px;
-      font-weight: 700;
+      font-family: 'Cookie', cursive;
+      font-size: 32px;
+      font-weight: 400;
       color: var(--primary-color);
     }
     .email-initial {
       background: var(--primary-color);
       color: var(--accent-color);
-      width: 45px;
-      height: 45px;
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       font-size: 20px;
-      font-weight: 500;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
     /* Progress Container */
     .progress-container {
       width: 100%;
+      margin-top: 2rem;
       max-width: 1000px;
-      margin-top: 90px;
-      padding: 20px;
+      margin-bottom: 20px;
+      padding: 0 20px;
     }
     .progress {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
     }
     .step {
       position: relative;
-      background: var(--border-color);
+      background: var(--accent-light);
       color: var(--primary-color);
-      padding: 20px 30px;
+      padding: 18px 28px;
       text-align: center;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 500;
-      border-radius: 5px 0 0 5px;
+      border-radius: 50px;
       flex: 1;
-      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-width: 120px;
-      height: 60px;
-      transition: background var(--transition-speed);
+      height: 54px;
+      cursor: default;
+      transition: background var(--transition-speed), transform var(--transition-speed);
     }
     .step span {
       position: absolute;
       top: 50%;
-      left: 15px;
+      left: 16px;
       transform: translateY(-50%);
       background: var(--accent-color);
       color: var(--primary-color);
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 18px;
+      font-weight: 600;
+      font-size: 16px;
       border: 2px solid var(--primary-color);
     }
     .step.active {
       background: var(--primary-color);
       color: var(--accent-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     .step.active span {
       background: var(--accent-color);
@@ -127,8 +135,8 @@
       max-width: 1200px;
       text-align: center;
       background: var(--accent-color);
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
       margin: 20px;
       min-height: 60vh;
       transition: all var(--transition-speed);
@@ -136,12 +144,12 @@
     /* Step Containers */
     .step-container {
       border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 30px;
+      border-radius: 12px;
+      padding: 32px;
       width: 100%;
       max-width: 900px;
       margin: 20px auto;
-      background: linear-gradient(135deg, var(--accent-color), #f7f7f7);
+      background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
       animation: fadeIn 0.5s ease-in-out;
       text-align: left;
     }
@@ -151,120 +159,105 @@
     }
     /* Form Styles */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
     .form-group label {
-      font-weight: 500;
-      margin-bottom: 5px;
+      font-weight: 600;
+      margin-bottom: 8px;
       display: block;
       color: var(--text-color);
+      font-size: 16px;
     }
     .form-group input[type="number"],
     .form-group input[type="text"],
     .form-group textarea {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       font-size: 16px;
       border: 1px solid var(--border-color);
-      border-radius: 5px;
+      border-radius: 8px;
       outline: none;
-      transition: border-color var(--transition-speed);
+      transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
     }
-    .form-group input[type="number"]:focus,
-    .form-group input[type="text"]:focus,
+    .form-group input:focus,
     .form-group textarea:focus {
       border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(142, 68, 173, 0.2);
     }
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 120px;
     }
     h2 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 20px;
+      font-family: 'Cookie', cursive;
+      font-size: 30px;
+      font-weight: 400;
+      margin-bottom: 24px;
       color: var(--primary-color);
     }
     p {
       font-size: 16px;
-      margin-bottom: 10px;
+      color: var(--light-text);
+      margin-bottom: 12px;
     }
     /* Next & Back buttons */
     .next-btn {
       background: var(--primary-color);
       color: var(--accent-color);
       border: none;
-      padding: 15px 30px;
-      border-radius: 5px;
+      padding: 12px 24px;
+      border-radius: 50px;
       cursor: pointer;
       font-size: 16px;
       font-weight: 500;
-      transition: background var(--transition-speed);
+      transition: background var(--transition-speed), transform var(--transition-speed);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       margin-top: 20px;
     }
     .next-btn:hover {
-      background: #4a316a;
+      background: #9b59b6;
+      transform: scale(1.05);
+    }
+    .next-btn[disabled] {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
     /* Hide non-active steps */
     #step2, #step3 {
       display: none;
     }
-
-    /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
-
-:root {
-  --primary-color: #5a3e85;
-  --secondary-color: #f8f8f8;
-  --accent-color: #ffffff;
-  --text-color: #333333;
-  --light-text: #666666;
-  --border-color: #e0e0e0;
-  --transition-speed: 0.3s;
-}
-
-body {
-  font-family: 'Inter', 'Roboto', sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--text-color);
-}
-
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  color: var(--primary-color);
-}
-
-h2 {
-  font-size: 26px;
-}
-
-p {
-  font-size: 16px;
-  color: var(--light-text);
-}
-
-/* Buttons */
-.next-btn {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-}
-
-/* Labels & Inputs */
-.form-group label {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.form-group input,
-.form-group textarea {
-  font-size: 17px;
-  font-family: 'Inter', sans-serif;
-}
-
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+    }
+    .spinner {
+      border: 8px solid rgba(255,255,255,0.3);
+      border-top: 8px solid #fff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -322,7 +315,7 @@ p {
         <p id="reviewDescription" style="white-space: pre-wrap;"></p>
       </div>
       <div style="text-align: right;">
-        <button id="back-step1" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+        <button id="back-step1" class="next-btn" style="background: #bbb; margin-right: 10px;">← Back</button>
         <button id="next-step2" class="next-btn">Next Step →</button>
       </div>
     </div>
@@ -340,11 +333,17 @@ p {
           </label>
         </div>
         <div style="text-align: right; margin-top: 20px;">
-          <button id="back-step2" class="next-btn" style="background: gray; margin-right: 10px;">← Back</button>
+          <button id="back-step2" class="next-btn" style="background: #bbb; margin-right: 10px;">← Back</button>
           <button id="submit-ppt" class="next-btn">Submit PPT</button>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div>Please wait, generating your PPT...</div>
   </div>
   
   <script>
@@ -357,6 +356,7 @@ p {
       const step1 = document.getElementById("step1");
       const step2 = document.getElementById("step2");
       const step3 = document.getElementById("step3");
+      const loadingOverlay = document.getElementById("loadingOverlay");
 
       // Buttons for transitions
       const nextStep1Btn = document.getElementById("next-step1");
@@ -377,23 +377,19 @@ p {
 
       // Transition from Step 1 to Step 2
       nextStep1Btn.addEventListener("click", function () {
-        // Validate required fields
         if (!numSlidesInput.value || !topicInput.value || !descriptionInput.value) {
           alert("Please fill out all fields.");
           return;
         }
-        // Populate review section
         reviewSlides.textContent = numSlidesInput.value;
         reviewTopic.textContent = topicInput.value;
         reviewDescription.textContent = descriptionInput.value;
-        // Move to Step 2
         step1.style.display = "none";
         step2.style.display = "block";
         document.querySelector('.progress .step[data-step="1"]').classList.remove('active');
         document.querySelector('.progress .step[data-step="2"]').classList.add('active');
       });
 
-      // Back button from Step 2 to Step 1
       backStep1Btn.addEventListener("click", function () {
         step2.style.display = "none";
         step1.style.display = "block";
@@ -401,7 +397,6 @@ p {
         document.querySelector('.progress .step[data-step="1"]').classList.add('active');
       });
 
-      // Transition from Step 2 to Step 3
       nextStep2Btn.addEventListener("click", function () {
         step2.style.display = "none";
         step3.style.display = "block";
@@ -409,7 +404,6 @@ p {
         document.querySelector('.progress .step[data-step="3"]').classList.add('active');
       });
 
-      // Back button from Step 3 to Step 2
       backStep2Btn.addEventListener("click", function () {
         step3.style.display = "none";
         step2.style.display = "block";
@@ -417,54 +411,47 @@ p {
         document.querySelector('.progress .step[data-step="2"]').classList.add('active');
       });
 
-      // Submit PPT event listener
-      // Submit PPT event listener
-submitPptBtn.addEventListener("click", async () => {
-  const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-
-  // Prepare payload
-  const payload = {
-    slides: numSlidesInput.value,
-    topic: topicInput.value,
-    description: descriptionInput.value,
-    email: email,
-    is_email: selectedOption === "yes"
-  };
-
-  try {
-    const response = await fetch("/generate_ppt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (response.ok) {
-      // Get the file blob from the response
-      const blob = await response.blob();
-      // Create a URL for the blob
-      const downloadUrl = window.URL.createObjectURL(blob);
-      // Create a temporary link element
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      // Set the desired file name
-      link.download = "presentation.pptx";
-      // Append to the document, trigger click, and remove it
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      alert("PPT generation successful!");
-    } else {
-      // If response is not OK, try to extract error info as JSON
-      const errorData = await response.json();
-      alert("PPT generation failed: " + errorData.error);
-    }
-  } catch (error) {
-    console.error("Error generating PPT:", error);
-    alert("An error occurred while generating the PPT.");
-  }
-});
-
+      submitPptBtn.addEventListener("click", async () => {
+        const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
+        const payload = {
+          slides: numSlidesInput.value,
+          topic: topicInput.value,
+          description: descriptionInput.value,
+          email: email,
+          is_email: selectedOption === "yes"
+        };
+        // Show loading overlay
+        loadingOverlay.style.display = "flex";
+        submitPptBtn.disabled = true;
+        try {
+          const response = await fetch("/generate_ppt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = "presentation.pptx";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            alert("PPT generation successful!");
+          } else {
+            const errorData = await response.json();
+            alert("PPT generation failed: " + errorData.error);
+          }
+        } catch (error) {
+          console.error("Error generating PPT:", error);
+          alert("An error occurred while generating the PPT.");
+        } finally {
+          // Hide loading overlay
+          loadingOverlay.style.display = "none";
+          submitPptBtn.disabled = false;
+        }
+      });
     });
   </script>
 </body>

@@ -2,444 +2,203 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz Text Input</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizXpert – Text to Quiz</title>
+  <!-- Import Cute Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    :root {
+      --primary-color: #8e44ad;
+      --secondary-color: #f0eefb;
+      --accent-color: #ffffff;
+      --accent-light: #fce4ec;
+      --text-color: #4a4a4a;
+      --light-text: #777777;
+      --border-color: #e0d4ed;
+      --transition-speed: 0.3s;
     }
-    body {
-      background-color: #fff;
-      min-height: 100vh;
-      width: 100vw;
-    }
-    .navbar {
-      width: 100%;
-      background: #fff;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      font-size: 28px;
-      font-weight: bold;
-      position: fixed;
-      top: 0;
-      left: 0;
-      color: #7a4dc1;
-      z-index: 10;
-      font-family: Georgia, 'Times New Roman', Times, serif;
-    }
-    .email-initial {
-      background: #7a4dc1;
-      color: white;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      font-size: 20px;
-    }
-    #step1, #step2, #step3 {
-      margin-top: 80px;
-      padding: 0 20px 40px;
-    }
-    .progress-bar {
-      width: 100%;
-      background: #f0f0f0;
-      padding: 20px 0;
-      margin-bottom: 40px;
-    }
-    .progress {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    .step {
-      position: relative;
-      flex: 1;
-      background: #fff;
-      color: #6a1fe2;
-      font-weight: bold;
-      text-align: center;
-      padding: 15px 10px;
-      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 120px;
-      min-height: 80px;
-      transition: background 0.3s, color 0.3s;
-    }
-    .step span {
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      background: #fff;
-      color: #7a4dc1;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .step > strong {
-      font-size: 18px;
-      color: inherit;
-    }
-    .step p {
-      color: #000;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-    .step.active {
-      background: #7a4dc1;
-      color: #fff;
-    }
-    .step.active:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: -20px;
-      width: 0;
-      height: 0;
-      border-top: 40px solid transparent;
-      border-bottom: 40px solid transparent;
-      border-left: 20px solid #7a4dc1;
-    }
-    .white-box {
-      background: #fafafa;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 30px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    #text-input {
-      width: 100%;
-      height: 200px;
-      max-height: 400px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 16px;
-      resize: vertical;
-      color: #333;
-      margin-top: 10px;
-    }
-    .question-types, .question-count {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .toggle-btn {
-      background-color: #f1f1f1;
-      border: 1px solid #ccc;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .toggle-btn.active {
-      background-color: #7a4dc1;
-      color: white;
-      border-color: #7a4dc1;
-    }
-    .next-btn {
-      background: #7a4dc1;
-      color: white;
-      border: none;
-      padding: 15px 25px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
-      float: right;
-    }
-    .next-btn:hover {
-      background: #5c3aa0;
-    }
-    .back-btn {
-      background: gray !important;
-      margin-right: 10px;
-    }
-    .clearfix::after {
-      content: "";
-      display: block;
-      clear: both;
-    }
-    /* Loading overlay styles */
-    #loadingOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: #7a4dc1;
-      z-index: 2000;
-      display: none;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: var(--secondary-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; width: 100vw; color: var(--text-color); padding-top: 80px; }
+    .navbar { width: 100%; background: var(--accent-color); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; z-index: 10; border-bottom: 2px solid var(--accent-light); }
+    .navbar .brand { font-family: 'Cookie', cursive; font-size: 32px; color: var(--primary-color); }
+    .email-initial { background: var(--primary-color); color: var(--accent-color); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: 600; }
+    .progress-container { margin-top: 2rem; max-width: 1000px; margin-bottom: 20px; padding: 0 20px; }
+    .progress { display: flex; justify-content: space-between; gap: 12px; width: 800px;}
+    .step { position: relative; background: var(--accent-light); color: var(--primary-color); padding: 18px 28px; text-align: center; font-size: 17px; font-weight: 500; border-radius: 50px; flex: 1; display: flex; align-items: center; justify-content: center; min-width: 120px; height: 54px; transition: background var(--transition-speed), transform var(--transition-speed); }
+    .step span { position: absolute; top: 50%; left: 16px; transform: translateY(-50%); background: var(--accent-color); color: var(--primary-color); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .step.active { background: var(--primary-color); color: var(--accent-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .step.active span { background: var(--accent-color); color: var(--primary-color); border-color: var(--accent-color); }
+    .container { padding: 40px 20px; width: 100%; max-width: 800px; background: var(--accent-color); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.1); margin-bottom: 40px; }
+    .white-box { background: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; }
+    h2 { font-family: 'Cookie', cursive; font-size: 30px; color: var(--primary-color); margin-bottom: 20px; text-align: center; }
+    p { color: var(--light-text); margin-bottom: 8px; }
+    textarea { width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 8px; resize: vertical; min-height: 150px; outline: none; transition: border-color var(--transition-speed); }
+    textarea:focus { border-color: var(--primary-color); }
+    .question-types, .question-count { display: flex; gap: 10px; margin-bottom: 20px; }
+    .toggle-btn { flex: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--accent-color); cursor: pointer; transition: background var(--transition-speed), border-color var(--transition-speed); }
+    .toggle-btn.active { background: var(--primary-color); color: var(--accent-color); border-color: var(--primary-color); }
+    .next-btn { background: var(--primary-color); color: var(--accent-color); border: none; padding: 12px 24px; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background var(--transition-speed); }
+    .next-btn:hover { background: #9b59b6; }
+    .back-btn { background: #bbb; margin-right: 10px; }
+    #loadingOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; color: #fff; font-size: 24px; z-index: 100; }
+    .spinner { border: 8px solid rgba(255,255,255,0.3); border-top: 8px solid #fff; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
   <div class="navbar">
-    <span>QuizXpert</span>
-    <span class="email-initial" id="emailInitial"></span>
+    <div class="brand">QuizXpert</div>
+    <div class="email-initial" id="emailInitial"></div>
   </div>
-  <!-- Step 1: Enter Text -->
-  <div id="step1">
-    <div class="progress-bar">
-      <div class="progress">
-        <div class="step active">
-          <span>1</span>
-          <strong>Enter Text</strong>
-          <p>Type or paste the text content</p>
-        </div>
-        <div class="step">
-          <span>2</span>
-          <strong>Configure Quiz</strong>
-          <p>Select types and levels</p>
-        </div>
-        <div class="step">
-          <span>3</span>
-          <strong>Output Options</strong>
-          <p>Get it on your Email</p>
-        </div>
-      </div>
+  <div class="progress-container">
+    <div class="progress">
+      <div class="step active" data-step="1"><span>1</span> Enter Text</div>
+      <div class="step" data-step="2"><span>2</span> Configure Quiz</div>
+      <div class="step" data-step="3"><span>3</span> Output Options</div>
     </div>
-    <h2 style="text-align:center; margin-bottom: 20px;">Enter or Paste Your Text</h2>
-    <div class="white-box clearfix">
+  </div>
+  <div class="container" id="step1">
+    <h2>Enter or Paste Your Text</h2>
+    <div class="white-box">
       <p>Type or paste up to 4000 characters:</p>
-      <textarea 
-        id="text-input"
-        placeholder="Enter or paste your topic/description here..."
-        maxlength="4000"
-      ></textarea>
+      <textarea id="text-input" maxlength="4000" placeholder="Enter or paste your text..."></textarea>
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
   </div>
-  <!-- Step 2: Configure Quiz -->
-  <div id="step2" style="display: none;">
-    <div class="progress-bar">
-      <div class="progress">
-        <div class="step">
-          <span>1</span>
-          <strong>Enter Text</strong>
-          <p>Type or paste the text content</p>
-        </div>
-        <div class="step active">
-          <span>2</span>
-          <strong>Configure Quiz</strong>
-          <p>Select types and levels</p>
-        </div>
-        <div class="step">
-          <span>3</span>
-          <strong>Output Options</strong>
-          <p>Get it on your Email</p>
-        </div>
+  <div class="container" id="step2" style="display:none;">
+    <h2>Configure Quiz</h2>
+    <div class="white-box">
+      <p>Select question type:</p>
+      <div class="question-types">
+        <button class="toggle-btn active">Multiple Choice</button>
+        <button class="toggle-btn">True False</button>
+        <button class="toggle-btn">Fill in the blank</button>
+        <button class="toggle-btn">General QA</button>
       </div>
-    </div>
-    <h2 style="text-align:center; margin-bottom: 20px;">Configure Quiz</h2>
-    <div class="white-box clearfix">
-      <div>
-        <p style="margin-bottom: 5px;">What type of questions?</p>
-        <div class="question-types">
-          <button class="toggle-btn active">Multiple Choice</button>
-          <button class="toggle-btn">True False</button>
-          <button class="toggle-btn">Fill in the blank</button>
-          <button class="toggle-btn">General Question Answers</button>
-        </div>
+      <p>Select difficulty level:</p>
+      <div class="question-count">
+        <button class="toggle-btn">Easy</button>
+        <button class="toggle-btn active">Medium</button>
+        <button class="toggle-btn">Hard</button>
       </div>
-      <div style="margin-top:20px;">
-        <p style="margin-bottom: 5px;">Difficulty Level?</p>
-        <div class="question-count">
-          <button class="toggle-btn">Easy</button>
-          <button class="toggle-btn active">Medium</button>
-          <button class="toggle-btn">Hard</button>
-        </div>
-      </div>
-      <button id="next-step2" class="next-btn">Next Step →</button>
+      <div style="text-align:right;"><button id="back-step1" class="next-btn back-btn">← Back</button><button id="next-step2" class="next-btn">Next Step →</button></div>
     </div>
   </div>
-  <!-- Step 3: Output Options -->
-  <div id="step3" style="display: none;">
-    <div class="progress-bar">
-      <div class="progress">
-        <div class="step">
-          <span>1</span>
-          <strong>Enter Text</strong>
-          <p>Type or paste the text content</p>
-        </div>
-        <div class="step">
-          <span>2</span>
-          <strong>Configure Quiz</strong>
-          <p>Select types and levels</p>
-        </div>
-        <div class="step active">
-          <span>3</span>
-          <strong>Output Options</strong>
-          <p>Get it on your Email</p>
-        </div>
-      </div>
-    </div>
-    <h2 style="text-align:center; margin-bottom: 20px;">Do you want to receive the quiz via email?</h2>
-    <div class="white-box clearfix">
-      <label style="display:block; margin-bottom:5px;">
-        <input type="radio" name="emailOption" value="yes" /> Yes, send to my email
-      </label>
-      <label style="display:block; margin-bottom:15px;">
-        <input type="radio" name="emailOption" value="no" checked /> No, Thanks
-      </label>
-      <button id="back-step2" class="next-btn back-btn">← Back</button>
-      <button id="submit-quiz" class="next-btn">Submit Quiz</button>
+  <div class="container" id="step3" style="display:none;">
+    <h2>Receive Quiz via Email?</h2>
+    <div class="white-box">
+      <label><input type="radio" name="emailOption" value="yes" /> Yes, send to my email</label><br>
+      <label><input type="radio" name="emailOption" value="no" checked /> No, Thanks</label>
+      <div style="text-align:right; margin-top:20px;"><button id="back-step2" class="next-btn back-btn">← Back</button><button id="submit-quiz" class="next-btn">Submit Quiz</button></div>
     </div>
   </div>
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay">Loading... Please wait</div>
+  <div id="loadingOverlay"><div class="spinner"></div>Please wait, generating your quiz...</div>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let email = document.getElementById("userEmail").value;
-      if (email) {
-        document.getElementById("emailInitial").textContent = email.charAt(0).toUpperCase();
-      }
-      const step1 = document.getElementById("step1");
-      const step2 = document.getElementById("step2");
-      const step3 = document.getElementById("step3");
-      const nextStep1Btn = document.getElementById("next-step1");
-      const nextStep2Btn = document.getElementById("next-step2");
-      const backStep2Btn = document.getElementById("back-step2");
-      const submitQuizBtn = document.getElementById("submit-quiz");
-      const textInput = document.getElementById("text-input");
-      const loadingOverlay = document.getElementById("loadingOverlay");
+   document.addEventListener('DOMContentLoaded', () => {
+    const email = document.getElementById('userEmail').value;
+    document.getElementById('emailInitial').textContent = email.charAt(0).toUpperCase();
 
-      nextStep1Btn.addEventListener("click", function () {
-        const userText = textInput.value.trim();
-        if (!userText) {
-          alert("Please enter some text first!");
+    const steps = [
+      document.getElementById('step1'),
+      document.getElementById('step2'),
+      document.getElementById('step3'),
+    ];
+    const indicators = document.querySelectorAll('.step');
+
+    function showStep(i) {
+      steps.forEach((s, j) => s.style.display = j === i ? 'block' : 'none');
+      indicators.forEach((ind, j) => ind.classList.toggle('active', j === i));
+    }
+
+    // STEP 1 → Save text & go to Step 2
+    document.getElementById('next-step1').onclick = () => {
+      const text = document.getElementById('text-input').value.trim();
+      if (!text) {
+        alert('Please enter some text first!');
+        return;
+      }
+      localStorage.setItem('topicText', text);
+      showStep(1);
+    };
+    document.getElementById('back-step1').onclick = () => showStep(0);
+
+    // STEP 2 navigation
+    document.getElementById('next-step2').onclick = () => showStep(2);
+    document.getElementById('back-step2').onclick = () => showStep(1);
+
+    // Toggle-button behavior (question type & difficulty)
+    document.querySelectorAll('.question-types .toggle-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.question-types .toggle-btn')
+          .forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+    });
+    document.querySelectorAll('.question-count .toggle-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.question-count .toggle-btn')
+          .forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+    });
+
+    // SUBMIT (Step 3)
+    document.getElementById('submit-quiz').onclick = async () => {
+      const option = document.querySelector('input[name="emailOption"]:checked').value;
+      const difficulty = document.querySelector('.question-count .toggle-btn.active')
+        .textContent.trim();
+      const label = document.querySelector('.question-types .toggle-btn.active')
+        .textContent.trim();
+
+      // Map UI labels → payload & redirect values
+      let type;
+      if (label === 'Multiple Choice')      type = 'MCQs';
+      else if (label === 'True False')      type = 'truefalse';
+      else if (label === 'Fill in the blank') type = 'blanks';
+      else /* General QA */                 type = 'qa';
+
+      const topic    = localStorage.getItem('topicText') || '';
+      const payload  = { topic, type, difficulty, email, is_email: option === 'yes' };
+
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.style.display = 'flex';
+
+      try {
+        const res  = await fetch('/generateOnTopic', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        overlay.style.display = 'none';
+
+        if (!res.ok) {
+          alert('Quiz generation failed: ' + (data.error || 'Unknown error'));
           return;
         }
-        localStorage.setItem("topicText", userText);
-        step1.style.display = "none";
-        step2.style.display = "block";
-        const steps = document.querySelectorAll(".progress .step");
-        steps[0].classList.remove("active");
-        steps[1].classList.add("active");
-      });
 
-      const questionTypeButtons = document.querySelectorAll('.question-types .toggle-btn');
-      questionTypeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          questionTypeButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
+        const params = new URLSearchParams({
+          message:    data.message,
+          email,
+          difficulty
         });
-      });
 
-      const questionCountButtons = document.querySelectorAll('.question-count .toggle-btn');
-      questionCountButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          questionCountButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
-        });
-      });
+        // Redirect exactly as in your previous code
+        let redirect;
+        if (type === 'MCQs')        redirect = `/quiz?${params}`;
+        else if (type === 'truefalse') redirect = `/truefalse?${params}`;
+        else if (type === 'blanks')    redirect = `/blank?${params}`;
+        else                           redirect = `/qa?${params}`;
 
-      nextStep2Btn.addEventListener("click", function () {
-        step2.style.display = "none";
-        step3.style.display = "block";
-        const steps = document.querySelectorAll(".progress .step");
-        steps[1].classList.remove("active");
-        steps[2].classList.add("active");
-      });
+        window.location.href = redirect;
 
-      backStep2Btn.addEventListener("click", function () {
-        step3.style.display = "none";
-        step2.style.display = "block";
-        const steps = document.querySelectorAll(".progress .step");
-        steps[2].classList.remove("active");
-        steps[1].classList.add("active");
-      });
-
-      submitQuizBtn.addEventListener("click", async () => {
-        const selectedOption = document.querySelector("input[name='emailOption']:checked").value;
-        const difficultyBtn = document.querySelector(".question-count .toggle-btn.active");
-        const difficulty = difficultyBtn ? difficultyBtn.textContent.trim() : "Medium";
-        const questionTypeBtn = document.querySelector(".question-types .toggle-btn.active");
-        let questionType = questionTypeBtn ? questionTypeBtn.textContent.trim() : "Multiple Choice";
-
-        if (questionType === "Multiple Choice") {
-          questionType = "MCQs";
-        } else if (questionType === "True False") {
-          questionType = "truefalse";
-        } else if (questionType === "Fill in the blank") {
-          questionType = "blanks";
-        } else if (questionType === "General Question Answers") {
-          questionType = "qa";
-        }
-        
-        const userText = localStorage.getItem("topicText") || "";
-        
-        // Build the payload with is_email as a boolean value
-        const payload = {
-          difficulty: difficulty,
-          type: questionType,
-          topic: userText,
-          email: email,
-          is_email: selectedOption === "yes"
-        };
-
-        // Show loading overlay while processing
-        loadingOverlay.style.display = "flex";
-        try {
-          const response = await fetch("/generateOnTopic", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          const data = await response.json();
-          // Hide loading overlay when done
-          loadingOverlay.style.display = "none";
-          if (response.ok) {
-            const params = new URLSearchParams({
-              message: data.message,
-              email: email,
-              difficulty: difficulty
-            });
-            if (questionType === "MCQs") {
-              window.location.href = `/quiz?${params.toString()}`;
-            } else if (questionType === "truefalse") {
-              window.location.href = `/truefalse?${params.toString()}`;
-            } else if (questionType === "qa") {
-              window.location.href = `/qa?${params.toString()}`;
-            } else {
-              window.location.href = `/blank?${params.toString()}`;
-            }
-          } else {
-            alert("Quiz generation failed: " + data.error);
-          }
-        } catch (error) {
-          console.error("Error generating quiz:", error);
-          loadingOverlay.style.display = "none";
-          alert("An error occurred while generating the quiz.");
-        }
-      });
-    });
+      } catch (e) {
+        overlay.style.display = 'none';
+        alert('Error generating quiz');
+      }
+    };
+  });
   </script>
 </body>
 </html>
