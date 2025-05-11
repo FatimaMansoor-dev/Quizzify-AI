@@ -1,10 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fill-in-the-Blank Quiz</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- PDF export library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.3"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -42,13 +47,17 @@
     }
     .correct-answer { color: #28a745; }
     .source         { color: #555; }
+    .button-group {
+      display: flex; gap: 10px; margin-top: 15px;
+    }
     button {
-      padding: 12px 25px; background: #1C0E6D; color: #fff;
+      flex: 1;
+      padding: 12px 25px; background: #4A41FF; color: #fff;
       font-size: 1rem; border: none; border-radius: 5px;
       cursor: pointer; transition: background 0.3s ease;
-      margin-top: 15px; display: block; width: 100%;
     }
     button:hover { background: #3732C1; }
+    #return-btn { display: none; margin-top: 10px; }
     #score-container {
       font-size: 1.5rem; font-weight: 700; color: #1C0E6D;
       text-align: center; margin-top: 25px; display: none;
@@ -56,45 +65,62 @@
   </style>
 </head>
 <body>
-  <div class="quiz-container">
+  <div class="quiz-container" id="quiz-container">
     <h1>Fill-in-the-Blank Quiz</h1>
-    <form id="quiz-form">
-      <div id="questions"></div>
-      <button type="submit" id="submit-btn">Submit Answers</button>
-      <button type="button" id="return-btn" style="display:none;" onclick="returnHome()">Return Home</button>
-    </form>
+    <div id="questions"></div>
+    <div class="button-group">
+      <button id="validate-btn">Validate Quiz Now!</button>
+      <button id="download-btn">Download PDF</button>
+    </div>
+    <button id="return-btn" onclick="returnHome()">Return Home</button>
     <div id="score-container"></div>
   </div>
 
   <script>
+    // Extract URL parameters
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("message") || "";
+    const email = params.get("email") || null;
+    const difficulty = params.get("difficulty") || null;
     const correctAnswers = {};
 
+    // Send quiz via email after rendering
+    function sendQuizEmail() {
+      if (!email || !email.includes('@')) return;
+      fetch('/sendQuizEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, quiz: raw })
+      })
+      .then(res => res.json())
+      .then(data => {
+        // optional: show status
+      })
+      .catch(() => {
+        // ignore errors
+      });
+    }
+
+    // Parse fill-in-the-blank quiz questions
     function parseQuiz(text) {
       const container = document.getElementById("questions");
-      // Regex to capture each question block
       const questionRegex = /\*\*Question\s+(\d+):\*\*([\s\S]*?)(?=\*\*Question\s+\d+:\*\*|$)/g;
       let match;
       while ((match = questionRegex.exec(text)) !== null) {
         const qNum = match[1].trim();
         const block = match[2].trim();
-        // Extract question text (before Answer:)
         const qText = (block.split(/\*\*Answer:\*\*|Answer:/)[0] || '').replace(/\r?\n/g, ' ').trim();
-        // Extract answer
         const ansMatch = block.match(/\*\*Answer:\*\*\s*([^\r\n]+)/) || block.match(/Answer:\s*([^\r\n]+)/);
         const answerText = ansMatch ? ansMatch[1].trim() : '';
-        // Extract source
         const srcMatch = block.match(/\*\*Source:\*\*\s*([\s\S]*)$/) || block.match(/Source:\s*([\s\S]*)$/);
         const sourceText = srcMatch ? srcMatch[1].trim() : null;
 
         correctAnswers[qNum] = { answer: answerText, source: sourceText };
 
-        // Build question HTML
         const div = document.createElement("div");
         div.classList.add("question");
         let html = `<p><strong>Question ${qNum}:</strong> ${qText}</p>`;
-        html += `<input type="text" name="q${qNum}" data-question="${qNum}" placeholder="Type your answer here" required>`;
+        html += `<input type="text" id="input${qNum}" data-question="${qNum}" placeholder="Type your answer here" required>`;
         html += `<p class="correct-answer" id="answer${qNum}">Correct Answer: <strong>${answerText}</strong></p>`;
         if (sourceText) {
           html += `<p class="source" id="source${qNum}">Source: <strong>${sourceText}</strong></p>`;
@@ -104,19 +130,15 @@
       }
     }
 
-    function returnHome() {
-      const email = params.get("email") || "";
-      window.location.href = `/userProfile?email=${encodeURIComponent(email)}`;
-    }
-
-    document.getElementById("quiz-form").addEventListener("submit", function(evt) {
-      evt.preventDefault();
+    // Validate quiz and show results
+    function validateQuiz() {
       let score = 0;
       const total = Object.keys(correctAnswers).length;
-      document.querySelectorAll("input[type=text]").forEach(input => {
+      Object.keys(correctAnswers).forEach(q => {
+        const input = document.getElementById(`input${q}`);
+        input.disabled = true;
         const userAns = input.value.trim().toLowerCase();
-        const q = input.dataset.question;
-        const correct = (correctAnswers[q]?.answer || '').toLowerCase();
+        const correct = correctAnswers[q].answer.toLowerCase();
         const ansEl = document.getElementById(`answer${q}`);
         const srcEl = document.getElementById(`source${q}`);
         if (userAns === correct) {
@@ -128,15 +150,46 @@
         ansEl.style.display = "block";
         if (srcEl) srcEl.style.display = "block";
       });
+
       const scoreEl = document.getElementById("score-container");
       scoreEl.innerHTML = `You scored <strong>${score}/${total}</strong>!`;
       scoreEl.style.display = "block";
-      document.getElementById("submit-btn").style.display = "none";
-      document.getElementById("return-btn").style.display = "block";
-    });
 
-    // Kick off parsing
-    parseQuiz(raw);
+      // Celebrate
+      if (window.confetti) {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      // Hide validate, show return
+      document.getElementById("validate-btn").disabled = true;
+      document.getElementById("return-btn").style.display = "block";
+
+      // Save results
+      fetch('/insertResults', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, email, difficulty })
+      });
+    }
+
+    // Download quiz as PDF
+    function downloadPDF() {
+      html2pdf().set({ margin: 0.5, filename: `quiz_${email||'user'}.pdf`, html2canvas: { scale: 2 } })
+        .from(document.getElementById('quiz-container')).save();
+    }
+
+    // Return to profile
+    function returnHome() {
+      window.location.href = `/userProfile?email=${encodeURIComponent(email||'')}`;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      sendQuizEmail();
+      parseQuiz(raw);
+      document.getElementById("validate-btn").addEventListener("click", validateQuiz);
+      document.getElementById("download-btn").addEventListener("click", downloadPDF);
+    });
   </script>
+
 </body>
 </html>

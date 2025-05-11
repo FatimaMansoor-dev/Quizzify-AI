@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QuizXpert – Upload Your Document</title>
-  <!-- Import Cute Google Fonts -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap" rel="stylesheet">
   <!-- PDF.js for PDF parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <!-- Mammoth for DOCX parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
   <style>
-    :root {
+    :root { 
       --primary-color: #8e44ad;
       --secondary-color: #f0eefb;
       --accent-color: #ffffff;
@@ -21,54 +21,192 @@
       --border-color: #e0d4ed;
       --transition-speed: 0.3s;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    body { background: var(--secondary-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; width: 100vw; color: var(--text-color); padding-top: 80px; }
-    .navbar { width:100%; background: var(--accent-color); padding: 15px 30px; display:flex; justify-content: space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.1); position:fixed; top:0; z-index:10; border-bottom:2px solid var(--accent-light); }
-    .navbar .brand{ font-family:'Cookie', cursive; font-size:32px; color: var(--primary-color); }
-    .email-initial{ background:var(--primary-color); color:var(--accent-color); width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:20px; font-weight:600; }
-    .progress-container{ width:100%; max-width:1000px; margin-bottom:20px; padding:0 20px; margin-top: 2rem;}
-    .progress{ display:flex; justify-content:space-between; gap:12px; width: 800px;}
-    .step{ position:relative; background:var(--accent-light); color:var(--primary-color); padding:18px 28px; text-align:center; font-size:17px; font-weight:500; border-radius:50px; flex:1; display:flex; align-items:center; justify-content:center; min-width:120px; height:54px; transition:background var(--transition-speed), transform var(--transition-speed); }
-    .step span{ position:absolute; top:50%; left:16px; transform:translateY(-50%); background:var(--accent-color); color:var(--primary-color); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:600; }
-    .step.active{ background:var(--primary-color); color:var(--accent-color); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    .step.active span{ background:var(--accent-color); color:var(--primary-color); }
-    .container{ padding:40px 20px; width:100%; max-width:1200px; background:var(--accent-color); border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,0.1); margin:20px; min-height:60vh; transition:all var(--transition-speed); }
-    .step-container{ border:1px solid var(--border-color); border-radius:12px; padding:32px; width:100%; max-width:900px; margin:20px auto; background:linear-gradient(135deg, var(--accent-color), var(--secondary-color)); animation:fadeIn 0.5s ease-in-out; }
-    @keyframes fadeIn{ from{ opacity:0; transform:translateY(20px);} to{ opacity:1; transform:translateY(0);} }
-    .upload-box{ margin-bottom: 2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed var(--border-color); padding:40px; border-radius:12px; cursor:pointer; color:var(--light-text); font-size:16px; transition:border-color var(--transition-speed); }
-    .upload-box:hover{ border-color:var(--primary-color); }
-    .upload-box input{ display:none; }
-    #file-preview{ margin-top:12px; font-size:15px; color:var(--text-color); }
-    .quiz-config{ display:flex; flex-direction:column; gap:20px; max-width:600px; margin:0 auto; }
-    .quiz-config p{ font-weight:500; margin-bottom:6px; }
-    .toggle-btn{ padding:12px 20px; border:1px solid var(--border-color); border-radius:8px; background:var(--accent-color); cursor:pointer; transition:background var(--transition-speed), border-color var(--transition-speed); }
-    .toggle-btn.active{ background:var(--primary-color); color:var(--accent-color); border-color:var(--primary-color); }
-    .next-btn{ background:var(--primary-color); color:var(--accent-color); border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-size:16px; font-weight:500; transition:background var(--transition-speed); }
-    .next-btn:hover{ background:#9b59b6; margin-top: 1rem; }
-    .back-btn{ background:#bbb; margin-right:10px; }
-    #loadingOverlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; color:#fff; font-size:24px; z-index:100; }
-    .spinner{ border:8px solid rgba(255,255,255,0.3); border-top:8px solid #fff; border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; margin-bottom:16px; }
-    @keyframes spin{ 0%{ transform:rotate(0deg);}100%{ transform:rotate(360deg);} }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+    body { 
+      background:var(--secondary-color);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-height:100vh;
+      width:100vw;
+      color:var(--text-color);
+      padding-top:80px;
+    }
+    .navbar { 
+      width:100%;
+      background:var(--accent-color);
+      padding:15px 30px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      position:fixed;
+      top:0;
+      z-index:10;
+      border-bottom:2px solid var(--accent-light);
+    }
+    .navbar .brand { font-family:'Cookie',cursive; font-size:32px; color:var(--primary-color); }
+    .email-initial { 
+      background:var(--primary-color);
+      color:var(--accent-color);
+      width:48px;
+      height:48px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      font-size:20px;
+      font-weight:600;
+    }
+    .progress-container { 
+      width:100%;
+      max-width:1000px;
+      margin-bottom:20px;
+      padding:0 20px;
+      margin-top:2rem;
+    }
+    .progress { display:flex; justify-content:space-between; gap:12px; }
+    .step { 
+      position:relative;
+      background:var(--accent-light);
+      color:var(--primary-color);
+      padding:18px 28px;
+      text-align:center;
+      font-size:17px;
+      font-weight:500;
+      border-radius:50px;
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-width:120px;
+      height:54px;
+      transition:background var(--transition-speed), transform var(--transition-speed);
+    }
+    .step span { 
+      position:absolute;
+      top:50%;
+      left:16px;
+      transform:translateY(-50%);
+      background:var(--accent-color);
+      color:var(--primary-color);
+      border-radius:50%;
+      width:36px;
+      height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
+    }
+    .step.active { 
+      background:var(--primary-color);
+      color:var(--accent-color);
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    .step.active span { background:var(--accent-color); color:var(--primary-color); }
+    .container { 
+      padding:40px 20px;
+      width:100%;
+      max-width:900px;
+      background:var(--accent-color);
+      border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+      margin:20px;
+      min-height:60vh;
+      transition:all var(--transition-speed);
+    }
+    .step-container { 
+      display:none;
+      border:1px solid var(--border-color);
+      border-radius:12px;
+      padding:32px;
+      background:linear-gradient(135deg,var(--accent-color),var(--secondary-color));
+      animation:fadeIn 0.5s ease-in-out;
+    }
+    .step-container.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+    h2 { font-family:'Cookie',cursive; font-size:30px; color:var(--primary-color); margin-bottom:16px; }
+    .upload-box { 
+      margin-bottom:2rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border:2px dashed var(--border-color);
+      padding:40px;
+      border-radius:12px;
+      cursor:pointer;
+      color:var(--light-text);
+      font-size:16px;
+      transition:border-color var(--transition-speed);
+    }
+    .upload-box:hover { border-color:var(--primary-color); }
+    .upload-box input { display:none; }
+    #file-preview { margin-top:12px; font-size:15px; color:var(--text-color); }
+    .quiz-config { display:flex; flex-direction:column; gap:20px; max-width:600px; margin:0 auto; }
+    .quiz-config p { font-weight:500; margin-bottom:6px; }
+    .toggle-btn { 
+      padding:12px 20px;
+      border:1px solid var(--primary-color);
+      border-radius:8px;
+      cursor:pointer;
+      transition:background var(--transition-speed), color var(--transition-speed);
+    }
+    .toggle-btn.selected, .toggle-btn.active { 
+      background:var(--primary-color);
+      color:var(--accent-color);
+      border-color:var(--primary-color);
+    }
+    .next-btn { 
+      background:var(--primary-color);
+      color:var(--accent-color);
+      border:none;
+      padding:12px 24px;
+      border-radius:50px;
+      cursor:pointer;
+      font-size:16px;
+      font-weight:500;
+      transition:background var(--transition-speed);
+    }
+    .next-btn:hover { background:#9b59b6; }
+    .back-btn { background:#bbb; margin-right:10px; }
+    #loadingOverlay { 
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.5);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:24px;
+      z-index:100;
+    }
+    .spinner { 
+      border:8px solid rgba(255,255,255,0.3);
+      border-top:8px solid #fff;
+      border-radius:50%;
+      width:60px;
+      height:60px;
+      animation:spin 1s linear infinite;
+      margin-bottom:16px;
+    }
+    @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
   </style>
 </head>
 <body>
   <input type="hidden" id="userEmail" value="{{ email }}">
-  <div class="navbar">
-    <div class="brand">QuizXpert</div>
-    <div class="email-initial" id="emailInitial"></div>
-  </div>
-
-  <div class="progress-container">
-    <div class="progress">
-      <div class="step active" data-step="1"><span>1</span> Upload Document</div>
-      <div class="step" data-step="2"><span>2</span> Configure Quiz</div>
-      <div class="step" data-step="3"><span>3</span> Output Options</div>
-    </div>
-  </div>
-
+  <div class="navbar"><div class="brand">QuizXpert</div><div class="email-initial" id="emailInitial"></div></div>
+  <div class="progress-container"><div class="progress">
+    <div class="step active" data-step="1"><span>1</span> Upload Document</div>
+    <div class="step" data-step="2"><span>2</span> Configure Quiz</div>
+    <div class="step" data-step="3"><span>3</span> Output Options</div>
+  </div></div>
   <div class="container">
-    <!-- Step 1 -->
-    <div id="step1" class="step-container">
+    <div id="step1" class="step-container active">
       <h2>Upload Document (PDF/DOCX, max 5 pages)</h2>
       <label class="upload-box">
         <p>Click to upload</p>
@@ -77,9 +215,7 @@
       </label>
       <button id="next-step1" class="next-btn">Next Step →</button>
     </div>
-
-    <!-- Step 2 -->
-    <div id="step2" class="step-container" style="display:none;">
+    <div id="step2" class="step-container">
       <h2>Configure Quiz</h2>
       <div class="quiz-config">
         <div>
@@ -102,9 +238,7 @@
       </div>
       <button id="next-step2" class="next-btn">Next Step →</button>
     </div>
-
-    <!-- Step 3 -->
-    <div id="step3" class="step-container" style="display:none;">
+    <div id="step3" class="step-container">
       <h2>Receive Quiz via Email?</h2>
       <div class="quiz-config email-options">
         <label class="toggle-btn"><input type="radio" name="emailOption" value="yes" /> Yes</label>
@@ -116,128 +250,61 @@
       </div>
     </div>
   </div>
-
-  <div id="loadingOverlay">
-    <div class="spinner"></div>
-    Please wait, generating your quiz...
-  </div>
-
+  <div id="loadingOverlay"><div class="spinner"></div>Please wait, generating your quiz...</div>
   <script>
-   document.addEventListener('DOMContentLoaded', () => {
-      // Navbar initial
+    document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('userEmail').value;
       document.getElementById('emailInitial').textContent = email.charAt(0).toUpperCase();
-
-      // File upload & preview
       const fileInput = document.getElementById('file-upload');
       const filePreview = document.getElementById('file-preview');
       let docText = '';
-
       fileInput.addEventListener('change', () => {
         const f = fileInput.files[0];
         if (f) filePreview.textContent = `Selected: ${f.name}`;
       });
-
-      // Step containers & indicators
-      const stepsEls = [
-        document.getElementById('step1'),
-        document.getElementById('step2'),
-        document.getElementById('step3')
-      ];
+      const stepsEls = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
       const indicators = document.querySelectorAll('.step');
       function show(i) {
-        stepsEls.forEach((s, j) => s.style.display = j === i ? 'block' : 'none');
-        indicators.forEach((el, j) => el.classList.toggle('active', j === i));
+        stepsEls.forEach((s,j) => s.classList.toggle('active', j===i));
+        indicators.forEach((el,j) => el.classList.toggle('active', j===i));
       }
-
-      // Next from Step 1 → extract text, store, go to 2
       document.getElementById('next-step1').onclick = () => {
-        const f = fileInput.files[0];
-        if (!f) return alert('Please upload a document first!');
-        const reader = new FileReader();
-        const isPDF  = f.type === 'application/pdf';
-        const isDOCX = f.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        if (!isPDF && !isDOCX) {
-          return alert('Unsupported file type. Please upload PDF or DOCX.');
-        }
+        const f = fileInput.files[0]; if (!f) return alert('Please upload a document first!');
+        const reader = new FileReader(); const isPDF = f.type==='application/pdf'; const isDOCX = f.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        if (!isPDF && !isDOCX) return alert('Unsupported file type. Please upload PDF or DOCX.');
         reader.onload = async function() {
           try {
             if (isPDF) {
               const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-              if (pdf.numPages > 5) return alert('Maximum 5 pages allowed.');
-              docText = '';
-              for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const cont = await page.getTextContent();
-                docText += cont.items.map(it => it.str).join(' ') + '\n';
-              }
-            } else {
-              const result = await mammoth.extractRawText({ arrayBuffer: this.result });
-              docText = result.value;
-            }
-            localStorage.setItem('docText', docText);
-            show(1);
-          } catch (e) {
-            console.error(e);
-            alert('Failed to read the document. Please try again.');
-          }
+              if (pdf.numPages>5) return alert('Maximum 5 pages allowed.'); docText='';
+              for (let i=1;i<=pdf.numPages;i++){ const page = await pdf.getPage(i); const cont = await page.getTextContent(); docText += cont.items.map(it => it.str).join(' ')+'\n'; }
+            } else { const result = await mammoth.extractRawText({ arrayBuffer: this.result }); docText = result.value; }
+            localStorage.setItem('docText', docText); show(1);
+          } catch(e){ console.error(e); alert('Failed to read the document. Please try again.'); }
         };
         reader.readAsArrayBuffer(f);
       };
-
-      // Step 2 & 3 navigation
       document.getElementById('next-step2').onclick = () => show(2);
       document.getElementById('back-step2').onclick = () => show(1);
-
-      // Toggle behavior
       ['question-types','question-count','email-options'].forEach(cls => {
-        document.querySelectorAll(`.${cls} .toggle-btn`).forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll(`.${cls} .toggle-btn`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (cls === 'email-options') btn.querySelector('input').checked = true;
-          });
-        });
+        document.querySelectorAll(`.${cls} .toggle-btn`).forEach(btn => btn.addEventListener('click', () => {
+          document.querySelectorAll(`.${cls} .toggle-btn`).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active'); if (cls==='email-options') btn.querySelector('input').checked=true;
+        }));
       });
-
-      // Submit Quiz with second-code logic for redirects
       document.getElementById('submit-quiz').onclick = async () => {
-        const overlay = document.getElementById('loadingOverlay');
-        overlay.style.display = 'flex';
-
+        const overlay = document.getElementById('loadingOverlay'); overlay.style.display='flex';
         const diffLabel = document.querySelector('.question-count .toggle-btn.active').textContent;
         const typeLabel = document.querySelector('.question-types .toggle-btn.active').textContent;
-        const map = {
-          'Multiple Choice': 'MCQs',
-          'True False':      'truefalse',
-          'Fill in the blank':'blanks',
-          'General QA':      'qa'
-        };
-        const type = map[typeLabel] || 'MCQs';
-        const is_email = document.querySelector('input[name="emailOption"]:checked').value === 'yes';
-        const topic = localStorage.getItem('docText') || '';
-
-        const payload = { email, topic, difficulty: diffLabel, type, is_email };
-        try {
-          const res = await fetch('/generateOnTopic', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload)
-          });
-          const data = await res.json();
-          overlay.style.display = 'none';
-          if (!res.ok) throw new Error(data.error || 'Unknown error');
-          // Build redirect URL based on type
-          const params = new URLSearchParams({ message: data.message, email, difficulty: diffLabel });
-          let url = '/quiz?'+ params.toString();
-          if (type === 'truefalse') url = '/truefalse?'+ params.toString();
-          else if (type === 'qa') url = '/qa?'+ params.toString();
-          else if (type === 'blanks') url = '/blank?'+ params.toString();
-          window.location.href = url;
-        } catch (e) {
-          overlay.style.display = 'none';
-          alert('Error generating quiz: ' + e.message);
-        }
+        const map = { 'Multiple Choice':'MCQs','True False':'truefalse','Fill in the blank':'blanks','General QA':'qa' };
+        const type=map[typeLabel]||'MCQs'; const is_email=document.querySelector('input[name="emailOption"]:checked').value==='yes';
+        const topic = localStorage.getItem('docText')||'';
+        const payload={email,topic,difficulty:diffLabel,type,is_email};
+        try { const res = await fetch('/generateOnTopic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+          const data = await res.json(); overlay.style.display='none'; if(!res.ok) throw new Error(data.error||'Unknown error');
+          const params=new URLSearchParams({message:data.message,email,difficulty:diffLabel});
+          let url='/quiz?'+params.toString(); if(type==='truefalse') url='/truefalse?'+params.toString(); else if(type==='qa') url='/qa?'+params.toString(); else if(type==='blanks') url='/blank?'+params.toString(); window.location.href=url;
+        } catch(e){ overlay.style.display='none'; alert('Error generating quiz: '+e.message); }
       };
     });
   </script>

@@ -6,7 +6,9 @@ import random
 from flask_mail import Mail, Message
 from groq import Groq
 from flask import Flask, request, jsonify
-import time
+import fitz
+import google.generativeai as genai
+
 from pptx import Presentation
 from pptx.util import Inches, Pt
 import logging
@@ -78,6 +80,9 @@ mail = Mail(app)
 groq_api_key = os.environ.get('GROQ_API_KEY')
 client = Groq(api_key=groq_api_key)
 
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = genai.GenerativeModel("gemini-1.5-flash")
 # ---------------------
 # Firebase / JSON config
 # ---------------------
@@ -921,7 +926,158 @@ def generate_ppt():
     except Exception as e:
         logging.exception("Error generating PPT")
         return jsonify({"error": str(e)}), 500
+    
 
+
+from flask import jsonify, request
+
+@app.route('/sendQuizEmail', methods=['POST'])
+@login_required   # optional — if you want only logged‑in users to hit it
+def send_quiz_email():
+    data = request.get_json() or {}
+    email = data.get('email')
+    quiz = data.get('quiz')
+    print(email, quiz)
+    if not email or not quiz:
+        return jsonify(success=False, error="Missing payload"), 400
+
+    try:
+        msg = Message(
+            subject="Your Quiz from QuizXpert",
+            recipients=[email],
+            body=f"Hello,\n\nHere’s your quiz:\n\n{quiz}\n\nGood luck!"
+        )
+        mail.send(msg)
+        return jsonify(success=True)
+    except Exception as e:
+        app.logger.error(f"Error sending quiz email: {e}")
+        return jsonify(success=False, error=str(e)), 500
+    
+from PIL import Image
+
+import re
+from google.api_core.exceptions import ResourceExhausted
+
+@app.route('/get_quiz', methods=['POST'])
+def get_quiz():
+    if 'quizPdf' not in request.files:
+        return jsonify({"error": "No quizPdf file provided"}), 400
+
+    file = request.files['quizPdf']
+    try:
+        pdf_bytes = file.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+        quizzes = []
+        for page_num in range(doc.page_count):
+            page = doc.load_page(page_num)
+            pix = page.get_pixmap()
+            pil_img = Image.frombytes(
+                "RGB",
+                (pix.width, pix.height),
+                pix.samples
+            )
+
+            prompt = (
+                "Extract all quiz questions and answers from this page image. "
+                "Return ONLY a JSON array. Do not wrap it in markdown or code fences."
+            )
+
+            # ← Pass [prompt, pil_img] positionally
+            try:
+                response = gemini_model.generate_content([prompt, pil_img])
+            except ResourceExhausted:
+                return jsonify({
+                    "error": "Gemini API quota exceeded—please wait or upgrade your plan."
+                }), 429
+            except Exception as e:
+                logging.exception(f"Gemini failed on page {page_num+1}:")
+                return jsonify({
+                    "error": f"AI service error on page {page_num+1}: {e}"
+                }), 500
+
+            content = response.text
+
+            # Strip any ```json fences
+            cleaned = re.sub(r"^```(?:json)?\s*", "", content)
+            cleaned = re.sub(r"\s*```$", "", cleaned).strip()
+
+            try:
+                page_quiz = json.loads(cleaned)
+            except json.JSONDecodeError:
+                logging.error(f"Failed to parse JSON on page {page_num+1}: {cleaned}")
+                page_quiz = {"raw": cleaned}
+
+            quizzes.append({
+                "page": page_num + 1,
+                "quiz": page_quiz
+            })
+            print(quizzes)
+
+        return jsonify({"quizzes": quizzes}), 200
+
+    except Exception as e:
+        logging.exception("Error extracting quiz from PDF:")
+        return jsonify({"error": f"Quiz extraction failed: {e}"}), 500
+
+import fitz                              # PyMuPDF
+from flask import request, jsonify
+@app.route('/validation', methods=['POST'])
+def validation():
+    # 1) Transcript (JSON preferred)
+    data = request.get_json(silent=True) or {}
+    transcript = (data.get('transcript') or request.form.get('transcript','')).strip()
+    if not transcript:
+        return jsonify({"error": "Transcript is required"}), 400
+
+    # 2) PDF → PIL.Image pages
+    if 'quizPdf' not in request.files:
+        return jsonify({"error": "Quiz PDF is required"}), 400
+    pdf_bytes = request.files['quizPdf'].read()
+    try:
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    except Exception as e:
+        return jsonify({"error": f"Invalid PDF: {e}"}), 400
+
+    page_images = []
+    for page in doc:
+        pix = page.get_pixmap(dpi=150)
+        png = pix.tobytes(output="png")
+        pil_img = Image.open(io.BytesIO(png))
+        page_images.append(pil_img)
+
+    # 3) Build prompt
+    prompt = (
+    "You are a quiz validator, you have to check the user's quiz from the source i am providing, Respond with a JSON array of objects with keys: question, given_answer, is_correct, source. Selected answer may be right or wrong, you have to check slected answer from the source. the quiz: {page_images}, the source: {transcript}."
+)
+
+    # 4) Call Gemini
+    try:
+        response = gemini_model.generate_content([prompt] + page_images)
+        content = getattr(response, "result", None) or getattr(response, "text", "")
+        print(content)
+    except ResourceExhausted:
+        return jsonify({"error": "Quota exceeded"}), 429
+    except Exception as e:
+        logging.exception("Gemini API call failed")
+        return jsonify({"error": str(e)}), 500
+
+    # 5) Strip fences & parse JSON
+    cleaned = re.sub(r"^```(?:json)?\s*", "", content)
+    cleaned = re.sub(r"\s*```$", "", cleaned).strip()
+    try:
+        result = json.loads(cleaned)
+    except json.JSONDecodeError:
+        logging.error(f"Failed to parse JSON: {cleaned}")
+        return jsonify({"error":"Invalid JSON from AI","raw":cleaned}), 502
+
+    return jsonify({"validation": result}), 200
+
+@app.route('/validation_go')
+def validation_go():
+    return render_template(
+        'validation.html'
+    )
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
