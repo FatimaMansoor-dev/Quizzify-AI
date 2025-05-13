@@ -1178,7 +1178,7 @@ def validation():
         page_images.append(pil_img)
 
     # 3) Build prompt
-    prompt = "You are a quiz validator, you have to check the user's quiz from the source i am providing, Respond with a JSON array of objects with keys: question, given_answer, is_correct, source. Selected answer may be right or wrong, you have to check slected answer from the source. the quiz: {page_images}, the source: {transcript}."
+    prompt = f"You are a quiz validator, you have to check the user's quiz from the source i am providing, Respond with a JSON array of objects with keys: question, given_answer, is_correct, source including the exact location of answer. Selected answer may be right or wrong, you have to check slected answer from the source. the quiz: {page_images}, the source: {transcript}."
 
     # 4) Call Gemini
     try:

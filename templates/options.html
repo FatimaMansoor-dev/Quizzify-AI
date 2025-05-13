@@ -53,6 +53,21 @@
             font-weight: bold;
         }
 
+        /* Return Home button */
+        .return-btn {
+            background: #6a0dad;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .return-btn:hover {
+            background: #552682;
+        }
+
         /* Main Content */
         main {
             padding: 50px 20px;
@@ -130,34 +145,32 @@
 <body>
     <header>
         <div class="logo">QuizXpert</div>
-        <!-- <div class="user-info">
-            <div class="profile">D</div>
-        </div> -->
+        <button class="return-btn" onclick="window.location.href='/userProfile?email={{ email }}'">
+          Return Home
+        </button>
     </header>
 
     <main>
         <h1>Select a Source to Create Questions</h1>
         <div class="options">
-            <div class="option pdf">
-                <div class="header" onclick="window.location.href='/pdf?email={{ email }}'">📄 From PDF</div>
+            <div class="option pdf" onclick="window.location.href='/pdf?email={{ email }}'">
+                <div class="header">📄 From PDF</div>
                 <div class="content">Create a quiz based on your PDF</div>
             </div>
             <div class="option text" onclick="window.location.href='/topic?email={{ email }}'">
                 <div class="header">📝 From Topic</div>
                 <div class="content">Create a quiz based on your custom Topic</div>
             </div>
-            <div class="option voice">
-                <div class="header"  onclick="window.location.href='/voice?email={{ email }}'">🔗 From MP3 Recording</div>
+            <div class="option voice" onclick="window.location.href='/voice?email={{ email }}'">
+                <div class="header">🎙️ From MP3 Recording</div>
                 <div class="content">Create a quiz based on a Voice Lecture</div>
             </div>
-            
-            
-            <div class="option url">
-                <div class="header" onclick="window.location.href='/website?email={{ email }}'">🔗 From URL</div>
+            <div class="option url" onclick="window.location.href='/website?email={{ email }}'">
+                <div class="header">🔗 From URL</div>
                 <div class="content">Create a quiz based on a website URL</div>
             </div>
-            <div class="option youtube">
-                <div class="header" onclick="window.location.href='/youtube?email={{ email }}'">🎥 From YouTube</div>
+            <div class="option youtube" onclick="window.location.href='/youtube?email={{ email }}'">
+                <div class="header">🎥 From YouTube</div>
                 <div class="content">Create a quiz based on a YouTube video</div>
             </div>
         </div>
